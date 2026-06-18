@@ -1,21 +1,60 @@
-# Dependencies
-node_modules/
-frontend/node_modules/
-
-# Build
-frontend/dist/
-
 # Python
 backend/venv/
 backend/__pycache__/
+backend/app/__pycache__/
+backend/app/api/__pycache__/
+backend/app/models/__pycache__/
+backend/app/schemas/__pycache__/
+backend/app/services/__pycache__/
+backend/app/db/__pycache__/
+backend/app/core/__pycache__/
 **/__pycache__/
 *.pyc
+*.pyo
+*.pyd
+.Python
+*.egg-info/
+dist/
+build/
 
-# Environment - NEVER commit these
+# Environment files — NEVER commit these
 .env
 .env.local
+.env.production
 backend/.env
+frontend/.env
+frontend/.env.local
 
-# OS
+# Node
+frontend/node_modules/
+node_modules/
+
+# Build output
+frontend/dist/
+frontend/build/
+
+# Database
+*.db
+*.sqlite
+
+# OS files
 .DS_Store
+.DS_Store?
 Thumbs.db
+desktop.ini
+
+# IDE
+.vscode/settings.json
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+
+# Alembic — commit migrations but not this
+# (keep alembic/versions/ tracked)
