@@ -1,86 +1,102 @@
-# AEVRO — Premium Clothing Brand
+# AEVRO
 
-E-commerce platform for AEVRO wide-leg pleated trousers.
+Premium clothing brand commerce platform.
 
-## Tech Stack
-- Frontend: React + Vite + TypeScript + TailwindCSS
-- Backend: FastAPI + SQLAlchemy + PostgreSQL
+This repository is now structured for the production-grade stack:
+
+- Frontend: Next.js, TypeScript, Tailwind CSS, Vercel
+- Backend: NestJS, TypeScript, REST APIs, Render
+- Database: Neon PostgreSQL, Prisma ORM
+- Media: Cloudinary
 - Payments: Razorpay
-- Images: Cloudinary
-- Deployment: Vercel (frontend) + Railway (backend)
 
-## Prerequisites
-- Node.js v18+
-- Python 3.11+
-- PostgreSQL running locally
-- Git
+Phase 1 creates the clean project foundation only. Product APIs, Prisma,
+Cloudinary, Razorpay, auth, and admin features are intentionally not added yet.
 
-## Setup — Backend
+## Repository Structure
 
+```txt
+Aevro/
+├── docs/                 Project notes, setup, architecture, API, deployment
+├── frontend/             Next.js + TypeScript frontend
+├── backend/              NestJS + TypeScript backend
+├── legacy/               Preserved previous Vite/FastAPI prototype
+├── README.md             Root setup and project overview
+└── sampleclip.mp4
+```
+
+## Local Setup
+
+### Backend
+
+```bash
 cd backend
-python -m venv venv
-
-# Windows:
-venv\Scripts\activate
-# Mac/Linux:
-source venv/bin/activate
-
-pip install -r requirements.txt
-
-# Setup environment
+npm install
 cp .env.example .env
-# Edit .env with your values
+npm run start:dev
+```
 
-# Create database
-psql -U postgres -c "CREATE DATABASE aevro;"
+Backend:
 
-# Run migrations
-alembic upgrade head
+```txt
+http://localhost:8000/api/v1/health
+```
 
-# Seed products
-python seed.py
+### Frontend
 
-# Start server
-uvicorn app.main:app --reload --port 8000
-
-API running at: http://localhost:8000
-Docs at: http://localhost:8000/docs
-
-## Setup — Frontend
-
+```bash
 cd frontend
 npm install
-
-# Setup environment  
-cp .env.example .env
-# Edit .env with your values
-
+cp .env.example .env.local
 npm run dev
+```
 
-Site running at: http://localhost:5173
+Frontend:
 
-## Project Structure
-AEVRO/
-├── frontend/          React + Vite app
-├── backend/           FastAPI app
-│   ├── app/
-│   │   ├── api/       Route handlers
-│   │   ├── models/    Database models
-│   │   ├── schemas/   Pydantic schemas
-│   │   ├── services/  Business logic
-│   │   ├── db/        Database connection
-│   │   └── core/      Config & settings
-│   ├── alembic/       Migrations
-│   └── seed.py        Sample data
-└── README.md
+```txt
+http://localhost:3000
+```
 
-## Environment Variables
-See backend/.env.example and frontend/.env.example
+## Environment Files
 
-## API Endpoints
-GET  /products              List all products
-GET  /products/{slug}       Single product
-POST /orders                Create order
-POST /payments/create-order Razorpay order
-POST /payments/verify       Verify payment
-GET  /health                Health check
+```txt
+backend/.env.example
+frontend/.env.example
+```
+
+Never commit real `.env` files or secret keys.
+
+## Legacy Prototype
+
+The previous prototype is preserved for reference:
+
+```txt
+legacy/frontend-vite
+legacy/backend-fastapi
+```
+
+## Documentation
+
+Start here:
+
+- [Architecture](docs/architecture.md)
+- [Setup](docs/setup.md)
+- [API Notes](docs/api.md)
+- [Deployment](docs/deployment.md)
+
+## Phase 1 Status
+
+Done:
+
+- Created clean `frontend/` Next.js skeleton.
+- Created clean `backend/` NestJS skeleton.
+- Preserved previous implementation under `legacy/`.
+- Added project docs.
+
+Not added yet:
+
+- Prisma and Neon database setup
+- Cloudinary uploads
+- Razorpay payments
+- Auth
+- Product/order/cart business logic
