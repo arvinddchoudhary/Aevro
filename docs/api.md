@@ -7,9 +7,110 @@ The NestJS backend currently exposes health routes:
 ```txt
 GET /api/v1/health
 GET /api/v1/health/database
+GET /api/v1/categories
+GET /api/v1/products
+GET /api/v1/products/:identifier
 ```
 
 `GET /api/v1/health/database` verifies Prisma can connect to PostgreSQL.
+
+## Public Category Endpoints
+
+### List Categories
+
+```txt
+GET /api/v1/categories
+```
+
+Query parameters:
+
+```txt
+includeEmpty=true|false
+```
+
+By default this returns categories that have at least one active product.
+
+Example:
+
+```bash
+curl "http://localhost:8000/api/v1/categories"
+```
+
+Response shape:
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "id": "category_id",
+      "name": "Trousers",
+      "slug": "trousers",
+      "description": "Premium wide-leg and tailored trousers.",
+      "activeProductCount": 2
+    }
+  ]
+}
+```
+
+## Public Product Endpoints
+
+### List Products
+
+```txt
+GET /api/v1/products
+```
+
+Query parameters:
+
+```txt
+page=1
+limit=12
+category=trousers
+search=pleated
+status=ACTIVE
+minPrice=100000
+maxPrice=250000
+sort=newest|price_asc|price_desc
+```
+
+Example:
+
+```bash
+curl "http://localhost:8000/api/v1/products?page=1&limit=12&category=trousers&sort=newest"
+```
+
+Response shape:
+
+```json
+{
+  "success": true,
+  "data": [],
+  "meta": {
+    "page": 1,
+    "limit": 12,
+    "total": 0,
+    "totalPages": 0,
+    "hasNextPage": false,
+    "hasPreviousPage": false
+  }
+}
+```
+
+### Product Details
+
+```txt
+GET /api/v1/products/:identifier
+```
+
+`:identifier` can be a product `slug` or product `id`. This endpoint only
+returns active public products.
+
+Example:
+
+```bash
+curl "http://localhost:8000/api/v1/products/wide-leg-pleated-trouser-black"
+```
 
 Errors use a consistent shape:
 
