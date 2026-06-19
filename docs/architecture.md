@@ -6,10 +6,10 @@ The repository currently contains the production stack foundation:
 
 - `frontend/`: Next.js + TypeScript + Tailwind CSS skeleton
 - `backend/`: NestJS + TypeScript REST API skeleton
-- `legacy/`: preserved previous Vite/FastAPI prototype
+- `docs/`: Architecture, API, setup, and deployment notes
 
-Phase 1 intentionally contains only basic setup. No product, payment, upload,
-database, or auth logic is implemented yet.
+Phase 2 adds the Prisma + Neon PostgreSQL foundation. Product, payment, upload,
+and auth business logic is not implemented yet.
 
 The backend foundation now includes:
 
@@ -18,6 +18,8 @@ The backend foundation now includes:
 - Consistent HTTP error filter
 - URI API versioning under `/api/v1`
 - CORS driven by environment variables
+- Prisma Client foundation
+- Database health check route
 
 ## Target State
 
@@ -27,9 +29,30 @@ The production architecture is:
 Aevro/
 ├── frontend/     Next.js + TypeScript storefront and future admin UI
 ├── backend/      NestJS + TypeScript REST API
-├── legacy/       Previous prototype kept for reference
 └── docs/         Architecture, API, setup, and deployment notes
 ```
+
+## Database Foundation
+
+Prisma is configured inside `backend/prisma/schema.prisma` using PostgreSQL and
+`DATABASE_URL` from `backend/prisma.config.ts`. The initial schema includes:
+
+- `User`
+- `Category`
+- `Product`
+- `ProductImage`
+- `CartItem`
+- `Order`
+- `OrderItem`
+- `Payment`
+
+Initial enums:
+
+- `UserRole`
+- `ProductStatus`
+- `OrderStatus`
+- `PaymentStatus`
+- `PaymentProvider`
 
 ## Design Principles
 
