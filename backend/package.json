@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "build": "tsc -p tsconfig.build.json",
+    "db:seed": "tsx prisma/seed.ts",
     "prisma:deploy": "prisma migrate deploy",
     "prisma:dev": "prisma migrate dev",
     "prisma:format": "prisma format",

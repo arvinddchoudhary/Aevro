@@ -77,6 +77,7 @@ cd backend
 npm run prisma:generate
 npm run prisma:validate
 npm run prisma:dev -- --name init
+npm run db:seed
 ```
 
 This repository also includes an initial generated migration at:
