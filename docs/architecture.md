@@ -11,6 +11,14 @@ The repository currently contains the production stack foundation:
 Phase 1 intentionally contains only basic setup. No product, payment, upload,
 database, or auth logic is implemented yet.
 
+The backend foundation now includes:
+
+- Environment validation
+- Global request validation pipe
+- Consistent HTTP error filter
+- URI API versioning under `/api/v1`
+- CORS driven by environment variables
+
 ## Target State
 
 The production architecture is:

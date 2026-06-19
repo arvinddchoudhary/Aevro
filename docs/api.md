@@ -8,6 +8,19 @@ The NestJS backend currently exposes only a health route:
 GET /api/v1/health
 ```
 
+Errors use a consistent shape:
+
+```json
+{
+  "success": false,
+  "statusCode": 400,
+  "message": "Validation failed",
+  "error": "Bad Request",
+  "path": "/api/v1/example",
+  "timestamp": "2026-06-19T00:00:00.000Z"
+}
+```
+
 ## Planned API Direction
 
 Future API routes should remain versioned:

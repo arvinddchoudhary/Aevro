@@ -54,6 +54,7 @@ Backend:
 NODE_ENV=development
 PORT=8000
 FRONTEND_URL=http://localhost:3000
+CORS_ORIGINS=http://localhost:3000
 ```
 
 Frontend:
