@@ -2,11 +2,14 @@
 
 ## Current Phase 1 API
 
-The NestJS backend currently exposes only a health route:
+The NestJS backend currently exposes health routes:
 
 ```txt
 GET /api/v1/health
+GET /api/v1/health/database
 ```
+
+`GET /api/v1/health/database` verifies Prisma can connect to PostgreSQL.
 
 Errors use a consistent shape:
 

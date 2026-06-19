@@ -49,6 +49,19 @@ npm run typecheck
 npm run build
 ```
 
+Prisma checks:
+
+```bash
+npm run prisma:generate
+npm run prisma:validate
+```
+
+After setting a real Neon `DATABASE_URL`, run migrations:
+
+```bash
+npm run prisma:dev -- --name init
+```
+
 ### Frontend
 
 ```bash
