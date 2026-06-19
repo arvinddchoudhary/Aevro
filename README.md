@@ -77,6 +77,13 @@ Frontend:
 http://localhost:3000
 ```
 
+Product browsing pages:
+
+```txt
+http://localhost:3000/products
+http://localhost:3000/products/:identifier
+```
+
 ## Environment Files
 
 ```txt
