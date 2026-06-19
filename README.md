@@ -42,6 +42,13 @@ Backend:
 http://localhost:8000/api/v1/health
 ```
 
+Backend validation/build checks:
+
+```bash
+npm run typecheck
+npm run build
+```
+
 ### Frontend
 
 ```bash
