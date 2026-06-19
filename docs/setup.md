@@ -53,6 +53,17 @@ Verify:
 http://localhost:3000
 ```
 
+Frontend product browsing pages:
+
+```txt
+http://localhost:3000
+http://localhost:3000/products
+http://localhost:3000/products/wide-leg-pleated-trouser-black
+```
+
+These pages read from `NEXT_PUBLIC_API_URL`, which should point to the backend
+API root, for example `http://localhost:8000/api/v1`.
+
 ## Environment Variables
 
 Backend:
