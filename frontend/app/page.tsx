@@ -35,14 +35,14 @@ export default async function HomePage() {
         <div className="mt-10 flex flex-col gap-3 sm:flex-row">
           <Link
             href="/products"
-            className="inline-flex h-12 items-center justify-center bg-[#111111] px-7 text-xs uppercase tracking-[0.18em] text-white"
+            className="inline-flex h-12 min-w-40 items-center justify-center border border-[#111111] bg-white px-7 text-sm font-medium uppercase tracking-[0.08em] text-[#111111] hover:bg-[#111111] hover:text-white"
           >
             Shop products
           </Link>
           {categories[0] && (
             <Link
               href={`/products?category=${categories[0].slug}`}
-              className="inline-flex h-12 items-center justify-center border border-[#d9d9d9] px-7 text-xs uppercase tracking-[0.18em]"
+              className="inline-flex h-12 min-w-32 items-center justify-center border border-[#d9d9d9] px-7 text-sm font-medium uppercase tracking-[0.08em]"
             >
               {categories[0].name}
             </Link>

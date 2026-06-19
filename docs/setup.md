@@ -73,14 +73,17 @@ NODE_ENV=development
 PORT=8000
 FRONTEND_URL=http://localhost:3000
 CORS_ORIGINS=http://localhost:3000
-DATABASE_URL=postgresql://USER:PASSWORD@HOST/aevro?sslmode=require
+DATABASE_URL=postgresql://USER:PASSWORD@HOST/aevro?sslmode=require&connect_timeout=10
+DIRECT_URL=postgresql://USER:PASSWORD@DIRECT_HOST/aevro?sslmode=require&connect_timeout=10
 ```
 
 ## Neon + Prisma Setup
 
 1. Create a Neon project and PostgreSQL database.
-2. Copy the Neon PostgreSQL connection string.
-3. Add it to `backend/.env` as `DATABASE_URL`.
+2. Copy both Neon connection strings:
+   - pooled URL for `DATABASE_URL`
+   - direct/unpooled URL for `DIRECT_URL`
+3. Add both values to `backend/.env`.
 4. Run Prisma commands from the backend folder:
 
 ```bash

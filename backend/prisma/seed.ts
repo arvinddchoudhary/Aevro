@@ -38,7 +38,7 @@ async function main() {
         'A high-rise double-pleated wide-leg trouser in premium drape fabric.',
       images: [
         {
-          url: 'https://res.cloudinary.com/demo/image/upload/v1/aevro/placeholder-black-1.jpg',
+          url: '/images/products/product-1.jpg',
           altText: 'AEVRO black wide-leg pleated trouser',
           sortOrder: 0,
         },
@@ -56,8 +56,26 @@ async function main() {
         'A relaxed wide-leg trouser with a clean tailored drape and minimal branding.',
       images: [
         {
-          url: 'https://res.cloudinary.com/demo/image/upload/v1/aevro/placeholder-charcoal-1.jpg',
+          url: '/images/products/product-2.jpg',
           altText: 'AEVRO charcoal wide-leg pleated trouser',
+          sortOrder: 0,
+        },
+      ],
+    },
+    {
+      name: 'Wide-Leg Essential Trouser - Onyx',
+      slug: 'wide-leg-essential-trouser-onyx',
+      sku: 'AEVRO-WLET-ONX',
+      color: 'Onyx',
+      size: '34',
+      stock: 10,
+      priceInPaise: 209900,
+      description:
+        'A clean wide-leg trouser with an easy fall, soft waistband, and refined everyday silhouette.',
+      images: [
+        {
+          url: '/images/products/product-2.jpg',
+          altText: 'AEVRO onyx wide-leg essential trouser',
           sortOrder: 0,
         },
       ],

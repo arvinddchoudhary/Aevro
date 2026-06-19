@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { Prisma, ProductStatus } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import {
@@ -8,14 +8,14 @@ import {
 
 @Injectable()
 export class ProductsService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(@Inject(PrismaService) private readonly prisma: PrismaService) {}
 
   async listProducts(query: ListProductsQueryDto) {
-    const page = query.page;
-    const limit = query.limit;
+    const page = Number(query.page ?? 1);
+    const limit = Number(query.limit ?? 12);
     const skip = (page - 1) * limit;
     const where = this.buildProductWhere(query);
-    const orderBy = this.buildProductOrderBy(query.sort);
+    const orderBy = this.buildProductOrderBy(query.sort ?? ProductSort.Newest);
 
     const [products, total] = await this.prisma.$transaction([
       this.prisma.product.findMany({
@@ -61,7 +61,7 @@ export class ProductsService {
   private buildProductWhere(query: ListProductsQueryDto): Prisma.ProductWhereInput {
     const and: Prisma.ProductWhereInput[] = [
       {
-        status: query.status,
+        status: query.status ?? ProductStatus.ACTIVE,
       },
     ];
 
@@ -98,11 +98,16 @@ export class ProductsService {
       });
     }
 
-    if (query.minPrice !== undefined || query.maxPrice !== undefined) {
+    const minPrice =
+      query.minPrice === undefined ? undefined : Number(query.minPrice);
+    const maxPrice =
+      query.maxPrice === undefined ? undefined : Number(query.maxPrice);
+
+    if (minPrice !== undefined || maxPrice !== undefined) {
       and.push({
         priceInPaise: {
-          gte: query.minPrice,
-          lte: query.maxPrice,
+          gte: minPrice,
+          lte: maxPrice,
         },
       });
     }
