@@ -75,6 +75,9 @@ http://localhost:3000/admin/products/new
 These pages read from `NEXT_PUBLIC_API_URL`, which should point to the backend
 API root, for example `http://localhost:8000/api/v1`.
 
+Product detail pages support customer variant selection. Customers choose color
+and size before adding a product to the local cart.
+
 The cart foundation is frontend-only in Phase 6 and uses browser
 `localStorage`. No backend cart API is required yet.
 

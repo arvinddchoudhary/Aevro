@@ -286,7 +286,7 @@ export function CheckoutPageContent() {
         <div className="mt-6 space-y-5">
           {items.map((item) => (
             <div
-              key={item.productId}
+              key={item.itemKey}
               className="flex gap-4 border-b border-[#eeeeee] pb-5 last:border-b-0"
             >
               <div className="h-24 w-18 shrink-0 overflow-hidden bg-[#f5f5f5]">
@@ -307,6 +307,11 @@ export function CheckoutPageContent() {
                 <p className="mt-1 text-xs uppercase tracking-[0.14em] text-[#777777]">
                   Qty {item.quantity}
                 </p>
+                {(item.selectedColor || item.selectedSize) && (
+                  <p className="mt-2 text-xs leading-5 text-[#555555]">
+                    {[item.selectedColor, item.selectedSize].filter(Boolean).join(' / ')}
+                  </p>
+                )}
                 <p className="mt-2 text-sm">
                   {formatPrice(item.priceInPaise * item.quantity)}
                 </p>

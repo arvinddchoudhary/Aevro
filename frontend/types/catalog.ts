@@ -26,8 +26,21 @@ export type ProductVariant = {
   colorHex: string | null;
   size: string;
   stock: number;
-  sku: string | null;
+  sku?: string | null;
   images: ProductImage[];
+};
+
+export type ProductColorOption = {
+  colorName: string;
+  colorSlug: string;
+  colorHex: string | null;
+  totalStock: number;
+};
+
+export type ProductSizeOption = {
+  variantId: string;
+  size: string;
+  stock: number;
 };
 
 export type Product = {
@@ -43,6 +56,10 @@ export type Product = {
   status: ProductStatus;
   category: Pick<Category, 'id' | 'name' | 'slug'> | null;
   images: ProductImage[];
+  primaryImage?: ProductImage | null;
+  availableColors?: ProductColorOption[];
+  sizesByColor?: Record<string, ProductSizeOption[]>;
+  imagesByColor?: Record<string, ProductImage[]>;
   variants?: ProductVariant[];
   createdAt: string;
   updatedAt: string;

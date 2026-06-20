@@ -35,6 +35,14 @@ export class OrdersService {
         color: true,
         size: true,
         stock: true,
+        variants: {
+          select: {
+            id: true,
+            colorName: true,
+            size: true,
+            stock: true,
+          },
+        },
       },
     });
 
@@ -50,7 +58,16 @@ export class OrdersService {
         throw new BadRequestException('One or more products are unavailable.');
       }
 
-      if (product.stock < item.quantity) {
+      const variant = item.variantId
+        ? product.variants.find((productVariant) => productVariant.id === item.variantId)
+        : null;
+      const stock = variant?.stock ?? product.stock;
+
+      if (item.variantId && !variant) {
+        throw new BadRequestException(`${product.name} variant is unavailable.`);
+      }
+
+      if (stock < item.quantity) {
         throw new BadRequestException(`${product.name} does not have enough stock.`);
       }
 
@@ -61,8 +78,8 @@ export class OrdersService {
         quantity: item.quantity,
         unitPriceInPaise: product.priceInPaise,
         lineTotalInPaise: product.priceInPaise * item.quantity,
-        selectedColor: product.color,
-        selectedSize: product.size,
+        selectedColor: variant?.colorName ?? product.color,
+        selectedSize: variant?.size ?? product.size,
       };
     });
     const totalInPaise = orderItems.reduce(
@@ -141,19 +158,27 @@ export class OrdersService {
   }
 
   private mergeDuplicateItems(createOrderDto: CreateOrderDto) {
-    const quantityByProductId = new Map<string, number>();
+    const quantityByItemKey = new Map<
+      string,
+      {
+        productId: string;
+        variantId?: string;
+        quantity: number;
+      }
+    >();
 
     createOrderDto.items.forEach((item) => {
-      quantityByProductId.set(
-        item.productId,
-        (quantityByProductId.get(item.productId) ?? 0) + item.quantity,
-      );
+      const itemKey = `${item.productId}:${item.variantId ?? 'default'}`;
+      const existingItem = quantityByItemKey.get(itemKey);
+
+      quantityByItemKey.set(itemKey, {
+        productId: item.productId,
+        variantId: item.variantId,
+        quantity: (existingItem?.quantity ?? 0) + item.quantity,
+      });
     });
 
-    return Array.from(quantityByProductId.entries()).map(([productId, quantity]) => ({
-      productId,
-      quantity,
-    }));
+    return Array.from(quantityByItemKey.values());
   }
 
   private createOrderNumber() {

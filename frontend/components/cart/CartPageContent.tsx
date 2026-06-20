@@ -23,7 +23,7 @@ export function CartPageContent() {
       <section className="space-y-6">
         {items.map((item) => (
           <article
-            key={item.productId}
+            key={item.itemKey}
             className="grid gap-5 border-b border-[#e5e5e5] pb-6 sm:grid-cols-[140px_1fr]"
           >
             <Link
@@ -57,9 +57,15 @@ export function CartPageContent() {
                 <p className="mt-2 text-sm text-[#555555]">
                   {formatPrice(item.priceInPaise)}
                 </p>
+                {(item.selectedColor || item.selectedSize) && (
+                  <div className="mt-3 space-y-1 text-sm text-[#555555]">
+                    {item.selectedColor && <p>Colour: {item.selectedColor}</p>}
+                    {item.selectedSize && <p>Size: {item.selectedSize}</p>}
+                  </div>
+                )}
                 <div className="mt-5">
                   <CartQuantityControls
-                    productId={item.productId}
+                    itemKey={item.itemKey}
                     quantity={item.quantity}
                     stock={item.stock}
                   />

@@ -13,9 +13,13 @@ import type { Product } from '../types/catalog';
 const CART_STORAGE_KEY = 'aevro.cart.v1';
 
 export type CartItem = {
+  itemKey: string;
   productId: string;
+  variantId?: string;
   slug: string;
   name: string;
+  selectedColor?: string;
+  selectedSize?: string;
   priceInPaise: number;
   imageUrl?: string;
   imageAltText?: string | null;
@@ -24,14 +28,27 @@ export type CartItem = {
   quantity: number;
 };
 
+export type AddToCartSelection = {
+  variantId?: string;
+  selectedColor?: string;
+  selectedSize?: string;
+  stock?: number;
+  imageUrl?: string;
+  imageAltText?: string | null;
+};
+
 type CartContextValue = {
   items: CartItem[];
   itemCount: number;
   subtotalInPaise: number;
-  addProduct: (product: Product, quantity?: number) => boolean;
-  incrementItem: (productId: string) => void;
-  decrementItem: (productId: string) => void;
-  removeItem: (productId: string) => void;
+  addProduct: (
+    product: Product,
+    selection?: AddToCartSelection,
+    quantity?: number,
+  ) => boolean;
+  incrementItem: (itemKey: string) => void;
+  decrementItem: (itemKey: string) => void;
+  removeItem: (itemKey: string) => void;
   clearCart: () => void;
 };
 
@@ -59,7 +76,12 @@ function readStoredCart() {
       return [];
     }
 
-    return parsed.filter((item) => item.productId && item.quantity > 0);
+    return parsed
+      .filter((item) => item.productId && item.quantity > 0)
+      .map((item) => ({
+        ...item,
+        itemKey: item.itemKey ?? item.productId,
+      }));
   } catch {
     return [];
   }
@@ -81,43 +103,54 @@ export function CartProvider({ children }: { children: ReactNode }) {
   }, [hasLoaded, items]);
 
   const value = useMemo<CartContextValue>(() => {
-    const addProduct = (product: Product, quantity = 1) => {
-      if (product.status !== 'ACTIVE' || product.stock <= 0) {
+    const addProduct = (
+      product: Product,
+      selection: AddToCartSelection = {},
+      quantity = 1,
+    ) => {
+      const stock = selection.stock ?? product.stock;
+      const itemKey = `${product.id}:${selection.variantId ?? 'default'}`;
+
+      if (product.status !== 'ACTIVE' || stock <= 0) {
         return false;
       }
 
       setItems((currentItems) => {
-        const existingItem = currentItems.find((item) => item.productId === product.id);
-        const requestedQuantity = normalizeQuantity(quantity, product.stock);
+        const existingItem = currentItems.find((item) => item.itemKey === itemKey);
+        const requestedQuantity = normalizeQuantity(quantity, stock);
 
         if (existingItem) {
           return currentItems.map((item) =>
-            item.productId === product.id
+            item.itemKey === itemKey
               ? {
                   ...item,
-                  stock: product.stock,
+                  stock,
                   quantity: normalizeQuantity(
                     item.quantity + requestedQuantity,
-                    product.stock,
+                    stock,
                   ),
                 }
               : item,
           );
         }
 
-        const primaryImage = product.images[0];
+        const primaryImage = product.primaryImage ?? product.images[0];
 
         return [
           ...currentItems,
           {
+            itemKey,
             productId: product.id,
+            variantId: selection.variantId,
             slug: product.slug,
             name: product.name,
+            selectedColor: selection.selectedColor,
+            selectedSize: selection.selectedSize,
             priceInPaise: product.priceInPaise,
-            imageUrl: primaryImage?.url,
-            imageAltText: primaryImage?.altText,
+            imageUrl: selection.imageUrl ?? primaryImage?.url,
+            imageAltText: selection.imageAltText ?? primaryImage?.altText,
             categoryName: product.category?.name,
-            stock: product.stock,
+            stock,
             quantity: requestedQuantity,
           },
         ];
@@ -126,10 +159,10 @@ export function CartProvider({ children }: { children: ReactNode }) {
       return true;
     };
 
-    const incrementItem = (productId: string) => {
+    const incrementItem = (itemKey: string) => {
       setItems((currentItems) =>
         currentItems.map((item) =>
-          item.productId === productId
+          item.itemKey === itemKey
             ? {
                 ...item,
                 quantity: normalizeQuantity(item.quantity + 1, item.stock),
@@ -139,11 +172,11 @@ export function CartProvider({ children }: { children: ReactNode }) {
       );
     };
 
-    const decrementItem = (productId: string) => {
+    const decrementItem = (itemKey: string) => {
       setItems((currentItems) =>
         currentItems
           .map((item) =>
-            item.productId === productId
+            item.itemKey === itemKey
               ? {
                   ...item,
                   quantity: item.quantity - 1,
@@ -154,9 +187,9 @@ export function CartProvider({ children }: { children: ReactNode }) {
       );
     };
 
-    const removeItem = (productId: string) => {
+    const removeItem = (itemKey: string) => {
       setItems((currentItems) =>
-        currentItems.filter((item) => item.productId !== productId),
+        currentItems.filter((item) => item.itemKey !== itemKey),
       );
     };
 

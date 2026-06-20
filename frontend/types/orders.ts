@@ -13,6 +13,7 @@ export type CreateOrderPayload = {
   };
   items: Array<{
     productId: string;
+    variantId?: string;
     quantity: number;
   }>;
 };
