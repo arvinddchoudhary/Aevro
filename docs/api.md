@@ -2,7 +2,7 @@
 
 ## Current Phase 1 API
 
-The NestJS backend currently exposes health routes:
+The NestJS backend currently exposes these public Phase 5 routes:
 
 ```txt
 GET /api/v1/health
@@ -74,6 +74,8 @@ maxPrice=250000
 sort=newest|price_asc|price_desc
 ```
 
+Price filters use integer paise, matching the backend money model.
+
 Example:
 
 ```bash
@@ -85,12 +87,40 @@ Response shape:
 ```json
 {
   "success": true,
-  "data": [],
+  "data": [
+    {
+      "id": "product_id",
+      "name": "Wide-Leg Pleated Trouser - Black",
+      "slug": "wide-leg-pleated-trouser-black",
+      "description": "A high-rise double-pleated wide-leg trouser.",
+      "priceInPaise": 189900,
+      "sku": "AEVRO-WLPT-BLK",
+      "color": "Black",
+      "size": "30",
+      "stock": 12,
+      "status": "ACTIVE",
+      "category": {
+        "id": "category_id",
+        "name": "Trousers",
+        "slug": "trousers"
+      },
+      "images": [
+        {
+          "id": "image_id",
+          "url": "https://example.com/product.jpg",
+          "altText": "AEVRO black wide-leg pleated trouser",
+          "sortOrder": 0
+        }
+      ],
+      "createdAt": "2026-06-19T00:00:00.000Z",
+      "updatedAt": "2026-06-19T00:00:00.000Z"
+    }
+  ],
   "meta": {
     "page": 1,
     "limit": 12,
-    "total": 0,
-    "totalPages": 0,
+    "total": 1,
+    "totalPages": 1,
     "hasNextPage": false,
     "hasPreviousPage": false
   }

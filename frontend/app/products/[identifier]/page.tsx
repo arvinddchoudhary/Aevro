@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
+import { ProductImageFrame } from '../../../components/products/ProductImageFrame';
 import { ErrorState } from '../../../components/ui/ErrorState';
 import { getProduct } from '../../../lib/api/catalog';
 import { formatPrice } from '../../../lib/format';
@@ -31,7 +32,7 @@ export default async function ProductDetailsPage({
 
   const product = result.data;
   const primaryImage = product.images[0];
-  const productDetails = [
+  const productFacts = [
     ['Colour', product.color ?? 'Not specified'],
     ['Size', product.size ?? 'Not specified'],
     ['Stock', product.stock > 0 ? 'Available' : 'Out of stock'],
@@ -52,35 +53,21 @@ export default async function ProductDetailsPage({
 
         <div className="grid gap-10 lg:grid-cols-[minmax(0,1.08fr)_minmax(380px,0.92fr)] lg:gap-14">
           <section>
-            <div className="aspect-[4/5] w-full overflow-hidden bg-[#f4f4f4]">
-              {primaryImage ? (
-                <img
-                  src={primaryImage.url}
-                  alt={primaryImage.altText ?? product.name}
-                  className="h-full w-full object-cover"
-                />
-              ) : (
-                <div className="flex h-full items-center justify-center text-xs uppercase tracking-[0.2em] text-[#999999]">
-                  Product image
-                </div>
-              )}
-            </div>
+            <ProductImageFrame
+              image={primaryImage}
+              productName={product.name}
+              className="aspect-[4/5] w-full"
+            />
 
             <div className="mt-4 grid grid-cols-3 gap-4">
-              {(product.images.length > 0 ? product.images : [primaryImage]).map(
+              {(product.images.length > 0 ? product.images : [undefined]).map(
                 (image, index) => (
-                  <div
+                  <ProductImageFrame
                     key={image?.id ?? index}
-                    className="aspect-square overflow-hidden border border-[#eeeeee] bg-[#f7f7f7]"
-                  >
-                    {image ? (
-                      <img
-                        src={image.url}
-                        alt={image.altText ?? product.name}
-                        className="h-full w-full object-cover"
-                      />
-                    ) : null}
-                  </div>
+                    image={image}
+                    productName={product.name}
+                    className="aspect-square border border-[#eeeeee]"
+                  />
                 ),
               )}
             </div>
@@ -102,7 +89,7 @@ export default async function ProductDetailsPage({
             )}
 
             <div className="mt-10 border-y border-[#e5e5e5]">
-              {productDetails.map(([label, value]) => (
+              {productFacts.map(([label, value]) => (
                 <div
                   key={label}
                   className="grid grid-cols-[120px_1fr] border-b border-[#eeeeee] py-4 text-sm last:border-b-0"
@@ -124,7 +111,7 @@ export default async function ProductDetailsPage({
                 <p className="text-xs uppercase tracking-[0.18em] text-[#777777]">
                   Fabric
                 </p>
-                <p className="mt-2 text-sm leading-6">Soft premium trouser weight</p>
+                <p className="mt-2 text-sm leading-6">Premium everyday weight</p>
               </div>
             </div>
 
@@ -138,7 +125,7 @@ export default async function ProductDetailsPage({
               {product.category && (
                 <Link
                   href={`/products?category=${product.category.slug}`}
-                  className="inline-flex h-12 min-w-40 items-center justify-center border border-[#d9d9d9] px-7 text-sm font-medium uppercase tracking-[0.08em]"
+                  className="inline-flex h-12 min-w-40 items-center justify-center border border-[#d9d9d9] px-7 text-sm font-medium uppercase tracking-[0.08em] hover:border-[#111111]"
                 >
                   More {product.category.name}
                 </Link>
