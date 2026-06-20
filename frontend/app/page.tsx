@@ -42,7 +42,7 @@ export default async function HomePage() {
           {categories[0] && (
             <Link
               href={`/products?category=${categories[0].slug}`}
-              className="inline-flex h-12 min-w-32 items-center justify-center border border-[#d9d9d9] px-7 text-sm font-medium uppercase tracking-[0.08em]"
+              className="inline-flex h-12 min-w-32 items-center justify-center border border-[#d9d9d9] bg-white px-7 text-sm font-medium uppercase tracking-[0.08em] text-[#111111] hover:border-[#111111]"
             >
               {categories[0].name}
             </Link>
