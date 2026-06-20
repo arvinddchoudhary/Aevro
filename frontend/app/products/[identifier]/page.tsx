@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
+import { ProductImageFrame } from '../../../components/products/ProductImageFrame';
 import { ErrorState } from '../../../components/ui/ErrorState';
 import { getProduct } from '../../../lib/api/catalog';
 import { formatPrice } from '../../../lib/format';
@@ -31,57 +32,108 @@ export default async function ProductDetailsPage({
 
   const product = result.data;
   const primaryImage = product.images[0];
+  const productFacts = [
+    ['Colour', product.color ?? 'Not specified'],
+    ['Size', product.size ?? 'Not specified'],
+    ['Stock', product.stock > 0 ? 'Available' : 'Out of stock'],
+    ['SKU', product.sku ?? 'AEVRO'],
+  ];
 
   return (
-    <main className="mx-auto grid min-h-screen max-w-6xl gap-10 px-5 py-12 sm:px-8 lg:grid-cols-2">
-      <section>
-        <div className="aspect-[3/4] w-full bg-[#f4f4f4]">
-          {primaryImage ? (
-            <img
-              src={primaryImage.url}
-              alt={primaryImage.altText ?? product.name}
-              className="h-full w-full object-cover"
+    <main className="min-h-screen bg-white text-[#111111]">
+      <div className="mx-auto max-w-7xl px-5 py-8 sm:px-8 lg:py-12">
+        <div className="mb-8 flex items-center justify-between border-b border-[#e5e5e5] pb-5 text-sm">
+          <Link href="/products" className="underline-offset-4 hover:underline">
+            Back to products
+          </Link>
+          <span className="text-xs uppercase tracking-[0.22em] text-[#777777]">
+            {product.status}
+          </span>
+        </div>
+
+        <div className="grid gap-10 lg:grid-cols-[minmax(0,1.08fr)_minmax(380px,0.92fr)] lg:gap-14">
+          <section>
+            <ProductImageFrame
+              image={primaryImage}
+              productName={product.name}
+              className="aspect-[4/5] w-full"
             />
-          ) : (
-            <div className="flex h-full items-center justify-center text-xs uppercase tracking-[0.2em] text-[#999999]">
-              Product image
+
+            <div className="mt-4 grid grid-cols-3 gap-4">
+              {(product.images.length > 0 ? product.images : [undefined]).map(
+                (image, index) => (
+                  <ProductImageFrame
+                    key={image?.id ?? index}
+                    image={image}
+                    productName={product.name}
+                    className="aspect-square border border-[#eeeeee]"
+                  />
+                ),
+              )}
             </div>
-          )}
-        </div>
-      </section>
+          </section>
 
-      <section className="lg:py-8">
-        <Link href="/products" className="mb-8 inline-block text-sm underline underline-offset-4">
-          Back to products
-        </Link>
-        <p className="mb-3 text-xs uppercase tracking-[0.22em] text-[#777777]">
-          {product.category?.name ?? 'AEVRO'}
-        </p>
-        <h1 className="text-4xl font-light leading-tight md:text-5xl">{product.name}</h1>
-        <p className="mt-5 text-2xl">{formatPrice(product.priceInPaise)}</p>
-        {product.description && (
-          <p className="mt-8 max-w-xl leading-7 text-[#555555]">{product.description}</p>
-        )}
+          <section className="lg:sticky lg:top-24 lg:self-start">
+            <p className="mb-4 text-xs uppercase tracking-[0.24em] text-[#777777]">
+              {product.category?.name ?? 'AEVRO'}
+            </p>
+            <h1 className="max-w-2xl text-4xl font-light leading-[1.08] md:text-6xl">
+              {product.name}
+            </h1>
+            <p className="mt-6 text-2xl">{formatPrice(product.priceInPaise)}</p>
 
-        <div className="mt-10 grid gap-4 border-y border-[#e5e5e5] py-6 text-sm sm:grid-cols-2">
-          <div>
-            <p className="text-[#777777]">Colour</p>
-            <p className="mt-1">{product.color ?? 'Not specified'}</p>
-          </div>
-          <div>
-            <p className="text-[#777777]">Size</p>
-            <p className="mt-1">{product.size ?? 'Not specified'}</p>
-          </div>
-          <div>
-            <p className="text-[#777777]">Stock</p>
-            <p className="mt-1">{product.stock > 0 ? 'Available' : 'Out of stock'}</p>
-          </div>
-          <div>
-            <p className="text-[#777777]">Status</p>
-            <p className="mt-1">{product.status}</p>
-          </div>
+            {product.description && (
+              <p className="mt-8 max-w-xl text-base leading-8 text-[#555555]">
+                {product.description}
+              </p>
+            )}
+
+            <div className="mt-10 border-y border-[#e5e5e5]">
+              {productFacts.map(([label, value]) => (
+                <div
+                  key={label}
+                  className="grid grid-cols-[120px_1fr] border-b border-[#eeeeee] py-4 text-sm last:border-b-0"
+                >
+                  <span className="text-[#777777]">{label}</span>
+                  <span>{value}</span>
+                </div>
+              ))}
+            </div>
+
+            <div className="mt-8 grid gap-3 sm:grid-cols-2">
+              <div className="border border-[#e5e5e5] px-5 py-4">
+                <p className="text-xs uppercase tracking-[0.18em] text-[#777777]">
+                  Fit
+                </p>
+                <p className="mt-2 text-sm leading-6">Wide leg, relaxed drape</p>
+              </div>
+              <div className="border border-[#e5e5e5] px-5 py-4">
+                <p className="text-xs uppercase tracking-[0.18em] text-[#777777]">
+                  Fabric
+                </p>
+                <p className="mt-2 text-sm leading-6">Premium everyday weight</p>
+              </div>
+            </div>
+
+            <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+              <Link
+                href="/products"
+                className="inline-flex h-12 min-w-40 items-center justify-center border border-[#111111] bg-white px-7 text-sm font-medium uppercase tracking-[0.08em] text-[#111111] hover:bg-[#111111] hover:text-white"
+              >
+                Shop all
+              </Link>
+              {product.category && (
+                <Link
+                  href={`/products?category=${product.category.slug}`}
+                  className="inline-flex h-12 min-w-40 items-center justify-center border border-[#d9d9d9] px-7 text-sm font-medium uppercase tracking-[0.08em] hover:border-[#111111]"
+                >
+                  More {product.category.name}
+                </Link>
+              )}
+            </div>
+          </section>
         </div>
-      </section>
+      </div>
     </main>
   );
 }

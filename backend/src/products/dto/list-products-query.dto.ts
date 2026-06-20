@@ -1,4 +1,5 @@
 import { ProductStatus } from '@prisma/client';
+import { Transform } from 'class-transformer';
 import {
   IsEnum,
   IsInt,
@@ -15,11 +16,13 @@ export enum ProductSort {
 }
 
 export class ListProductsQueryDto {
+  @Transform(({ value }) => (value === undefined ? undefined : Number(value)))
   @IsInt()
   @Min(1)
   @IsOptional()
   page = 1;
 
+  @Transform(({ value }) => (value === undefined ? undefined : Number(value)))
   @IsInt()
   @Min(1)
   @Max(100)
@@ -38,11 +41,13 @@ export class ListProductsQueryDto {
   @IsOptional()
   status: ProductStatus = ProductStatus.ACTIVE;
 
+  @Transform(({ value }) => (value === undefined ? undefined : Number(value)))
   @IsInt()
   @Min(0)
   @IsOptional()
   minPrice?: number;
 
+  @Transform(({ value }) => (value === undefined ? undefined : Number(value)))
   @IsInt()
   @Min(0)
   @IsOptional()
