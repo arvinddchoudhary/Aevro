@@ -155,6 +155,22 @@ Errors use a consistent shape:
 }
 ```
 
+## Phase 6 Cart Foundation
+
+Cart is currently frontend-only and persisted in browser `localStorage`.
+There are no backend cart endpoints yet because auth and user ownership are not
+implemented.
+
+Current frontend route:
+
+```txt
+GET /cart
+```
+
+The cart stores a product snapshot with product id, slug, name, image, price,
+stock, and quantity. Backend cart APIs should be introduced only after auth and
+customer identity are designed.
+
 ## Planned API Direction
 
 Future API routes should remain versioned:

@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
+import { AddToCartButton } from '../../../components/cart/AddToCartButton';
 import { ProductImageFrame } from '../../../components/products/ProductImageFrame';
 import { ErrorState } from '../../../components/ui/ErrorState';
 import { getProduct } from '../../../lib/api/catalog';
@@ -116,12 +117,7 @@ export default async function ProductDetailsPage({
             </div>
 
             <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-              <Link
-                href="/products"
-                className="inline-flex h-12 min-w-40 items-center justify-center border border-[#111111] bg-white px-7 text-sm font-medium uppercase tracking-[0.08em] text-[#111111] hover:bg-[#111111] hover:text-white"
-              >
-                Shop all
-              </Link>
+              <AddToCartButton product={product} className="sm:min-w-48" />
               {product.category && (
                 <Link
                   href={`/products?category=${product.category.slug}`}
