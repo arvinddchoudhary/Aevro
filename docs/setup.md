@@ -60,6 +60,7 @@ http://localhost:3000
 http://localhost:3000/products
 http://localhost:3000/products/wide-leg-pleated-trouser-black
 http://localhost:3000/cart
+http://localhost:3000/checkout
 ```
 
 These pages read from `NEXT_PUBLIC_API_URL`, which should point to the backend
@@ -67,6 +68,10 @@ API root, for example `http://localhost:8000/api/v1`.
 
 The cart foundation is frontend-only in Phase 6 and uses browser
 `localStorage`. No backend cart API is required yet.
+
+The checkout foundation is frontend-only in Phase 7. It validates customer and
+shipping details and prepares a future order payload without collecting payment
+data.
 
 ## Environment Variables
 

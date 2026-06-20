@@ -171,6 +171,49 @@ The cart stores a product snapshot with product id, slug, name, image, price,
 stock, and quantity. Backend cart APIs should be introduced only after auth and
 customer identity are designed.
 
+## Phase 7 Checkout Foundation
+
+Checkout is currently frontend-only. It validates customer and shipping fields,
+then prepares a future backend order payload from the local cart. It does not
+create orders, collect payment data, or call Razorpay.
+
+Current frontend route:
+
+```txt
+GET /checkout
+```
+
+Prepared payload shape:
+
+```json
+{
+  "customer": {
+    "fullName": "Customer Name",
+    "email": "customer@example.com",
+    "phone": "+91 9999999999"
+  },
+  "shippingAddress": {
+    "addressLine": "Street address",
+    "city": "Hyderabad",
+    "state": "Telangana",
+    "postalCode": "500001",
+    "country": "India"
+  },
+  "items": [
+    {
+      "productId": "product_id",
+      "slug": "wide-leg-pleated-trouser-black",
+      "name": "Wide-Leg Pleated Trouser - Black",
+      "quantity": 1,
+      "unitPriceInPaise": 189900,
+      "lineTotalInPaise": 189900
+    }
+  ],
+  "subtotalInPaise": 189900,
+  "totalInPaise": 189900
+}
+```
+
 ## Planned API Direction
 
 Future API routes should remain versioned:
