@@ -82,6 +82,15 @@ cd backend
 npm run prisma:deploy
 ```
 
+The auth foundation in Phase 11 adds email/password login, Google login,
+httpOnly access/refresh cookies, and refresh-token rotation. Run migrations
+before testing auth:
+
+```bash
+cd backend
+npm run prisma:deploy
+```
+
 ## Environment Variables
 
 Backend:
@@ -95,6 +104,12 @@ DATABASE_URL=postgresql://USER:PASSWORD@HOST/aevro?sslmode=require&connect_timeo
 DIRECT_URL=postgresql://USER:PASSWORD@DIRECT_HOST/aevro?sslmode=require&connect_timeout=10
 RAZORPAY_KEY_ID=rzp_test_your_key_id
 RAZORPAY_KEY_SECRET=your_razorpay_key_secret
+JWT_ACCESS_SECRET=replace_with_long_random_access_secret
+JWT_REFRESH_SECRET=replace_with_long_random_refresh_secret
+JWT_ACCESS_EXPIRES_IN=15m
+JWT_REFRESH_EXPIRES_IN=30d
+GOOGLE_CLIENT_ID=your_google_oauth_client_id.apps.googleusercontent.com
+COOKIE_DOMAIN=
 ```
 
 ## Neon + Prisma Setup
@@ -119,6 +134,7 @@ This repository also includes an initial generated migration at:
 ```txt
 backend/prisma/migrations/000001_init/migration.sql
 backend/prisma/migrations/000002_add_order_shipping_country/migration.sql
+backend/prisma/migrations/000003_hybrid_auth_foundation/migration.sql
 ```
 
 For deployed environments, use:
@@ -150,3 +166,30 @@ NEXT_PUBLIC_API_URL=http://localhost:8000/api/v1
 4. Restart the backend after changing `.env`.
 5. Run the frontend and complete checkout. The frontend receives only the
    public Razorpay key id from the backend-created payment order.
+
+## Google Login Setup
+
+1. Open Google Cloud Console.
+2. Create or select a project.
+3. Configure the OAuth consent screen.
+4. Create an OAuth 2.0 Client ID for a web application.
+5. Add local frontend origin, for example:
+
+```txt
+http://localhost:3000
+```
+
+6. Copy the client id into `backend/.env`:
+
+```env
+GOOGLE_CLIENT_ID=your_google_oauth_client_id.apps.googleusercontent.com
+```
+
+7. The frontend should send the Google ID token to:
+
+```txt
+POST http://localhost:8000/api/v1/auth/google
+```
+
+The backend verifies the ID token and creates the same httpOnly cookie session
+used by email/password login.

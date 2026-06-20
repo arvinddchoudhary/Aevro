@@ -46,6 +46,30 @@ class EnvironmentVariables {
   @IsString()
   @IsOptional()
   RAZORPAY_KEY_SECRET!: string;
+
+  @IsString()
+  @IsOptional()
+  JWT_ACCESS_SECRET?: string;
+
+  @IsString()
+  @IsOptional()
+  JWT_REFRESH_SECRET?: string;
+
+  @IsString()
+  @IsOptional()
+  JWT_ACCESS_EXPIRES_IN = '15m';
+
+  @IsString()
+  @IsOptional()
+  JWT_REFRESH_EXPIRES_IN = '30d';
+
+  @IsString()
+  @IsOptional()
+  GOOGLE_CLIENT_ID?: string;
+
+  @IsString()
+  @IsOptional()
+  COOKIE_DOMAIN?: string;
 }
 
 export function validateEnvironment(config: Record<string, unknown>) {
