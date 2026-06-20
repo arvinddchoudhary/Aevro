@@ -7,6 +7,12 @@ The NestJS backend currently exposes these public routes:
 ```txt
 GET /api/v1/health
 GET /api/v1/health/database
+POST /api/v1/auth/register
+POST /api/v1/auth/login
+POST /api/v1/auth/google
+POST /api/v1/auth/refresh
+POST /api/v1/auth/logout
+GET /api/v1/auth/me
 GET /api/v1/categories
 GET /api/v1/products
 GET /api/v1/products/:identifier
@@ -17,6 +23,83 @@ POST /api/v1/payments/razorpay/verify
 ```
 
 `GET /api/v1/health/database` verifies Prisma can connect to PostgreSQL.
+
+## Phase 11 Auth API
+
+Auth supports email/password and Google login. Both methods issue the same
+backend-managed session cookies:
+
+- `aevro_access_token`: short-lived JWT access token
+- `aevro_refresh_token`: long-lived opaque refresh token
+
+Refresh tokens are stored only as hashes in the database and are rotated on
+refresh. Frontend code must not store JWTs in `localStorage`.
+
+### Register
+
+```txt
+POST /api/v1/auth/register
+```
+
+```json
+{
+  "name": "Customer Name",
+  "email": "customer@example.com",
+  "password": "password123"
+}
+```
+
+### Login
+
+```txt
+POST /api/v1/auth/login
+```
+
+```json
+{
+  "email": "customer@example.com",
+  "password": "password123"
+}
+```
+
+### Google Login
+
+```txt
+POST /api/v1/auth/google
+```
+
+```json
+{
+  "idToken": "google_id_token_from_frontend"
+}
+```
+
+The backend verifies this ID token against `GOOGLE_CLIENT_ID`.
+
+### Refresh
+
+```txt
+POST /api/v1/auth/refresh
+```
+
+Requires the `aevro_refresh_token` httpOnly cookie. Returns the current user and
+sets rotated access/refresh cookies.
+
+### Logout
+
+```txt
+POST /api/v1/auth/logout
+```
+
+Revokes the active refresh session and clears auth cookies.
+
+### Me
+
+```txt
+GET /api/v1/auth/me
+```
+
+Requires the `aevro_access_token` httpOnly cookie.
 
 ## Public Category Endpoints
 

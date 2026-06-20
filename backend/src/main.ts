@@ -4,6 +4,7 @@ import {
   FastifyAdapter,
   NestFastifyApplication,
 } from '@nestjs/platform-fastify';
+import fastifyCookie from '@fastify/cookie';
 import { ConfigService } from '@nestjs/config';
 import { ValidationPipe, VersioningType } from '@nestjs/common';
 import { AppModule } from './app.module';
@@ -22,6 +23,7 @@ async function bootstrap() {
     configService.get<string>('CORS_ORIGINS')?.split(',').map((origin) => origin.trim()) ??
     [frontendUrl];
 
+  await app.register(fastifyCookie);
   app.setGlobalPrefix('api');
   app.enableVersioning({
     type: VersioningType.URI,
@@ -29,6 +31,7 @@ async function bootstrap() {
   });
   app.enableCors({
     origin: corsOrigins,
+    credentials: true,
   });
   app.useGlobalFilters(new HttpExceptionFilter());
   app.useGlobalPipes(
