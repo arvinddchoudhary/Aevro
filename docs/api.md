@@ -13,6 +13,7 @@ POST /api/v1/auth/google
 POST /api/v1/auth/refresh
 POST /api/v1/auth/logout
 GET /api/v1/auth/me
+GET /api/v1/admin/health
 GET /api/v1/categories
 GET /api/v1/products
 GET /api/v1/products/:identifier
@@ -126,6 +127,37 @@ The frontend uses:
 
 All auth requests use `credentials: include` so browser cookies are sent. JWT
 tokens are not stored in frontend storage.
+
+## Phase 14 Admin Foundation
+
+Admin API routes use the same httpOnly cookie JWT session plus role-based
+access control. A user must have `role: ADMIN`.
+
+```txt
+GET /api/v1/admin/health
+```
+
+Response shape:
+
+```json
+{
+  "success": true,
+  "data": {
+    "status": "ok",
+    "service": "aevro-admin-api",
+    "access": "admin"
+  }
+}
+```
+
+Frontend admin route:
+
+```txt
+GET /admin
+```
+
+The frontend shows login-required, access-denied, or the admin shell depending
+on the current authenticated user.
 
 ## Phase 13 User Order History
 

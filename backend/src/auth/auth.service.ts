@@ -5,7 +5,7 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { User } from '@prisma/client';
+import { User, UserRole } from '@prisma/client';
 import { OAuth2Client } from 'google-auth-library';
 import {
   createHmac,
@@ -30,7 +30,7 @@ type SessionContext = {
 type JwtPayload = {
   sub: string;
   email: string;
-  role: string;
+  role: UserRole;
   type: 'access';
 };
 
