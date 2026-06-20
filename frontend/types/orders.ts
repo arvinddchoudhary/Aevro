@@ -34,6 +34,14 @@ export type Order = {
   };
   totalInPaise: number;
   status: 'PENDING' | 'CONFIRMED' | 'PROCESSING' | 'SHIPPED' | 'DELIVERED' | 'CANCELLED';
+  payment: {
+    id: string;
+    status: 'PENDING' | 'PAID' | 'FAILED' | 'REFUNDED';
+    provider: 'RAZORPAY';
+    amountInPaise: number;
+    currency: string;
+    paidAt: string | null;
+  } | null;
   items: Array<{
     id: string;
     productId: string | null;
@@ -44,6 +52,19 @@ export type Order = {
     lineTotalInPaise: number;
     selectedColor: string | null;
     selectedSize: string | null;
+    product: {
+      id: string;
+      name: string;
+      slug: string;
+      priceInPaise: number;
+      status: string;
+      images: Array<{
+        id: string;
+        url: string;
+        altText: string | null;
+        sortOrder: number;
+      }>;
+    } | null;
   }>;
   createdAt: string;
   updatedAt: string;
@@ -53,6 +74,17 @@ export type OrderResponse =
   | {
       success: true;
       data: Order;
+    }
+  | {
+      success: false;
+      statusCode?: number;
+      message: string | string[];
+    };
+
+export type OrdersResponse =
+  | {
+      success: true;
+      data: Order[];
     }
   | {
       success: false;

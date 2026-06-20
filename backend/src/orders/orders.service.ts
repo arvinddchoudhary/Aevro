@@ -9,16 +9,14 @@ import { PrismaService } from '../prisma/prisma.service';
 import { CreateOrderDto } from './dto/create-order.dto';
 
 type OrderWithItems = Prisma.OrderGetPayload<{
-  include: {
-    items: true;
-  };
+  include: ReturnType<OrdersService['orderInclude']>;
 }>;
 
 @Injectable()
 export class OrdersService {
   constructor(@Inject(PrismaService) private readonly prisma: PrismaService) {}
 
-  async createOrder(createOrderDto: CreateOrderDto) {
+  async createOrder(createOrderDto: CreateOrderDto, userId?: string) {
     const requestedItems = this.mergeDuplicateItems(createOrderDto);
     const productIds = requestedItems.map((item) => item.productId);
 
@@ -76,6 +74,7 @@ export class OrdersService {
     const order = await this.prisma.order.create({
       data: {
         orderNumber: this.createOrderNumber(),
+        userId,
         customerName: customer.fullName.trim(),
         customerEmail: customer.email.trim().toLowerCase(),
         customerPhone: customer.phone.trim(),
@@ -90,9 +89,7 @@ export class OrdersService {
           create: orderItems,
         },
       },
-      include: {
-        items: true,
-      },
+      include: this.orderInclude(),
     });
 
     return this.serializeOrder(order);
@@ -103,9 +100,37 @@ export class OrdersService {
       where: {
         id,
       },
-      include: {
-        items: true,
+      include: this.orderInclude(),
+    });
+
+    if (!order) {
+      throw new NotFoundException('Order not found.');
+    }
+
+    return this.serializeOrder(order);
+  }
+
+  async listCurrentUserOrders(userId: string) {
+    const orders = await this.prisma.order.findMany({
+      where: {
+        userId,
       },
+      orderBy: {
+        createdAt: 'desc',
+      },
+      include: this.orderInclude(),
+    });
+
+    return orders.map((order) => this.serializeOrder(order));
+  }
+
+  async getCurrentUserOrder(userId: string, orderId: string) {
+    const order = await this.prisma.order.findFirst({
+      where: {
+        id: orderId,
+        userId,
+      },
+      include: this.orderInclude(),
     });
 
     if (!order) {
@@ -138,6 +163,36 @@ export class OrdersService {
     return `AEVRO-${timestamp}-${random}`;
   }
 
+  private orderInclude() {
+    return {
+      items: {
+        include: {
+          product: {
+            select: {
+              id: true,
+              name: true,
+              slug: true,
+              priceInPaise: true,
+              status: true,
+              images: {
+                orderBy: {
+                  sortOrder: 'asc',
+                },
+                select: {
+                  id: true,
+                  url: true,
+                  altText: true,
+                  sortOrder: true,
+                },
+              },
+            },
+          },
+        },
+      },
+      payment: true,
+    } satisfies Prisma.OrderInclude;
+  }
+
   private serializeOrder(order: OrderWithItems) {
     return {
       id: order.id,
@@ -156,6 +211,16 @@ export class OrdersService {
       },
       totalInPaise: order.totalInPaise,
       status: order.status,
+      payment: order.payment
+        ? {
+            id: order.payment.id,
+            status: order.payment.status,
+            provider: order.payment.provider,
+            amountInPaise: order.payment.amountInPaise,
+            currency: order.payment.currency,
+            paidAt: order.payment.paidAt,
+          }
+        : null,
       items: order.items.map((item) => ({
         id: item.id,
         productId: item.productId,
@@ -166,6 +231,16 @@ export class OrdersService {
         lineTotalInPaise: item.lineTotalInPaise,
         selectedColor: item.selectedColor,
         selectedSize: item.selectedSize,
+        product: item.product
+          ? {
+              id: item.product.id,
+              name: item.product.name,
+              slug: item.product.slug,
+              priceInPaise: item.product.priceInPaise,
+              status: item.product.status,
+              images: item.product.images,
+            }
+          : null,
       })),
       createdAt: order.createdAt,
       updatedAt: order.updatedAt,

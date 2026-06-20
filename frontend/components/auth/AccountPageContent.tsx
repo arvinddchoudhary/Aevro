@@ -77,8 +77,14 @@ export function AccountPageContent() {
         </p>
         <div className="mt-6 flex flex-col gap-3">
           <Link
-            href="/products"
+            href="/account/orders"
             className="inline-flex h-12 items-center justify-center border border-[#111111] px-6 text-sm font-medium uppercase tracking-[0.08em] hover:bg-[#111111] hover:text-white"
+          >
+            View orders
+          </Link>
+          <Link
+            href="/products"
+            className="inline-flex h-12 items-center justify-center border border-[#d9d9d9] px-6 text-sm font-medium uppercase tracking-[0.08em] hover:border-[#111111]"
           >
             Continue shopping
           </Link>
