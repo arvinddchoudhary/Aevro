@@ -70,6 +70,18 @@ class EnvironmentVariables {
   @IsString()
   @IsOptional()
   COOKIE_DOMAIN?: string;
+
+  @IsString()
+  @IsOptional()
+  CLOUDINARY_CLOUD_NAME?: string;
+
+  @IsString()
+  @IsOptional()
+  CLOUDINARY_API_KEY?: string;
+
+  @IsString()
+  @IsOptional()
+  CLOUDINARY_API_SECRET?: string;
 }
 
 export function validateEnvironment(config: Record<string, unknown>) {

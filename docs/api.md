@@ -14,6 +14,14 @@ POST /api/v1/auth/refresh
 POST /api/v1/auth/logout
 GET /api/v1/auth/me
 GET /api/v1/admin/health
+GET /api/v1/admin/categories
+POST /api/v1/admin/categories
+GET /api/v1/admin/products
+POST /api/v1/admin/products
+GET /api/v1/admin/products/:id
+PATCH /api/v1/admin/products/:id
+PATCH /api/v1/admin/products/:id/status
+POST /api/v1/admin/uploads/product-images
 GET /api/v1/categories
 GET /api/v1/products
 GET /api/v1/products/:identifier
@@ -154,10 +162,109 @@ Frontend admin route:
 
 ```txt
 GET /admin
+GET /admin/products
+GET /admin/products/new
 ```
 
 The frontend shows login-required, access-denied, or the admin shell depending
 on the current authenticated user.
+
+## Phase 15 Admin Product Management
+
+Admin product, category, and upload routes require the same httpOnly cookie JWT
+session and `role: ADMIN`.
+
+### Admin Categories
+
+```txt
+GET /api/v1/admin/categories
+POST /api/v1/admin/categories
+```
+
+Create category body:
+
+```json
+{
+  "name": "Trousers",
+  "slug": "trousers",
+  "description": "Premium trouser range."
+}
+```
+
+### Admin Products
+
+```txt
+GET /api/v1/admin/products
+POST /api/v1/admin/products
+GET /api/v1/admin/products/:id
+PATCH /api/v1/admin/products/:id
+PATCH /api/v1/admin/products/:id/status
+```
+
+Create product body:
+
+```json
+{
+  "name": "Wide-Leg Trouser",
+  "slug": "wide-leg-trouser",
+  "description": "Relaxed premium trouser.",
+  "priceInPaise": 209900,
+  "categoryId": "category_id",
+  "status": "ACTIVE",
+  "variants": [
+    {
+      "colorName": "Onyx",
+      "colorSlug": "onyx",
+      "colorHex": "#111111",
+      "size": "32",
+      "stock": 20,
+      "sku": "AEVRO-WLT-ONX-32",
+      "images": [
+        {
+          "url": "https://res.cloudinary.com/.../image/upload/...",
+          "publicId": "aevro/products/trousers/wide-leg-trouser/onyx/image",
+          "altText": "wide-leg-trouser onyx image 1",
+          "sortOrder": 0,
+          "isPrimary": true
+        }
+      ]
+    }
+  ]
+}
+```
+
+Status update body:
+
+```json
+{
+  "status": "ACTIVE"
+}
+```
+
+### Product Image Upload
+
+```txt
+POST /api/v1/admin/uploads/product-images
+Content-Type: multipart/form-data
+```
+
+Multipart fields:
+
+```txt
+files: up to 5 jpg, jpeg, png, or webp images
+categorySlug: trousers
+productSlug: wide-leg-trouser
+colorSlug: onyx
+```
+
+The backend uploads files to Cloudinary under:
+
+```txt
+aevro/products/{categorySlug}/{productSlug}/{colorSlug}
+```
+
+The response includes image URLs, Cloudinary public IDs, sort order, alt text,
+and primary image metadata. Cloudinary secret keys are only used by the backend.
 
 ## Phase 13 User Order History
 
@@ -270,7 +377,32 @@ Response shape:
           "id": "image_id",
           "url": "https://example.com/product.jpg",
           "altText": "AEVRO black wide-leg pleated trouser",
-          "sortOrder": 0
+          "sortOrder": 0,
+          "publicId": "aevro/products/trousers/wide-leg-pleated-trouser-black/black/image",
+          "isPrimary": true,
+          "variantId": "variant_id"
+        }
+      ],
+      "variants": [
+        {
+          "id": "variant_id",
+          "colorName": "Black",
+          "colorSlug": "black",
+          "colorHex": "#111111",
+          "size": "30",
+          "stock": 12,
+          "sku": "AEVRO-WLPT-BLK-30",
+          "images": [
+            {
+              "id": "image_id",
+              "url": "https://example.com/product.jpg",
+              "altText": "AEVRO black wide-leg pleated trouser",
+              "sortOrder": 0,
+              "publicId": "aevro/products/trousers/wide-leg-pleated-trouser-black/black/image",
+              "isPrimary": true,
+              "variantId": "variant_id"
+            }
+          ]
         }
       ],
       "createdAt": "2026-06-19T00:00:00.000Z",
