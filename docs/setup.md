@@ -65,6 +65,8 @@ http://localhost:3000/checkout/confirmation/order_id
 http://localhost:3000/login
 http://localhost:3000/register
 http://localhost:3000/account
+http://localhost:3000/account/orders
+http://localhost:3000/account/orders/order_id
 ```
 
 These pages read from `NEXT_PUBLIC_API_URL`, which should point to the backend
@@ -80,6 +82,10 @@ clears the local cart and routes to order confirmation.
 The frontend auth integration uses backend httpOnly cookies. Auth requests use
 `credentials: 'include'`; JWTs are never stored in localStorage or
 sessionStorage.
+
+The user order history pages use the same httpOnly cookie session and call
+protected backend routes with credentials included. Authenticated checkout
+orders are linked to the current user; guest checkout still works.
 
 The orders foundation in Phase 8 adds backend order creation. Run migrations
 before testing order creation so the shipping country column exists:

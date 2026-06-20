@@ -18,6 +18,8 @@ GET /api/v1/products
 GET /api/v1/products/:identifier
 POST /api/v1/orders
 GET /api/v1/orders/:id
+GET /api/v1/orders/me
+GET /api/v1/orders/me/:id
 POST /api/v1/payments/razorpay/order
 POST /api/v1/payments/razorpay/verify
 ```
@@ -109,6 +111,8 @@ Frontend auth routes:
 GET /login
 GET /register
 GET /account
+GET /account/orders
+GET /account/orders/:id
 ```
 
 The frontend uses:
@@ -122,6 +126,22 @@ The frontend uses:
 
 All auth requests use `credentials: include` so browser cookies are sent. JWT
 tokens are not stored in frontend storage.
+
+## Phase 13 User Order History
+
+Authenticated order history uses:
+
+```txt
+GET /api/v1/orders/me
+GET /api/v1/orders/me/:id
+```
+
+These routes require the `aevro_access_token` httpOnly cookie and only return
+orders where `order.userId` matches the authenticated user. Responses include
+order items, product data, payment status, totals, statuses, and timestamps.
+
+Logged-in checkout requests include cookies, so new orders are linked to the
+current user. Guest checkout continues to work without an account.
 
 ## Public Category Endpoints
 

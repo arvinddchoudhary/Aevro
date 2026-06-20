@@ -1,0 +1,15 @@
+import { AccountOrdersPageContent } from '../../../components/orders/AccountOrdersPageContent';
+
+export default function AccountOrdersPage() {
+  return (
+    <main className="mx-auto min-h-screen max-w-7xl px-5 py-12 sm:px-8">
+      <div className="mb-10">
+        <p className="mb-3 text-xs uppercase tracking-[0.22em] text-[#777777]">
+          Account
+        </p>
+        <h1 className="text-4xl font-light md:text-5xl">Orders</h1>
+      </div>
+      <AccountOrdersPageContent />
+    </main>
+  );
+}
