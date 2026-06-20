@@ -3,6 +3,7 @@ import { ConfigModule } from '@nestjs/config';
 import { CategoriesModule } from './categories/categories.module';
 import { validateEnvironment } from './config/env.validation';
 import { HealthModule } from './health/health.module';
+import { OrdersModule } from './orders/orders.module';
 import { ProductsModule } from './products/products.module';
 
 @Module({
@@ -14,6 +15,7 @@ import { ProductsModule } from './products/products.module';
     HealthModule,
     CategoriesModule,
     ProductsModule,
+    OrdersModule,
   ],
 })
 export class AppModule {}

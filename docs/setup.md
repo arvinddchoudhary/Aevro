@@ -73,6 +73,14 @@ The checkout foundation is frontend-only in Phase 7. It validates customer and
 shipping details and prepares a future order payload without collecting payment
 data.
 
+The orders foundation in Phase 8 adds backend order creation. Run migrations
+before testing order creation so the shipping country column exists:
+
+```bash
+cd backend
+npm run prisma:deploy
+```
+
 ## Environment Variables
 
 Backend:
@@ -107,6 +115,7 @@ This repository also includes an initial generated migration at:
 
 ```txt
 backend/prisma/migrations/000001_init/migration.sql
+backend/prisma/migrations/000002_add_order_shipping_country/migration.sql
 ```
 
 For deployed environments, use:
