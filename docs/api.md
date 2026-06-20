@@ -378,11 +378,47 @@ Response shape:
           "url": "https://example.com/product.jpg",
           "altText": "AEVRO black wide-leg pleated trouser",
           "sortOrder": 0,
-          "publicId": "aevro/products/trousers/wide-leg-pleated-trouser-black/black/image",
           "isPrimary": true,
           "variantId": "variant_id"
         }
       ],
+      "primaryImage": {
+        "id": "image_id",
+        "url": "https://example.com/product.jpg",
+        "altText": "AEVRO black wide-leg pleated trouser",
+        "sortOrder": 0,
+        "isPrimary": true,
+        "variantId": "variant_id"
+      },
+      "availableColors": [
+        {
+          "colorName": "Black",
+          "colorSlug": "black",
+          "colorHex": "#111111",
+          "totalStock": 12
+        }
+      ],
+      "sizesByColor": {
+        "black": [
+          {
+            "variantId": "variant_id",
+            "size": "30",
+            "stock": 12
+          }
+        ]
+      },
+      "imagesByColor": {
+        "black": [
+          {
+            "id": "image_id",
+            "url": "https://example.com/product.jpg",
+            "altText": "AEVRO black wide-leg pleated trouser",
+            "sortOrder": 0,
+            "isPrimary": true,
+            "variantId": "variant_id"
+          }
+        ]
+      },
       "variants": [
         {
           "id": "variant_id",
@@ -391,14 +427,12 @@ Response shape:
           "colorHex": "#111111",
           "size": "30",
           "stock": 12,
-          "sku": "AEVRO-WLPT-BLK-30",
           "images": [
             {
               "id": "image_id",
               "url": "https://example.com/product.jpg",
               "altText": "AEVRO black wide-leg pleated trouser",
               "sortOrder": 0,
-              "publicId": "aevro/products/trousers/wide-leg-pleated-trouser-black/black/image",
               "isPrimary": true,
               "variantId": "variant_id"
             }
@@ -461,8 +495,8 @@ GET /cart
 ```
 
 The cart stores a product snapshot with product id, slug, name, image, price,
-stock, and quantity. Backend cart APIs should be introduced only after auth and
-customer identity are designed.
+variant id, selected color, selected size, stock, and quantity. Backend cart
+APIs should be introduced only after auth and customer identity are designed.
 
 ## Phase 7 Checkout Foundation
 
@@ -496,6 +530,7 @@ Order creation payload shape:
   "items": [
     {
       "productId": "product_id",
+      "variantId": "variant_id",
       "quantity": 1
     }
   ]
@@ -534,6 +569,7 @@ Request body:
   "items": [
     {
       "productId": "product_id",
+      "variantId": "variant_id",
       "quantity": 1
     }
   ]

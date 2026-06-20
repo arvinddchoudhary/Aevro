@@ -160,7 +160,6 @@ export class ProductsService {
           altText: true,
           sortOrder: true,
           isPrimary: true,
-          publicId: true,
           variantId: true,
         },
       },
@@ -173,7 +172,6 @@ export class ProductsService {
           colorHex: true,
           size: true,
           stock: true,
-          sku: true,
           images: {
             orderBy: {
               sortOrder: 'asc',
@@ -181,10 +179,10 @@ export class ProductsService {
             select: {
               id: true,
               url: true,
-              publicId: true,
               altText: true,
               sortOrder: true,
               isPrimary: true,
+              variantId: true,
             },
           },
         },
@@ -195,6 +193,66 @@ export class ProductsService {
   private serializeProduct(product: Prisma.ProductGetPayload<{
     select: ReturnType<ProductsService['productSelect']>;
   }>) {
+    const variants = product.variants.map((variant) => ({
+      id: variant.id,
+      colorName: variant.colorName,
+      colorSlug: variant.colorSlug,
+      colorHex: variant.colorHex,
+      size: variant.size,
+      stock: variant.stock,
+      images: variant.images,
+    }));
+    const variantImages = variants.flatMap((variant) => variant.images);
+    const primaryImage =
+      variantImages.find((image) => image.isPrimary) ??
+      product.images.find((image) => image.isPrimary) ??
+      variantImages[0] ??
+      product.images[0] ??
+      null;
+    const colors = new Map<
+      string,
+      {
+        colorName: string;
+        colorSlug: string;
+        colorHex: string | null;
+        totalStock: number;
+      }
+    >();
+    const sizesByColor: Record<
+      string,
+      {
+        variantId: string;
+        size: string;
+        stock: number;
+      }[]
+    > = {};
+    const imagesByColor: Record<string, typeof product.images> = {};
+
+    variants.forEach((variant) => {
+      const existingColor = colors.get(variant.colorSlug);
+
+      colors.set(variant.colorSlug, {
+        colorName: variant.colorName,
+        colorSlug: variant.colorSlug,
+        colorHex: variant.colorHex,
+        totalStock: (existingColor?.totalStock ?? 0) + variant.stock,
+      });
+
+      sizesByColor[variant.colorSlug] = [
+        ...(sizesByColor[variant.colorSlug] ?? []),
+        {
+          variantId: variant.id,
+          size: variant.size,
+          stock: variant.stock,
+        },
+      ];
+
+      imagesByColor[variant.colorSlug] = [
+        ...(imagesByColor[variant.colorSlug] ?? []),
+        ...variant.images,
+      ];
+    });
+
     return {
       id: product.id,
       name: product.name,
@@ -208,7 +266,11 @@ export class ProductsService {
       status: product.status,
       category: product.category,
       images: product.images,
-      variants: product.variants,
+      primaryImage,
+      availableColors: Array.from(colors.values()),
+      sizesByColor,
+      imagesByColor,
+      variants,
       createdAt: product.createdAt,
       updatedAt: product.updatedAt,
     };

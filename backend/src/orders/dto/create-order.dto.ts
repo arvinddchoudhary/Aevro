@@ -4,6 +4,7 @@ import {
   IsArray,
   IsEmail,
   IsInt,
+  IsOptional,
   IsString,
   Matches,
   Max,
@@ -50,6 +51,10 @@ export class CreateOrderShippingAddressDto {
 export class CreateOrderItemDto {
   @IsString()
   productId!: string;
+
+  @IsString()
+  @IsOptional()
+  variantId?: string;
 
   @Transform(({ value }) => Number(value))
   @IsInt()

@@ -3,13 +3,13 @@
 import { useCart } from '../../lib/cart';
 
 type CartQuantityControlsProps = {
-  productId: string;
+  itemKey: string;
   quantity: number;
   stock: number;
 };
 
 export function CartQuantityControls({
-  productId,
+  itemKey,
   quantity,
   stock,
 }: CartQuantityControlsProps) {
@@ -20,7 +20,7 @@ export function CartQuantityControls({
       <div className="inline-flex h-10 items-center border border-[#d9d9d9]">
         <button
           type="button"
-          onClick={() => decrementItem(productId)}
+          onClick={() => decrementItem(itemKey)}
           className="h-full w-10 text-lg"
           aria-label="Decrease quantity"
         >
@@ -29,7 +29,7 @@ export function CartQuantityControls({
         <span className="min-w-10 text-center text-sm">{quantity}</span>
         <button
           type="button"
-          onClick={() => incrementItem(productId)}
+          onClick={() => incrementItem(itemKey)}
           disabled={quantity >= stock}
           className="h-full w-10 text-lg disabled:cursor-not-allowed disabled:text-[#bbbbbb]"
           aria-label="Increase quantity"
@@ -39,7 +39,7 @@ export function CartQuantityControls({
       </div>
       <button
         type="button"
-        onClick={() => removeItem(productId)}
+        onClick={() => removeItem(itemKey)}
         className="text-sm underline underline-offset-4"
       >
         Remove
