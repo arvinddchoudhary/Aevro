@@ -3,7 +3,6 @@ import { notFound } from 'next/navigation';
 import { ErrorState } from '../../../components/ui/ErrorState';
 import { getProduct } from '../../../lib/api/catalog';
 import { formatPrice } from '../../../lib/format';
-import { AddToCartButton } from '../../../components/products/AddToCartButton';
 
 export const dynamic = 'force-dynamic';
 
@@ -148,19 +147,6 @@ export default async function ProductDetailsPage({
           </section>
         </div>
       </div>
-
-      <div className="mt-8">
-        <AddToCartButton
-          productId={product.id}
-          productName={product.name}
-          productSlug={product.slug}
-          priceInPaise={product.priceInPaise}
-          availableColor={product.color}
-          availableSize={product.size}
-          imageUrl={primaryImage?.url}
-          stock={product.stock}
-        />
-      </div>
-    </main >
+    </main>
   );
 }
