@@ -61,6 +61,7 @@ http://localhost:3000/products
 http://localhost:3000/products/wide-leg-pleated-trouser-black
 http://localhost:3000/cart
 http://localhost:3000/checkout
+http://localhost:3000/checkout/confirmation/order_id
 ```
 
 These pages read from `NEXT_PUBLIC_API_URL`, which should point to the backend
@@ -69,9 +70,9 @@ API root, for example `http://localhost:8000/api/v1`.
 The cart foundation is frontend-only in Phase 6 and uses browser
 `localStorage`. No backend cart API is required yet.
 
-The checkout foundation is frontend-only in Phase 7. It validates customer and
-shipping details and prepares a future order payload without collecting payment
-data.
+The checkout flow creates a pending backend order after customer and shipping
+validation. It clears the local cart only after the backend order is created.
+Payment data is still not collected in this phase.
 
 The orders foundation in Phase 8 adds backend order creation. Run migrations
 before testing order creation so the shipping country column exists:

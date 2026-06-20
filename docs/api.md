@@ -175,17 +175,18 @@ customer identity are designed.
 
 ## Phase 7 Checkout Foundation
 
-Checkout is currently frontend-only. It validates customer and shipping fields,
-then prepares a future backend order payload from the local cart. It does not
-create orders, collect payment data, or call Razorpay.
+Checkout validates customer and shipping fields, then sends a pending order
+request to the backend orders API. It does not collect payment data or call
+Razorpay.
 
 Current frontend route:
 
 ```txt
 GET /checkout
+GET /checkout/confirmation/:id
 ```
 
-Prepared payload shape:
+Order creation payload shape:
 
 ```json
 {
@@ -204,15 +205,9 @@ Prepared payload shape:
   "items": [
     {
       "productId": "product_id",
-      "slug": "wide-leg-pleated-trouser-black",
-      "name": "Wide-Leg Pleated Trouser - Black",
-      "quantity": 1,
-      "unitPriceInPaise": 189900,
-      "lineTotalInPaise": 189900
+      "quantity": 1
     }
-  ],
-  "subtotalInPaise": 189900,
-  "totalInPaise": 189900
+  ]
 }
 ```
 
