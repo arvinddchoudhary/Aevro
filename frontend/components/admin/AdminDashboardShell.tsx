@@ -9,7 +9,8 @@ import { EmptyState } from '../ui/EmptyState';
 const adminSections = [
   {
     title: 'Products',
-    description: 'Catalog creation, edits, and publishing will live here later.',
+    description: 'Create catalog products, variants, stock, and product media.',
+    href: '/admin/products',
   },
   {
     title: 'Orders',
@@ -80,12 +81,15 @@ export function AdminDashboardShell() {
         </p>
         <nav className="mt-6 space-y-3 text-sm">
           {adminSections.map((section) => (
-            <span
-              key={section.title}
-              className="block border-b border-[#eeeeee] pb-3 last:border-b-0"
-            >
-              {section.title}
-            </span>
+            <div key={section.title} className="border-b border-[#eeeeee] pb-3 last:border-b-0">
+              {section.href ? (
+                <Link href={section.href} className="hover:text-[#777777]">
+                  {section.title}
+                </Link>
+              ) : (
+                <span>{section.title}</span>
+              )}
+            </div>
           ))}
         </nav>
       </aside>
@@ -113,6 +117,14 @@ export function AdminDashboardShell() {
               <p className="mt-4 text-sm leading-6 text-[#555555]">
                 {section.description}
               </p>
+              {section.href ? (
+                <Link
+                  href={section.href}
+                  className="mt-5 inline-flex h-10 items-center justify-center border border-[#111111] px-4 text-xs font-medium uppercase tracking-[0.12em] hover:bg-[#111111] hover:text-white"
+                >
+                  Open
+                </Link>
+              ) : null}
             </article>
           ))}
         </div>

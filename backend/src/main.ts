@@ -5,6 +5,7 @@ import {
   NestFastifyApplication,
 } from '@nestjs/platform-fastify';
 import fastifyCookie from '@fastify/cookie';
+import fastifyMultipart from '@fastify/multipart';
 import { ConfigService } from '@nestjs/config';
 import { ValidationPipe, VersioningType } from '@nestjs/common';
 import { AppModule } from './app.module';
@@ -24,6 +25,12 @@ async function bootstrap() {
     [frontendUrl];
 
   await app.register(fastifyCookie);
+  await app.register(fastifyMultipart, {
+    limits: {
+      fileSize: 5 * 1024 * 1024,
+      files: 5,
+    },
+  });
   app.setGlobalPrefix('api');
   app.enableVersioning({
     type: VersioningType.URI,

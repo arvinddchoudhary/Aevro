@@ -12,8 +12,22 @@ export type Category = {
 export type ProductImage = {
   id: string;
   url: string;
+  publicId?: string | null;
   altText: string | null;
   sortOrder: number;
+  isPrimary?: boolean;
+  variantId?: string | null;
+};
+
+export type ProductVariant = {
+  id: string;
+  colorName: string;
+  colorSlug: string;
+  colorHex: string | null;
+  size: string;
+  stock: number;
+  sku: string | null;
+  images: ProductImage[];
 };
 
 export type Product = {
@@ -29,6 +43,7 @@ export type Product = {
   status: ProductStatus;
   category: Pick<Category, 'id' | 'name' | 'slug'> | null;
   images: ProductImage[];
+  variants?: ProductVariant[];
   createdAt: string;
   updatedAt: string;
 };

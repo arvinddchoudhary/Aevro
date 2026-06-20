@@ -68,6 +68,8 @@ http://localhost:3000/account
 http://localhost:3000/account/orders
 http://localhost:3000/account/orders/order_id
 http://localhost:3000/admin
+http://localhost:3000/admin/products
+http://localhost:3000/admin/products/new
 ```
 
 These pages read from `NEXT_PUBLIC_API_URL`, which should point to the backend
@@ -88,8 +90,9 @@ The user order history pages use the same httpOnly cookie session and call
 protected backend routes with credentials included. Authenticated checkout
 orders are linked to the current user; guest checkout still works.
 
-The admin foundation uses the same auth session and requires `role: ADMIN`.
-Only the admin shell and `GET /api/v1/admin/health` exist in this phase.
+The admin area uses the same auth session and requires `role: ADMIN`.
+Product management pages call admin-only backend routes with credentials
+included.
 
 The orders foundation in Phase 8 adds backend order creation. Run migrations
 before testing order creation so the shipping country column exists:
@@ -127,6 +130,9 @@ JWT_ACCESS_EXPIRES_IN=15m
 JWT_REFRESH_EXPIRES_IN=30d
 GOOGLE_CLIENT_ID=your_google_oauth_client_id.apps.googleusercontent.com
 COOKIE_DOMAIN=
+CLOUDINARY_CLOUD_NAME=your_cloudinary_cloud_name
+CLOUDINARY_API_KEY=your_cloudinary_api_key
+CLOUDINARY_API_SECRET=your_cloudinary_api_secret
 ```
 
 ## Neon + Prisma Setup
@@ -152,6 +158,7 @@ This repository also includes an initial generated migration at:
 backend/prisma/migrations/000001_init/migration.sql
 backend/prisma/migrations/000002_add_order_shipping_country/migration.sql
 backend/prisma/migrations/000003_hybrid_auth_foundation/migration.sql
+backend/prisma/migrations/000004_product_variants_cloudinary/migration.sql
 ```
 
 For deployed environments, use:
@@ -217,3 +224,31 @@ POST http://localhost:8000/api/v1/auth/google
 
 The backend verifies the ID token and creates the same httpOnly cookie session
 used by email/password login.
+
+## Cloudinary Product Image Setup
+
+1. Create or log in to a Cloudinary account.
+2. Copy the cloud name, API key, and API secret.
+3. Add them to `backend/.env`:
+
+```env
+CLOUDINARY_CLOUD_NAME=your_cloudinary_cloud_name
+CLOUDINARY_API_KEY=your_cloudinary_api_key
+CLOUDINARY_API_SECRET=your_cloudinary_api_secret
+```
+
+4. Restart the backend.
+5. Log in as an admin and open:
+
+```txt
+http://localhost:3000/admin/products/new
+```
+
+Product images are uploaded through the backend to:
+
+```txt
+aevro/products/{categorySlug}/{productSlug}/{colorSlug}
+```
+
+The upload endpoint accepts up to 5 images per color. Allowed formats are jpg,
+jpeg, png, and webp.

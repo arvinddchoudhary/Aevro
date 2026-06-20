@@ -159,6 +159,34 @@ export class ProductsService {
           url: true,
           altText: true,
           sortOrder: true,
+          isPrimary: true,
+          publicId: true,
+          variantId: true,
+        },
+      },
+      variants: {
+        orderBy: [{ colorSlug: 'asc' }, { size: 'asc' }],
+        select: {
+          id: true,
+          colorName: true,
+          colorSlug: true,
+          colorHex: true,
+          size: true,
+          stock: true,
+          sku: true,
+          images: {
+            orderBy: {
+              sortOrder: 'asc',
+            },
+            select: {
+              id: true,
+              url: true,
+              publicId: true,
+              altText: true,
+              sortOrder: true,
+              isPrimary: true,
+            },
+          },
         },
       },
     } satisfies Prisma.ProductSelect;
@@ -180,6 +208,7 @@ export class ProductsService {
       status: product.status,
       category: product.category,
       images: product.images,
+      variants: product.variants,
       createdAt: product.createdAt,
       updatedAt: product.updatedAt,
     };
