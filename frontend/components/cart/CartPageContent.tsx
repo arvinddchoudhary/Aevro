@@ -90,12 +90,18 @@ export function CartPageContent() {
           <span>{formatPrice(subtotalInPaise)}</span>
         </div>
         <p className="mt-4 text-sm leading-6 text-[#666666]">
-          Checkout and payment will be added in a later phase.
+          Checkout collects customer and shipping details before payment is added.
         </p>
         <div className="mt-6 flex flex-col gap-3">
           <Link
-            href="/products"
+            href="/checkout"
             className="inline-flex h-12 items-center justify-center border border-[#111111] px-6 text-sm font-medium uppercase tracking-[0.08em] hover:bg-[#111111] hover:text-white"
+          >
+            Continue to checkout
+          </Link>
+          <Link
+            href="/products"
+            className="inline-flex h-12 items-center justify-center border border-[#d9d9d9] px-6 text-sm font-medium uppercase tracking-[0.08em] hover:border-[#111111]"
           >
             Continue shopping
           </Link>
