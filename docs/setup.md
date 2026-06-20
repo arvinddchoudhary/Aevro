@@ -59,10 +59,14 @@ Frontend product browsing pages:
 http://localhost:3000
 http://localhost:3000/products
 http://localhost:3000/products/wide-leg-pleated-trouser-black
+http://localhost:3000/cart
 ```
 
 These pages read from `NEXT_PUBLIC_API_URL`, which should point to the backend
 API root, for example `http://localhost:8000/api/v1`.
+
+The cart foundation is frontend-only in Phase 6 and uses browser
+`localStorage`. No backend cart API is required yet.
 
 ## Environment Variables
 

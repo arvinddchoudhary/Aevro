@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { AddToCartButton } from '../cart/AddToCartButton';
 import { formatPrice } from '../../lib/format';
 import type { Product } from '../../types/catalog';
 import { ProductImageFrame } from './ProductImageFrame';
@@ -35,6 +36,7 @@ export function ProductCard({ product }: ProductCardProps) {
           </p>
         </div>
       </Link>
+      <AddToCartButton product={product} className="mt-4" />
     </article>
   );
 }

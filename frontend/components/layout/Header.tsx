@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { CartNavLink } from '../cart/CartNavLink';
 
 export function Header() {
   return (
@@ -10,6 +11,7 @@ export function Header() {
         <Link href="/products" className="underline-offset-4 hover:underline">
           Products
         </Link>
+        <CartNavLink />
       </nav>
     </header>
   );
