@@ -101,6 +101,28 @@ GET /api/v1/auth/me
 
 Requires the `aevro_access_token` httpOnly cookie.
 
+## Phase 12 Frontend Auth Integration
+
+Frontend auth routes:
+
+```txt
+GET /login
+GET /register
+GET /account
+```
+
+The frontend uses:
+
+- `POST /api/v1/auth/register`
+- `POST /api/v1/auth/login`
+- `POST /api/v1/auth/google`
+- `POST /api/v1/auth/refresh`
+- `POST /api/v1/auth/logout`
+- `GET /api/v1/auth/me`
+
+All auth requests use `credentials: include` so browser cookies are sent. JWT
+tokens are not stored in frontend storage.
+
 ## Public Category Endpoints
 
 ### List Categories

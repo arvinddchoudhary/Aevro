@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { Header } from '../components/layout/Header';
+import { AuthProvider } from '../lib/auth';
 import { CartProvider } from '../lib/cart';
 import './globals.css';
 
@@ -16,10 +17,12 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-        <CartProvider>
-          <Header />
-          {children}
-        </CartProvider>
+        <AuthProvider>
+          <CartProvider>
+            <Header />
+            {children}
+          </CartProvider>
+        </AuthProvider>
       </body>
     </html>
   );
