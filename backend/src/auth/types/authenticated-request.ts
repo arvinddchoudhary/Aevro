@@ -1,9 +1,10 @@
 import { FastifyRequest } from 'fastify';
+import { UserRole } from '@prisma/client';
 
 export type AuthenticatedUser = {
   id: string;
   email: string;
-  role: string;
+  role: UserRole;
 };
 
 export type AuthenticatedRequest = FastifyRequest & {
