@@ -62,6 +62,9 @@ http://localhost:3000/products/wide-leg-pleated-trouser-black
 http://localhost:3000/cart
 http://localhost:3000/checkout
 http://localhost:3000/checkout/confirmation/order_id
+http://localhost:3000/login
+http://localhost:3000/register
+http://localhost:3000/account
 ```
 
 These pages read from `NEXT_PUBLIC_API_URL`, which should point to the backend
@@ -73,6 +76,10 @@ The cart foundation is frontend-only in Phase 6 and uses browser
 The checkout flow creates a pending backend order after customer and shipping
 validation, opens Razorpay checkout, verifies the payment on the backend, then
 clears the local cart and routes to order confirmation.
+
+The frontend auth integration uses backend httpOnly cookies. Auth requests use
+`credentials: 'include'`; JWTs are never stored in localStorage or
+sessionStorage.
 
 The orders foundation in Phase 8 adds backend order creation. Run migrations
 before testing order creation so the shipping country column exists:
@@ -155,6 +162,7 @@ Frontend:
 
 ```env
 NEXT_PUBLIC_API_URL=http://localhost:8000/api/v1
+NEXT_PUBLIC_GOOGLE_CLIENT_ID=your_google_oauth_client_id.apps.googleusercontent.com
 ```
 
 ## Razorpay Test Setup
@@ -185,7 +193,13 @@ http://localhost:3000
 GOOGLE_CLIENT_ID=your_google_oauth_client_id.apps.googleusercontent.com
 ```
 
-7. The frontend should send the Google ID token to:
+7. Copy the same client id into `frontend/.env.local`:
+
+```env
+NEXT_PUBLIC_GOOGLE_CLIENT_ID=your_google_oauth_client_id.apps.googleusercontent.com
+```
+
+8. The frontend sends the Google ID token to:
 
 ```txt
 POST http://localhost:8000/api/v1/auth/google
