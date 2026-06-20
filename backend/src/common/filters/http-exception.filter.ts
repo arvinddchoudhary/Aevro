@@ -4,6 +4,7 @@ import {
   ExceptionFilter,
   HttpException,
   HttpStatus,
+  Logger,
 } from '@nestjs/common';
 import { FastifyReply, FastifyRequest } from 'fastify';
 
@@ -15,6 +16,8 @@ type ErrorResponseBody = {
 
 @Catch()
 export class HttpExceptionFilter implements ExceptionFilter {
+  private readonly logger = new Logger(HttpExceptionFilter.name);
+
   catch(exception: unknown, host: ArgumentsHost) {
     const context = host.switchToHttp();
     const response = context.getResponse<FastifyReply>();
@@ -38,6 +41,13 @@ export class HttpExceptionFilter implements ExceptionFilter {
       (typeof exceptionResponse === 'string'
         ? exceptionResponse
         : 'Internal server error');
+
+    if (!(exception instanceof HttpException)) {
+      this.logger.error(
+        `Unhandled exception for ${request.method} ${request.url}`,
+        exception instanceof Error ? exception.stack : String(exception),
+      );
+    }
 
     void response.status(statusCode).send({
       success: false,
