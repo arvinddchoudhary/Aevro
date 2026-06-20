@@ -10,7 +10,9 @@ import {
   validateCheckoutForm,
 } from '../../lib/checkout';
 import { createOrder } from '../../lib/api/orders';
+import { createRazorpayOrder, verifyRazorpayPayment } from '../../lib/api/payments';
 import { formatPrice } from '../../lib/format';
+import { loadRazorpayScript, openRazorpayCheckout } from '../../lib/razorpay';
 import { useCart } from '../../lib/cart';
 import { EmptyState } from '../ui/EmptyState';
 
@@ -68,12 +70,15 @@ export function CheckoutPageContent() {
   const [values, setValues] = useState(initialValues);
   const [errors, setErrors] = useState<CheckoutFormErrors>({});
   const [formError, setFormError] = useState<string | null>(null);
+  const [pendingOrderId, setPendingOrderId] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitLabel, setSubmitLabel] = useState('Pay with Razorpay');
 
   const updateValue = (name: keyof CheckoutFormValues, value: string) => {
     setValues((currentValues) => ({ ...currentValues, [name]: value }));
     setErrors((currentErrors) => ({ ...currentErrors, [name]: undefined }));
     setFormError(null);
+    setPendingOrderId(null);
   };
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
@@ -89,17 +94,70 @@ export function CheckoutPageContent() {
 
     try {
       setIsSubmitting(true);
-      const order = await createOrder(createOrderPayload(values, items));
+      setSubmitLabel(pendingOrderId ? 'Opening Razorpay' : 'Creating order');
+      const order = pendingOrderId
+        ? null
+        : await createOrder(createOrderPayload(values, items));
+      const orderId = pendingOrderId ?? order?.id;
 
-      clearCart();
-      router.push(`/checkout/confirmation/${order.id}`);
+      if (!orderId) {
+        throw new Error('Order could not be prepared for payment.');
+      }
+
+      setPendingOrderId(orderId);
+
+      setSubmitLabel('Opening Razorpay');
+      await loadRazorpayScript();
+      const razorpayOrder = await createRazorpayOrder(orderId);
+
+      openRazorpayCheckout({
+        razorpayOrder,
+        customer: order?.customer ?? {
+          name: values.fullName,
+          email: values.email,
+          phone: values.phone,
+        },
+        onSuccess: async (response) => {
+          setSubmitLabel('Verifying payment');
+
+          try {
+            await verifyRazorpayPayment({
+              orderId,
+              razorpayOrderId: response.razorpay_order_id,
+              razorpayPaymentId: response.razorpay_payment_id,
+              razorpaySignature: response.razorpay_signature,
+            });
+
+            clearCart();
+            router.push(`/checkout/confirmation/${orderId}`);
+          } catch (error) {
+            setIsSubmitting(false);
+            setSubmitLabel('Retry payment');
+            setFormError(
+              error instanceof Error
+                ? error.message
+                : 'Payment verification failed.',
+            );
+          }
+        },
+        onFailure: (failureMessage) => {
+          setIsSubmitting(false);
+          setSubmitLabel('Retry payment');
+          setFormError(failureMessage);
+        },
+        onDismiss: () => {
+          setIsSubmitting(false);
+          setSubmitLabel('Retry payment');
+          setFormError('Payment was not completed. You can retry from this page.');
+        },
+      });
     } catch (error) {
       setFormError(
         error instanceof Error
           ? error.message
           : 'Unable to create order. Please try again.',
       );
-    } finally {
+      setSubmitLabel('Retry payment');
       setIsSubmitting(false);
     }
   };
@@ -208,7 +266,15 @@ export function CheckoutPageContent() {
 
         {formError && (
           <div className="border border-[#8a1f1f] p-5 text-sm leading-6 text-[#8a1f1f] sm:p-6">
-            {formError}
+            <p>{formError}</p>
+            {pendingOrderId && (
+              <Link
+                href={`/checkout/confirmation/${pendingOrderId}`}
+                className="mt-3 inline-flex underline underline-offset-4"
+              >
+                View pending order
+              </Link>
+            )}
           </div>
         )}
       </section>
@@ -254,13 +320,13 @@ export function CheckoutPageContent() {
           <span>{formatPrice(subtotalInPaise)}</span>
         </div>
         <p className="mt-4 text-sm leading-6 text-[#666666]">
-          This creates a pending order. Payment will be added in the next phase.
+          This creates a pending order and opens Razorpay checkout securely.
         </p>
         <button
           disabled={isSubmitting}
           className="mt-6 h-12 w-full border border-[#111111] text-sm font-medium uppercase tracking-[0.08em] hover:bg-[#111111] hover:text-white disabled:cursor-not-allowed disabled:border-[#bdbdbd] disabled:text-[#777777] disabled:hover:bg-white"
         >
-          {isSubmitting ? 'Creating order' : 'Create pending order'}
+          {isSubmitting ? submitLabel : submitLabel}
         </button>
         <Link
           href="/cart"
