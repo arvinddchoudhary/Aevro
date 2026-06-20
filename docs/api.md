@@ -12,6 +12,8 @@ GET /api/v1/products
 GET /api/v1/products/:identifier
 POST /api/v1/orders
 GET /api/v1/orders/:id
+POST /api/v1/payments/razorpay/order
+POST /api/v1/payments/razorpay/verify
 ```
 
 `GET /api/v1/health/database` verifies Prisma can connect to PostgreSQL.
@@ -175,9 +177,9 @@ customer identity are designed.
 
 ## Phase 7 Checkout Foundation
 
-Checkout validates customer and shipping fields, then sends a pending order
-request to the backend orders API. It does not collect payment data or call
-Razorpay.
+Checkout validates customer and shipping fields, sends a pending order request
+to the backend orders API, then starts Razorpay payment through backend-created
+payment orders.
 
 Current frontend route:
 
@@ -301,6 +303,64 @@ Example:
 ```bash
 curl "http://localhost:8000/api/v1/orders/order_id"
 ```
+
+## Phase 10 Razorpay Payment API
+
+Razorpay secret keys are backend-only. The frontend never sends payment amounts
+or secret keys. It asks the backend to create a Razorpay order for an existing
+AEVRO order, then sends Razorpay's payment response back for backend signature
+verification.
+
+### Create Razorpay Order
+
+```txt
+POST /api/v1/payments/razorpay/order
+```
+
+Request body:
+
+```json
+{
+  "orderId": "internal_order_id"
+}
+```
+
+Response shape:
+
+```json
+{
+  "success": true,
+  "data": {
+    "keyId": "rzp_test_public_key_id",
+    "orderId": "internal_order_id",
+    "orderNumber": "AEVRO-MABC123-XYZ789",
+    "razorpayOrderId": "order_razorpay_id",
+    "amountInPaise": 189900,
+    "currency": "INR"
+  }
+}
+```
+
+### Verify Razorpay Payment
+
+```txt
+POST /api/v1/payments/razorpay/verify
+```
+
+Request body:
+
+```json
+{
+  "orderId": "internal_order_id",
+  "razorpayOrderId": "order_razorpay_id",
+  "razorpayPaymentId": "pay_razorpay_id",
+  "razorpaySignature": "signature_from_razorpay_checkout"
+}
+```
+
+On successful verification, the payment is marked `PAID` and the order status is
+updated to `CONFIRMED`. Invalid signatures are rejected and the payment is
+marked `FAILED`.
 
 ## Planned API Direction
 

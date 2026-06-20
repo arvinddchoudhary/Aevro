@@ -38,6 +38,14 @@ class EnvironmentVariables {
 
   @IsString()
   DATABASE_URL!: string;
+
+  @IsString()
+  @IsOptional()
+  RAZORPAY_KEY_ID!: string;
+
+  @IsString()
+  @IsOptional()
+  RAZORPAY_KEY_SECRET!: string;
 }
 
 export function validateEnvironment(config: Record<string, unknown>) {

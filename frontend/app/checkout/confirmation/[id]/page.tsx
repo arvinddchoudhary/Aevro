@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
+import { RazorpayPaymentPanel } from '../../../../components/payments/RazorpayPaymentPanel';
 import { ErrorState } from '../../../../components/ui/ErrorState';
 import { getOrder } from '../../../../lib/api/orders';
 import { formatPrice } from '../../../../lib/format';
@@ -43,8 +44,8 @@ export default async function OrderConfirmationPage({
               Your pending order is ready.
             </h1>
             <p className="mt-5 max-w-2xl text-sm leading-7 text-[#555555]">
-              Use this reference for the next payment step. Razorpay is not
-              connected yet, so no payment has been collected.
+              Use this reference for support and payment tracking. Razorpay
+              payment is verified by the backend before the order is confirmed.
             </p>
           </div>
           <div className="border border-[#e5e5e5] px-5 py-4">
@@ -121,6 +122,8 @@ export default async function OrderConfirmationPage({
               {order.shippingAddress.country}
             </p>
           </div>
+
+          {order.status === 'PENDING' && <RazorpayPaymentPanel order={order} />}
 
           <div className="mt-6 flex flex-col gap-3">
             <Link

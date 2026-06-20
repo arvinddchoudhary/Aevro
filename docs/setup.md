@@ -71,8 +71,8 @@ The cart foundation is frontend-only in Phase 6 and uses browser
 `localStorage`. No backend cart API is required yet.
 
 The checkout flow creates a pending backend order after customer and shipping
-validation. It clears the local cart only after the backend order is created.
-Payment data is still not collected in this phase.
+validation, opens Razorpay checkout, verifies the payment on the backend, then
+clears the local cart and routes to order confirmation.
 
 The orders foundation in Phase 8 adds backend order creation. Run migrations
 before testing order creation so the shipping country column exists:
@@ -93,6 +93,8 @@ FRONTEND_URL=http://localhost:3000
 CORS_ORIGINS=http://localhost:3000
 DATABASE_URL=postgresql://USER:PASSWORD@HOST/aevro?sslmode=require&connect_timeout=10
 DIRECT_URL=postgresql://USER:PASSWORD@DIRECT_HOST/aevro?sslmode=require&connect_timeout=10
+RAZORPAY_KEY_ID=rzp_test_your_key_id
+RAZORPAY_KEY_SECRET=your_razorpay_key_secret
 ```
 
 ## Neon + Prisma Setup
@@ -138,3 +140,13 @@ Frontend:
 ```env
 NEXT_PUBLIC_API_URL=http://localhost:8000/api/v1
 ```
+
+## Razorpay Test Setup
+
+1. Create or log in to a Razorpay account.
+2. Use test mode and copy the key id and key secret.
+3. Add them to `backend/.env` as `RAZORPAY_KEY_ID` and
+   `RAZORPAY_KEY_SECRET`.
+4. Restart the backend after changing `.env`.
+5. Run the frontend and complete checkout. The frontend receives only the
+   public Razorpay key id from the backend-created payment order.
