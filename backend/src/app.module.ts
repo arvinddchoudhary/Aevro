@@ -5,6 +5,9 @@ import { validateEnvironment } from './config/env.validation';
 import { HealthModule } from './health/health.module';
 import { ProductsModule } from './products/products.module';
 
+import { OrdersModule } from './orders/orders.module';
+import { PaymentsModule } from './payments/payments.module';
+
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -14,6 +17,8 @@ import { ProductsModule } from './products/products.module';
     HealthModule,
     CategoriesModule,
     ProductsModule,
+    OrdersModule,
+    PaymentsModule,
   ],
 })
 export class AppModule {}

@@ -114,9 +114,11 @@ export default async function ProductsPage({
           <div className="mb-5 text-sm text-[#666666]">
             Showing {products.length} of {meta.total} products
           </div>
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="grid grid-cols-2 gap-px bg-border md:grid-cols-3">
             {products.map((product) => (
-              <ProductCard key={product.id} product={product} />
+              <div key={product.id} className="bg-white">
+                <ProductCard product={product} />
+              </div>
             ))}
           </div>
         </>
