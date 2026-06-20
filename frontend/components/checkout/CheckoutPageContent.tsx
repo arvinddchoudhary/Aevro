@@ -1,14 +1,15 @@
 'use client';
 
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { FormEvent, useState } from 'react';
 import {
   CheckoutFormErrors,
   CheckoutFormValues,
-  CheckoutPayload,
-  createCheckoutPayload,
+  createOrderPayload,
   validateCheckoutForm,
 } from '../../lib/checkout';
+import { createOrder } from '../../lib/api/orders';
 import { formatPrice } from '../../lib/format';
 import { useCart } from '../../lib/cart';
 import { EmptyState } from '../ui/EmptyState';
@@ -62,19 +63,22 @@ function CheckoutField({
 }
 
 export function CheckoutPageContent() {
-  const { items, subtotalInPaise } = useCart();
+  const router = useRouter();
+  const { items, subtotalInPaise, clearCart } = useCart();
   const [values, setValues] = useState(initialValues);
   const [errors, setErrors] = useState<CheckoutFormErrors>({});
-  const [payload, setPayload] = useState<CheckoutPayload | null>(null);
+  const [formError, setFormError] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const updateValue = (name: keyof CheckoutFormValues, value: string) => {
     setValues((currentValues) => ({ ...currentValues, [name]: value }));
     setErrors((currentErrors) => ({ ...currentErrors, [name]: undefined }));
-    setPayload(null);
+    setFormError(null);
   };
 
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    setFormError(null);
 
     const nextErrors = validateCheckoutForm(values);
     setErrors(nextErrors);
@@ -83,7 +87,21 @@ export function CheckoutPageContent() {
       return;
     }
 
-    setPayload(createCheckoutPayload(values, items, subtotalInPaise));
+    try {
+      setIsSubmitting(true);
+      const order = await createOrder(createOrderPayload(values, items));
+
+      clearCart();
+      router.push(`/checkout/confirmation/${order.id}`);
+    } catch (error) {
+      setFormError(
+        error instanceof Error
+          ? error.message
+          : 'Unable to create order. Please try again.',
+      );
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   if (items.length === 0) {
@@ -188,18 +206,9 @@ export function CheckoutPageContent() {
           </div>
         </div>
 
-        {payload && (
-          <div className="border border-[#e5e5e5] p-5 sm:p-6">
-            <p className="text-xs uppercase tracking-[0.2em] text-[#777777]">
-              Payload ready
-            </p>
-            <p className="mt-3 text-sm leading-6 text-[#555555]">
-              Customer and cart data are ready for a future backend order API.
-              No payment data is collected in this phase.
-            </p>
-            <pre className="mt-5 max-h-80 overflow-auto bg-[#f6f6f6] p-4 text-xs leading-6">
-              {JSON.stringify(payload, null, 2)}
-            </pre>
+        {formError && (
+          <div className="border border-[#8a1f1f] p-5 text-sm leading-6 text-[#8a1f1f] sm:p-6">
+            {formError}
           </div>
         )}
       </section>
@@ -245,10 +254,13 @@ export function CheckoutPageContent() {
           <span>{formatPrice(subtotalInPaise)}</span>
         </div>
         <p className="mt-4 text-sm leading-6 text-[#666666]">
-          Payment and order creation will be connected in a later phase.
+          This creates a pending order. Payment will be added in the next phase.
         </p>
-        <button className="mt-6 h-12 w-full border border-[#111111] text-sm font-medium uppercase tracking-[0.08em] hover:bg-[#111111] hover:text-white">
-          Prepare checkout
+        <button
+          disabled={isSubmitting}
+          className="mt-6 h-12 w-full border border-[#111111] text-sm font-medium uppercase tracking-[0.08em] hover:bg-[#111111] hover:text-white disabled:cursor-not-allowed disabled:border-[#bdbdbd] disabled:text-[#777777] disabled:hover:bg-white"
+        >
+          {isSubmitting ? 'Creating order' : 'Create pending order'}
         </button>
         <Link
           href="/cart"

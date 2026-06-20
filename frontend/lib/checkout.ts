@@ -1,4 +1,5 @@
 import type { CartItem } from './cart';
+import type { CreateOrderPayload } from '../types/orders';
 
 export type CheckoutCustomer = {
   fullName: string;
@@ -14,30 +15,14 @@ export type CheckoutShippingAddress = {
   country: string;
 };
 
-export type CheckoutPayload = {
-  customer: CheckoutCustomer;
-  shippingAddress: CheckoutShippingAddress;
-  items: Array<{
-    productId: string;
-    slug: string;
-    name: string;
-    quantity: number;
-    unitPriceInPaise: number;
-    lineTotalInPaise: number;
-  }>;
-  subtotalInPaise: number;
-  totalInPaise: number;
-};
-
 export type CheckoutFormValues = CheckoutCustomer & CheckoutShippingAddress;
 
 export type CheckoutFormErrors = Partial<Record<keyof CheckoutFormValues, string>>;
 
-export function createCheckoutPayload(
+export function createOrderPayload(
   values: CheckoutFormValues,
   items: CartItem[],
-  subtotalInPaise: number,
-): CheckoutPayload {
+): CreateOrderPayload {
   return {
     customer: {
       fullName: values.fullName.trim(),
@@ -53,14 +38,8 @@ export function createCheckoutPayload(
     },
     items: items.map((item) => ({
       productId: item.productId,
-      slug: item.slug,
-      name: item.name,
       quantity: item.quantity,
-      unitPriceInPaise: item.priceInPaise,
-      lineTotalInPaise: item.priceInPaise * item.quantity,
     })),
-    subtotalInPaise,
-    totalInPaise: subtotalInPaise,
   };
 }
 
