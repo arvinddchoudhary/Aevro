@@ -1,9 +1,17 @@
-import { Controller, Get, ServiceUnavailableException } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Inject,
+  Logger,
+  ServiceUnavailableException,
+} from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 
 @Controller('health')
 export class HealthController {
-  constructor(private readonly prisma: PrismaService) {}
+  private readonly logger = new Logger(HealthController.name);
+
+  constructor(@Inject(PrismaService) private readonly prisma: PrismaService) {}
 
   @Get()
   getHealth() {
@@ -24,7 +32,12 @@ export class HealthController {
         database: 'connected',
         provider: 'postgresql',
       };
-    } catch {
+    } catch (error) {
+      this.logger.error(
+        'Database health check failed',
+        error instanceof Error ? error.stack : String(error),
+      );
+
       throw new ServiceUnavailableException('Database connection failed');
     }
   }

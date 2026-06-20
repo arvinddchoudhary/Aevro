@@ -83,7 +83,7 @@ export default async function ProductsPage({
               placeholder="Search products"
               className="h-11 flex-1 border border-[#d9d9d9] px-4 text-sm outline-none focus:border-[#111111]"
             />
-            <button className="h-11 bg-[#111111] px-5 text-xs uppercase tracking-[0.16em] text-white">
+            <button className="h-11 min-w-28 border border-[#111111] bg-white px-5 text-sm font-medium uppercase tracking-[0.08em] text-[#111111] hover:bg-[#111111] hover:text-white">
               Search
             </button>
           </form>

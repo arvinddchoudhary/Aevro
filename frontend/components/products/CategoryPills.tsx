@@ -15,9 +15,9 @@ export function CategoryPills({ categories, activeCategory }: CategoryPillsProps
     <div className="flex gap-2 overflow-x-auto pb-1">
       <Link
         href="/products"
-        className={`shrink-0 border px-4 py-2 text-sm ${
+        className={`inline-flex min-w-16 shrink-0 items-center justify-center border px-4 py-2 text-sm font-medium ${
           !activeCategory
-            ? 'border-[#111111] bg-[#111111] text-white'
+            ? 'border-[#111111] bg-white text-[#111111]'
             : 'border-[#dddddd] text-[#555555]'
         }`}
       >
@@ -27,9 +27,9 @@ export function CategoryPills({ categories, activeCategory }: CategoryPillsProps
         <Link
           key={category.id}
           href={`/products?category=${category.slug}`}
-          className={`shrink-0 border px-4 py-2 text-sm ${
+          className={`inline-flex min-w-24 shrink-0 items-center justify-center border px-4 py-2 text-sm font-medium ${
             activeCategory === category.slug
-              ? 'border-[#111111] bg-[#111111] text-white'
+              ? 'border-[#111111] bg-white text-[#111111]'
               : 'border-[#dddddd] text-[#555555]'
           }`}
         >
