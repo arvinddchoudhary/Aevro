@@ -133,6 +133,7 @@ model Order {
   shippingCity    String
   shippingState   String
   shippingPincode String
+  shippingCountry String      @default("India")
   totalInPaise    Int
   status          OrderStatus @default(PENDING)
   items           OrderItem[]

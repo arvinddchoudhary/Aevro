@@ -1,8 +1,8 @@
 # AEVRO API Notes
 
-## Current Phase 1 API
+## Current API
 
-The NestJS backend currently exposes these public Phase 5 routes:
+The NestJS backend currently exposes these public routes:
 
 ```txt
 GET /api/v1/health
@@ -10,6 +10,8 @@ GET /api/v1/health/database
 GET /api/v1/categories
 GET /api/v1/products
 GET /api/v1/products/:identifier
+POST /api/v1/orders
+GET /api/v1/orders/:id
 ```
 
 `GET /api/v1/health/database` verifies Prisma can connect to PostgreSQL.
@@ -212,6 +214,97 @@ Prepared payload shape:
   "subtotalInPaise": 189900,
   "totalInPaise": 189900
 }
+```
+
+## Phase 8 Orders API Foundation
+
+Orders are created on the backend from customer details, shipping address, and
+product IDs with quantities. The backend fetches product prices from PostgreSQL
+and calculates totals itself. Frontend subtotal, total, and payment status must
+not be trusted.
+
+### Create Order
+
+```txt
+POST /api/v1/orders
+```
+
+Request body:
+
+```json
+{
+  "customer": {
+    "fullName": "Customer Name",
+    "email": "customer@example.com",
+    "phone": "+91 9999999999"
+  },
+  "shippingAddress": {
+    "addressLine": "Street address",
+    "city": "Hyderabad",
+    "state": "Telangana",
+    "postalCode": "500001",
+    "country": "India"
+  },
+  "items": [
+    {
+      "productId": "product_id",
+      "quantity": 1
+    }
+  ]
+}
+```
+
+Response shape:
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": "order_id",
+    "orderNumber": "AEVRO-MABC123-XYZ789",
+    "customer": {
+      "name": "Customer Name",
+      "email": "customer@example.com",
+      "phone": "+91 9999999999"
+    },
+    "shippingAddress": {
+      "addressLine": "Street address",
+      "city": "Hyderabad",
+      "state": "Telangana",
+      "postalCode": "500001",
+      "country": "India"
+    },
+    "totalInPaise": 189900,
+    "status": "PENDING",
+    "items": [
+      {
+        "id": "order_item_id",
+        "productId": "product_id",
+        "productName": "Wide-Leg Pleated Trouser - Black",
+        "productSlug": "wide-leg-pleated-trouser-black",
+        "quantity": 1,
+        "unitPriceInPaise": 189900,
+        "lineTotalInPaise": 189900,
+        "selectedColor": "Black",
+        "selectedSize": "30"
+      }
+    ],
+    "createdAt": "2026-06-20T00:00:00.000Z",
+    "updatedAt": "2026-06-20T00:00:00.000Z"
+  }
+}
+```
+
+### Get Order
+
+```txt
+GET /api/v1/orders/:id
+```
+
+Example:
+
+```bash
+curl "http://localhost:8000/api/v1/orders/order_id"
 ```
 
 ## Planned API Direction
