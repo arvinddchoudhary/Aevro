@@ -1,6 +1,16 @@
-import { ConflictException, Inject, Injectable } from '@nestjs/common';
-import { AuthProvider, User, UserRole } from '@prisma/client';
+import {
+  ConflictException,
+  Inject,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
+import { AuthProvider, User, UserAddress, UserRole } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
+import {
+  CreateAddressDto,
+  UpdateAddressDto,
+  UpdateProfileDto,
+} from './dto/user-profile.dto';
 
 type CreateEmailUserInput = {
   name: string;
@@ -30,6 +40,148 @@ export class UsersService {
       where: {
         email: email.toLowerCase(),
       },
+    });
+  }
+
+  async getProfile(userId: string) {
+    const user = await this.findById(userId);
+
+    if (!user) {
+      throw new NotFoundException('User not found.');
+    }
+
+    return this.serializeUser(user);
+  }
+
+  async updateProfile(userId: string, dto: UpdateProfileDto) {
+    await this.ensureUserExists(userId);
+
+    const user = await this.prisma.user.update({
+      where: {
+        id: userId,
+      },
+      data: {
+        name: dto.name?.trim(),
+        phone: dto.phone?.trim(),
+      },
+    });
+
+    return this.serializeUser(user);
+  }
+
+  async listAddresses(userId: string) {
+    const addresses = await this.prisma.userAddress.findMany({
+      where: {
+        userId,
+      },
+      orderBy: [{ isDefault: 'desc' }, { createdAt: 'desc' }],
+    });
+
+    return addresses.map((address) => this.serializeAddress(address));
+  }
+
+  async createAddress(userId: string, dto: CreateAddressDto) {
+    await this.ensureUserExists(userId);
+    const addressCount = await this.prisma.userAddress.count({
+      where: {
+        userId,
+      },
+    });
+
+    const address = await this.prisma.$transaction(async (tx) => {
+      if (addressCount === 0) {
+        await tx.userAddress.updateMany({
+          where: {
+            userId,
+          },
+          data: {
+            isDefault: false,
+          },
+        });
+      }
+
+      return tx.userAddress.create({
+        data: {
+          ...this.buildAddressData(dto),
+          userId,
+          isDefault: addressCount === 0,
+        },
+      });
+    });
+
+    return this.serializeAddress(address);
+  }
+
+  async updateAddress(userId: string, addressId: string, dto: UpdateAddressDto) {
+    await this.ensureAddressBelongsToUser(userId, addressId);
+
+    const address = await this.prisma.userAddress.update({
+      where: {
+        id: addressId,
+      },
+      data: this.buildAddressData(dto),
+    });
+
+    return this.serializeAddress(address);
+  }
+
+  async setDefaultAddress(userId: string, addressId: string) {
+    await this.ensureAddressBelongsToUser(userId, addressId);
+
+    const address = await this.prisma.$transaction(async (tx) => {
+      await tx.userAddress.updateMany({
+        where: {
+          userId,
+        },
+        data: {
+          isDefault: false,
+        },
+      });
+
+      return tx.userAddress.update({
+        where: {
+          id: addressId,
+        },
+        data: {
+          isDefault: true,
+        },
+      });
+    });
+
+    return this.serializeAddress(address);
+  }
+
+  async deleteAddress(userId: string, addressId: string) {
+    const address = await this.ensureAddressBelongsToUser(userId, addressId);
+
+    await this.prisma.$transaction(async (tx) => {
+      await tx.userAddress.delete({
+        where: {
+          id: addressId,
+        },
+      });
+
+      if (address.isDefault) {
+        const nextAddress = await tx.userAddress.findFirst({
+          where: {
+            userId,
+          },
+          orderBy: {
+            createdAt: 'desc',
+          },
+        });
+
+        if (nextAddress) {
+          await tx.userAddress.update({
+            where: {
+              id: nextAddress.id,
+            },
+            data: {
+              isDefault: true,
+            },
+          });
+        }
+      }
     });
   }
 
@@ -122,6 +274,68 @@ export class UsersService {
       emailVerified: user.emailVerified,
       createdAt: user.createdAt,
       updatedAt: user.updatedAt,
+    };
+  }
+
+  private async ensureUserExists(userId: string) {
+    const user = await this.prisma.user.findUnique({
+      where: {
+        id: userId,
+      },
+      select: {
+        id: true,
+      },
+    });
+
+    if (!user) {
+      throw new NotFoundException('User not found.');
+    }
+  }
+
+  private async ensureAddressBelongsToUser(userId: string, addressId: string) {
+    const address = await this.prisma.userAddress.findFirst({
+      where: {
+        id: addressId,
+        userId,
+      },
+    });
+
+    if (!address) {
+      throw new NotFoundException('Address not found.');
+    }
+
+    return address;
+  }
+
+  private buildAddressData(
+    dto: CreateAddressDto | UpdateAddressDto,
+  ) {
+    return {
+      fullName: dto.fullName.trim(),
+      phone: dto.phone.trim(),
+      addressLine1: dto.addressLine1.trim(),
+      addressLine2: dto.addressLine2?.trim() || null,
+      city: dto.city.trim(),
+      state: dto.state.trim(),
+      postalCode: dto.postalCode.trim(),
+      country: dto.country.trim(),
+    };
+  }
+
+  private serializeAddress(address: UserAddress) {
+    return {
+      id: address.id,
+      fullName: address.fullName,
+      phone: address.phone,
+      addressLine1: address.addressLine1,
+      addressLine2: address.addressLine2,
+      city: address.city,
+      state: address.state,
+      postalCode: address.postalCode,
+      country: address.country,
+      isDefault: address.isDefault,
+      createdAt: address.createdAt,
+      updatedAt: address.updatedAt,
     };
   }
 }

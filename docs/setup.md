@@ -65,6 +65,8 @@ http://localhost:3000/checkout/confirmation/order_id
 http://localhost:3000/login
 http://localhost:3000/register
 http://localhost:3000/account
+http://localhost:3000/account/profile
+http://localhost:3000/account/addresses
 http://localhost:3000/account/orders
 http://localhost:3000/account/orders/order_id
 http://localhost:3000/admin
@@ -162,6 +164,8 @@ backend/prisma/migrations/000001_init/migration.sql
 backend/prisma/migrations/000002_add_order_shipping_country/migration.sql
 backend/prisma/migrations/000003_hybrid_auth_foundation/migration.sql
 backend/prisma/migrations/000004_product_variants_cloudinary/migration.sql
+backend/prisma/migrations/000005_inventory_variant_order_items/migration.sql
+backend/prisma/migrations/000006_user_profile_addresses/migration.sql
 ```
 
 For deployed environments, use:

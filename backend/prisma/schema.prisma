@@ -52,6 +52,7 @@ model User {
   emailVerified   Boolean          @default(false)
   authAccounts    AuthAccount[]
   refreshSessions RefreshSession[]
+  addresses       UserAddress[]
   cartItems       CartItem[]
   orders          Order[]
   createdAt       DateTime         @default(now())
@@ -59,6 +60,27 @@ model User {
 
   @@index([role])
   @@map("users")
+}
+
+model UserAddress {
+  id           String   @id @default(cuid())
+  userId       String
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  fullName     String
+  phone        String
+  addressLine1 String
+  addressLine2 String?
+  city         String
+  state        String
+  postalCode   String
+  country      String   @default("India")
+  isDefault    Boolean  @default(false)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@index([userId])
+  @@index([userId, isDefault])
+  @@map("user_addresses")
 }
 
 model AuthAccount {

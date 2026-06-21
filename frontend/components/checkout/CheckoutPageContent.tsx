@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { FormEvent, useState } from 'react';
+import { FormEvent, useEffect, useState } from 'react';
 import {
   CheckoutFormErrors,
   CheckoutFormValues,
@@ -11,6 +11,8 @@ import {
 } from '../../lib/checkout';
 import { createOrder } from '../../lib/api/orders';
 import { createRazorpayOrder, verifyRazorpayPayment } from '../../lib/api/payments';
+import { getUserAddresses } from '../../lib/api/users';
+import { useAuth } from '../../lib/auth';
 import { formatPrice } from '../../lib/format';
 import { loadRazorpayScript, openRazorpayCheckout } from '../../lib/razorpay';
 import { useCart } from '../../lib/cart';
@@ -66,6 +68,7 @@ function CheckoutField({
 
 export function CheckoutPageContent() {
   const router = useRouter();
+  const { status, user } = useAuth();
   const { items, subtotalInPaise, clearCart } = useCart();
   const [values, setValues] = useState(initialValues);
   const [errors, setErrors] = useState<CheckoutFormErrors>({});
@@ -79,6 +82,55 @@ export function CheckoutPageContent() {
   const lowStockItems = items.filter(
     (item) => item.stock > 0 && item.stock <= 5,
   );
+
+  useEffect(() => {
+    async function loadDefaultAddress() {
+      if (status !== 'authenticated' || !user) {
+        return;
+      }
+
+      try {
+        const addresses = await getUserAddresses();
+        const defaultAddress = addresses.find((address) => address.isDefault);
+
+        if (!defaultAddress) {
+          setValues((currentValues) => ({
+            ...currentValues,
+            fullName: currentValues.fullName || user.name,
+            email: currentValues.email || user.email,
+            phone: currentValues.phone || user.phone || '',
+          }));
+          return;
+        }
+
+        setValues((currentValues) => ({
+          ...currentValues,
+          fullName: currentValues.fullName || defaultAddress.fullName,
+          email: currentValues.email || user.email,
+          phone: currentValues.phone || defaultAddress.phone,
+          addressLine: currentValues.addressLine || [
+            defaultAddress.addressLine1,
+            defaultAddress.addressLine2,
+          ]
+            .filter(Boolean)
+            .join(', '),
+          city: currentValues.city || defaultAddress.city,
+          state: currentValues.state || defaultAddress.state,
+          postalCode: currentValues.postalCode || defaultAddress.postalCode,
+          country: currentValues.country || defaultAddress.country,
+        }));
+      } catch {
+        setValues((currentValues) => ({
+          ...currentValues,
+          fullName: currentValues.fullName || user.name,
+          email: currentValues.email || user.email,
+          phone: currentValues.phone || user.phone || '',
+        }));
+      }
+    }
+
+    void loadDefaultAddress();
+  }, [status, user]);
 
   const updateValue = (name: keyof CheckoutFormValues, value: string) => {
     setValues((currentValues) => ({ ...currentValues, [name]: value }));

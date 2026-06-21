@@ -8,6 +8,7 @@ import { HealthModule } from './health/health.module';
 import { OrdersModule } from './orders/orders.module';
 import { PaymentsModule } from './payments/payments.module';
 import { ProductsModule } from './products/products.module';
+import { UsersApiModule } from './users/users-api.module';
 import { UsersModule } from './users/users.module';
 
 @Module({
@@ -18,6 +19,7 @@ import { UsersModule } from './users/users.module';
     }),
     HealthModule,
     UsersModule,
+    UsersApiModule,
     AuthModule,
     AdminModule,
     CategoriesModule,
