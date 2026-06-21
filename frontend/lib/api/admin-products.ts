@@ -20,14 +20,28 @@ class AdminApiError extends Error {
 
 async function parseErrorMessage(response: Response) {
   try {
-    const body = (await response.json()) as { message?: string | string[] };
+    const body = (await response.json()) as {
+      error?: string;
+      message?: string | string[];
+    };
 
     if (Array.isArray(body.message)) {
       return body.message.join(' ');
     }
 
-    return body.message ?? 'Admin request failed.';
+    if (
+      response.status >= 500 ||
+      body.message?.toLowerCase?.().includes('internal server error')
+    ) {
+      return 'The server could not complete this admin request. Check backend logs, database migrations, and required environment variables.';
+    }
+
+    return body.message ?? body.error ?? 'Admin request failed.';
   } catch {
+    if (response.status >= 500) {
+      return 'The server could not complete this admin request. Check backend logs, database migrations, and required environment variables.';
+    }
+
     return 'Admin request failed.';
   }
 }

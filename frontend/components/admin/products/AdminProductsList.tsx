@@ -51,7 +51,7 @@ export function AdminProductsList() {
       {products.map((product) => (
         <article
           key={product.id}
-          className="grid gap-5 border border-[#e5e5e5] p-5 md:grid-cols-[96px_1fr_auto]"
+          className="grid gap-5 border border-[#e5e5e5] bg-white p-5 transition hover:border-[#111111] md:grid-cols-[96px_1fr_auto]"
         >
           <div className="aspect-[3/4] overflow-hidden bg-[#f5f5f5]">
             {product.primaryImage ? (
@@ -103,7 +103,7 @@ export function AdminProductsHeader() {
       </div>
       <Link
         href="/admin/products/new"
-        className="inline-flex h-12 items-center justify-center border border-[#111111] px-6 text-sm font-medium uppercase tracking-[0.08em] hover:bg-[#111111] hover:text-white"
+        className="inline-flex h-12 cursor-pointer items-center justify-center border border-[#111111] px-6 text-sm font-medium uppercase tracking-[0.08em] hover:bg-[#111111] hover:text-white"
       >
         New product
       </Link>
