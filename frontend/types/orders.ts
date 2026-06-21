@@ -46,6 +46,7 @@ export type Order = {
   items: Array<{
     id: string;
     productId: string | null;
+    variantId: string | null;
     productName: string;
     productSlug: string | null;
     quantity: number;
@@ -53,6 +54,15 @@ export type Order = {
     lineTotalInPaise: number;
     selectedColor: string | null;
     selectedSize: string | null;
+    variant: {
+      id: string;
+      colorName: string;
+      colorSlug: string;
+      colorHex: string | null;
+      size: string;
+      stock: number;
+      sku: string | null;
+    } | null;
     product: {
       id: string;
       name: string;

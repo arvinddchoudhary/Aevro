@@ -25,6 +25,7 @@ export type ProductVariant = {
   colorHex: string | null;
   size: string;
   stock: number;
+  lowStock?: boolean;
   sku?: string | null;
   images: ProductImage[];
 };
@@ -34,12 +35,14 @@ export type ProductColorOption = {
   colorSlug: string;
   colorHex: string | null;
   totalStock: number;
+  lowStock?: boolean;
 };
 
 export type ProductSizeOption = {
   variantId: string;
   size: string;
   stock: number;
+  lowStock?: boolean;
 };
 
 export type Product = {
@@ -52,6 +55,7 @@ export type Product = {
   color: string | null;
   size: string | null;
   stock: number;
+  lowStock?: boolean;
   status: ProductStatus;
   category: Pick<Category, 'id' | 'name' | 'slug'> | null;
   images: ProductImage[];

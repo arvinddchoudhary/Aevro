@@ -48,52 +48,64 @@ export function AdminProductsList() {
 
   return (
     <div className="space-y-4">
-      {products.map((product) => (
-        <article
-          key={product.id}
-          className="grid gap-5 border border-[#e5e5e5] bg-white p-5 transition hover:border-[#111111] md:grid-cols-[96px_1fr_auto]"
-        >
-          <div className="aspect-[3/4] overflow-hidden bg-[#f5f5f5]">
-            {product.primaryImage ? (
-              <img
-                src={product.primaryImage.url}
-                alt={product.primaryImage.altText ?? product.name}
-                className="h-full w-full object-cover"
-              />
-            ) : (
-              <div className="flex h-full items-center justify-center text-xs uppercase tracking-[0.18em] text-[#777777]">
-                AEVRO
-              </div>
-            )}
-          </div>
-          <div>
-            <div className="flex flex-wrap items-center gap-3">
-              <p className="text-xs uppercase tracking-[0.18em] text-[#777777]">
-                {product.category?.name ?? 'Uncategorised'}
-              </p>
-              <span className="border border-[#d9d9d9] px-3 py-1 text-xs uppercase tracking-[0.16em] text-[#555555]">
-                {product.status}
-              </span>
+      {products.map((product) => {
+        const lowStockVariants = product.variants.filter((variant) => variant.lowStock);
+        const outOfStockVariants = product.variants.filter((variant) => variant.stock <= 0);
+
+        return (
+          <article
+            key={product.id}
+            className="grid gap-5 border border-[#e5e5e5] bg-white p-5 transition hover:border-[#111111] md:grid-cols-[96px_1fr_auto]"
+          >
+            <div className="aspect-[3/4] overflow-hidden bg-[#f5f5f5]">
+              {product.primaryImage ? (
+                <img
+                  src={product.primaryImage.url}
+                  alt={product.primaryImage.altText ?? product.name}
+                  className="h-full w-full object-cover"
+                />
+              ) : (
+                <div className="flex h-full items-center justify-center text-xs uppercase tracking-[0.18em] text-[#777777]">
+                  AEVRO
+                </div>
+              )}
             </div>
-            <p className="mt-3 text-lg">{product.name}</p>
-            <p className="mt-2 text-sm text-[#555555]">
-              {product.variants.length} variant{product.variants.length === 1 ? '' : 's'} / Stock {product.stock}
-            </p>
-            <p className="mt-2 text-xs uppercase tracking-[0.16em] text-[#777777]">
-              Created {new Date(product.createdAt).toLocaleDateString()}
-            </p>
-          </div>
-          <div className="flex flex-col items-start gap-4 text-left md:items-end md:text-right">
-            <p className="text-lg">{formatPrice(product.priceInPaise)}</p>
-            <Link
-              href={`/admin/products/${product.id}/edit`}
-              className="inline-flex h-10 cursor-pointer items-center justify-center border border-[#111111] px-4 text-xs font-medium uppercase tracking-[0.1em] hover:bg-[#111111] hover:text-white"
-            >
-              Edit
-            </Link>
-          </div>
-        </article>
-      ))}
+            <div>
+              <div className="flex flex-wrap items-center gap-3">
+                <p className="text-xs uppercase tracking-[0.18em] text-[#777777]">
+                  {product.category?.name ?? 'Uncategorised'}
+                </p>
+                <span className="border border-[#d9d9d9] px-3 py-1 text-xs uppercase tracking-[0.16em] text-[#555555]">
+                  {product.status}
+                </span>
+              </div>
+              <p className="mt-3 text-lg">{product.name}</p>
+              <p className="mt-2 text-sm text-[#555555]">
+                {product.variants.length} variant{product.variants.length === 1 ? '' : 's'} / Stock {product.stock}
+              </p>
+              {(lowStockVariants.length > 0 || outOfStockVariants.length > 0) && (
+                <p className="mt-2 text-sm text-[#8a1f1f]">
+                  {outOfStockVariants.length > 0
+                    ? `${outOfStockVariants.length} variant${outOfStockVariants.length === 1 ? '' : 's'} out of stock`
+                    : `${lowStockVariants.length} low-stock variant${lowStockVariants.length === 1 ? '' : 's'}`}
+                </p>
+              )}
+              <p className="mt-2 text-xs uppercase tracking-[0.16em] text-[#777777]">
+                Created {new Date(product.createdAt).toLocaleDateString()}
+              </p>
+            </div>
+            <div className="flex flex-col items-start gap-4 text-left md:items-end md:text-right">
+              <p className="text-lg">{formatPrice(product.priceInPaise)}</p>
+              <Link
+                href={`/admin/products/${product.id}/edit`}
+                className="inline-flex h-10 cursor-pointer items-center justify-center border border-[#111111] px-4 text-xs font-medium uppercase tracking-[0.1em] hover:bg-[#111111] hover:text-white"
+              >
+                Edit
+              </Link>
+            </div>
+          </article>
+        );
+      })}
     </div>
   );
 }

@@ -8,6 +8,9 @@ import { CartQuantityControls } from './CartQuantityControls';
 
 export function CartPageContent() {
   const { items, subtotalInPaise, clearCart } = useCart();
+  const hasStockWarnings = items.some(
+    (item) => item.stock <= 0 || item.quantity >= item.stock,
+  );
 
   if (items.length === 0) {
     return (
@@ -63,6 +66,19 @@ export function CartPageContent() {
                     {item.selectedSize && <p>Size: {item.selectedSize}</p>}
                   </div>
                 )}
+                {item.stock <= 0 ? (
+                  <p className="mt-3 text-sm text-[#8a1f1f]">
+                    This variant is currently out of stock.
+                  </p>
+                ) : item.quantity >= item.stock ? (
+                  <p className="mt-3 text-sm text-[#8a1f1f]">
+                    You have selected the maximum available stock.
+                  </p>
+                ) : item.stock <= 5 ? (
+                  <p className="mt-3 text-sm text-[#8a1f1f]">
+                    Low stock: only {item.stock} left.
+                  </p>
+                ) : null}
                 <div className="mt-5">
                   <CartQuantityControls
                     itemKey={item.itemKey}
@@ -98,6 +114,12 @@ export function CartPageContent() {
         <p className="mt-4 text-sm leading-6 text-[#666666]">
           Checkout collects customer and shipping details before payment is added.
         </p>
+        {hasStockWarnings && (
+          <p className="mt-4 border border-[#8a1f1f] p-4 text-sm leading-6 text-[#8a1f1f]">
+            Stock is limited for one or more items. Final availability is checked
+            again before payment.
+          </p>
+        )}
         <div className="mt-6 flex flex-col gap-3">
           <Link
             href="/checkout"

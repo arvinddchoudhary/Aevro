@@ -411,6 +411,7 @@ Response shape:
       "color": "Black",
       "size": "30",
       "stock": 12,
+      "lowStock": false,
       "status": "ACTIVE",
       "category": {
         "id": "category_id",
@@ -440,7 +441,8 @@ Response shape:
           "colorName": "Black",
           "colorSlug": "black",
           "colorHex": "#111111",
-          "totalStock": 12
+          "totalStock": 12,
+          "lowStock": false
         }
       ],
       "sizesByColor": {
@@ -448,7 +450,8 @@ Response shape:
           {
             "variantId": "variant_id",
             "size": "30",
-            "stock": 12
+            "stock": 12,
+            "lowStock": false
           }
         ]
       },
@@ -472,6 +475,7 @@ Response shape:
           "colorHex": "#111111",
           "size": "30",
           "stock": 12,
+          "lowStock": false,
           "images": [
             {
               "id": "image_id",
@@ -647,13 +651,23 @@ Response shape:
       {
         "id": "order_item_id",
         "productId": "product_id",
+        "variantId": "variant_id",
         "productName": "Wide-Leg Pleated Trouser - Black",
         "productSlug": "wide-leg-pleated-trouser-black",
         "quantity": 1,
         "unitPriceInPaise": 189900,
         "lineTotalInPaise": 189900,
         "selectedColor": "Black",
-        "selectedSize": "30"
+        "selectedSize": "30",
+        "variant": {
+          "id": "variant_id",
+          "colorName": "Black",
+          "colorSlug": "black",
+          "colorHex": "#111111",
+          "size": "30",
+          "stock": 12,
+          "sku": "AEVRO-WLT-BLK-30"
+        }
       }
     ],
     "createdAt": "2026-06-20T00:00:00.000Z",
@@ -731,6 +745,43 @@ Request body:
 On successful verification, the payment is marked `PAID` and the order status is
 updated to `CONFIRMED`. Invalid signatures are rejected and the payment is
 marked `FAILED`.
+
+## Phase 19 Inventory And Stock Handling
+
+Stock is tracked at `ProductVariant` level for clothing color/size combinations.
+Order creation validates product status, variant existence, backend price, and
+available variant stock, but it does not deduct stock. This prevents abandoned
+pending orders from consuming inventory.
+
+Stock is deducted only after successful Razorpay payment verification. The
+payment verification transaction:
+
+- marks the payment `PAID` only once
+- decrements the ordered `ProductVariant.stock`
+- decrements the parent `Product.stock` total
+- updates the order status to `CONFIRMED`
+- returns the existing paid result on payment verification retries without
+  deducting stock again
+
+If stock is no longer available at payment verification time, the backend returns
+a clear insufficient-stock error and the payment/order confirmation is not
+completed.
+
+Public and admin product responses include `lowStock` flags when stock is above
+zero and at or below the current low-stock threshold.
+
+Migration added:
+
+```txt
+000005_inventory_variant_order_items
+```
+
+Run it with:
+
+```bash
+cd backend
+npm run prisma:deploy
+```
 
 ## Planned API Direction
 

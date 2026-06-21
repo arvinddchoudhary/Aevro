@@ -98,7 +98,9 @@ export function ProductVariantSelection({ product }: ProductVariantSelectionProp
   const canAddToCart = Boolean(selectedColor && selectedVariant && selectedVariant.stock > 0);
   const stockLabel = selectedVariant
     ? selectedVariant.stock > 0
-      ? `${selectedVariant.stock} available`
+      ? selectedVariant.lowStock
+        ? `Only ${selectedVariant.stock} left`
+        : `${selectedVariant.stock} available`
       : 'Out of stock'
     : selectedColor
       ? 'Select a size'
@@ -183,6 +185,11 @@ export function ProductVariantSelection({ product }: ProductVariantSelectionProp
                     style={{ backgroundColor: color.colorHex ?? '#111111' }}
                   />
                   {color.colorName}
+                  {color.lowStock && color.totalStock > 0 ? (
+                    <span className="text-xs uppercase tracking-[0.12em] text-[#8a1f1f]">
+                      Low
+                    </span>
+                  ) : null}
                 </button>
               ))}
             </div>
@@ -208,7 +215,12 @@ export function ProductVariantSelection({ product }: ProductVariantSelectionProp
                       : 'border-[#d9d9d9]'
                   }`}
                 >
-                  {size.size}
+                  <span>{size.size}</span>
+                  {size.stock > 0 && size.lowStock ? (
+                    <span className="ml-1 text-[10px] uppercase tracking-[0.08em]">
+                      Low
+                    </span>
+                  ) : null}
                 </button>
               ))}
             </div>
