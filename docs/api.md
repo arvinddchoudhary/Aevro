@@ -16,6 +16,9 @@ GET /api/v1/auth/me
 GET /api/v1/admin/health
 GET /api/v1/admin/categories
 POST /api/v1/admin/categories
+GET /api/v1/admin/orders
+GET /api/v1/admin/orders/:id
+PATCH /api/v1/admin/orders/:id/status
 GET /api/v1/admin/products
 POST /api/v1/admin/products
 GET /api/v1/admin/products/:id
@@ -162,12 +165,55 @@ Frontend admin route:
 
 ```txt
 GET /admin
+GET /admin/orders
+GET /admin/orders/:id
 GET /admin/products
 GET /admin/products/new
 ```
 
 The frontend shows login-required, access-denied, or the admin shell depending
 on the current authenticated user.
+
+## Phase 18 Admin Order Management
+
+Admin order routes require the same httpOnly cookie JWT session and
+`role: ADMIN`.
+
+```txt
+GET /api/v1/admin/orders
+GET /api/v1/admin/orders/:id
+PATCH /api/v1/admin/orders/:id/status
+```
+
+List query parameters:
+
+```txt
+page=1
+limit=20
+search=customer@example.com
+status=PENDING
+paymentStatus=PAID
+sort=newest
+```
+
+Supported `sort` values are `newest` and `oldest`.
+
+Status update body:
+
+```json
+{
+  "status": "PROCESSING"
+}
+```
+
+Admin order responses include customer details, shipping address, order items,
+product references, order total, order status, payment status, and timestamps.
+The admin UI is available at:
+
+```txt
+GET /admin/orders
+GET /admin/orders/:id
+```
 
 ## Phase 15 Admin Product Management
 
