@@ -116,11 +116,48 @@ export async function getAdminProducts() {
   return response.data;
 }
 
+export async function getAdminProduct(id: string) {
+  const response = await adminRequest<AdminItemResponse<AdminProduct>>(
+    `/admin/products/${id}`,
+  );
+
+  if (!response.success) {
+    throw new AdminApiError(
+      Array.isArray(response.message) ? response.message.join(' ') : response.message,
+      response.statusCode,
+    );
+  }
+
+  return response.data;
+}
+
 export async function createAdminProduct(payload: CreateAdminProductPayload) {
   const response = await adminRequest<AdminItemResponse<AdminProduct>>('/admin/products', {
     method: 'POST',
     body: JSON.stringify(payload),
   });
+
+  if (!response.success) {
+    throw new AdminApiError(
+      Array.isArray(response.message) ? response.message.join(' ') : response.message,
+      response.statusCode,
+    );
+  }
+
+  return response.data;
+}
+
+export async function updateAdminProduct(
+  id: string,
+  payload: CreateAdminProductPayload,
+) {
+  const response = await adminRequest<AdminItemResponse<AdminProduct>>(
+    `/admin/products/${id}`,
+    {
+      method: 'PATCH',
+      body: JSON.stringify(payload),
+    },
+  );
 
   if (!response.success) {
     throw new AdminApiError(

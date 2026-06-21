@@ -19,7 +19,8 @@ export class AdminProductImageDto {
   url!: string;
 
   @IsString()
-  publicId!: string;
+  @IsOptional()
+  publicId?: string;
 
   @IsString()
   @IsOptional()

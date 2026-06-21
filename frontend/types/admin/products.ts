@@ -1,13 +1,19 @@
-import type { Category, ProductImage } from '../catalog';
+import type { Category } from '../catalog';
 
 export type AdminProductStatus = 'DRAFT' | 'ACTIVE' | 'ARCHIVED';
 
 export type UploadedProductImage = {
   url: string;
-  publicId: string;
+  publicId?: string | null;
   altText?: string;
   sortOrder: number;
   isPrimary: boolean;
+};
+
+export type AdminProductImage = UploadedProductImage & {
+  id?: string;
+  altText?: string | null;
+  variantId?: string | null;
 };
 
 export type AdminProductVariantInput = {
@@ -38,7 +44,7 @@ export type AdminProduct = {
   priceInPaise: number;
   status: AdminProductStatus;
   category: Category | null;
-  primaryImage: ProductImage | null;
+  primaryImage: AdminProductImage | null;
   stock: number;
   createdAt: string;
   updatedAt: string;
@@ -50,7 +56,7 @@ export type AdminProduct = {
     size: string;
     stock: number;
     sku: string | null;
-    images: ProductImage[];
+    images: AdminProductImage[];
   }>;
 };
 

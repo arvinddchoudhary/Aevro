@@ -6,10 +6,12 @@ import {
   createAdminCategory,
   createAdminProduct,
   getAdminCategories,
+  updateAdminProduct,
   uploadProductImages,
 } from '../../../lib/api/admin-products';
 import type { Category } from '../../../types/catalog';
 import type {
+  AdminProduct,
   AdminProductStatus,
   UploadedProductImage,
 } from '../../../types/admin/products';
@@ -122,18 +124,51 @@ function TextInput({
   );
 }
 
-export function AdminProductForm() {
+type AdminProductFormProps = {
+  product?: AdminProduct;
+};
+
+function productToVariants(product?: AdminProduct): VariantForm[] {
+  if (!product?.variants.length) {
+    return [emptyVariant()];
+  }
+
+  return product.variants.map((variant) => ({
+    colorName: variant.colorName,
+    colorSlug: variant.colorSlug,
+    colorHex: variant.colorHex ?? '',
+    size: variant.size,
+    stock: String(variant.stock),
+    sku: variant.sku ?? '',
+    images: variant.images.map((image, index) => ({
+      url: image.url,
+      publicId: image.publicId,
+      altText: image.altText ?? undefined,
+      sortOrder: image.sortOrder ?? index,
+      isPrimary: image.isPrimary ?? index === 0,
+    })),
+  }));
+}
+
+export function AdminProductForm({ product }: AdminProductFormProps) {
   const router = useRouter();
+  const isEditMode = Boolean(product);
   const [categories, setCategories] = useState<Category[]>([]);
-  const [name, setName] = useState('');
-  const [slug, setSlug] = useState('');
-  const [description, setDescription] = useState('');
-  const [price, setPrice] = useState('');
-  const [categoryId, setCategoryId] = useState('');
+  const [name, setName] = useState(product?.name ?? '');
+  const [slug, setSlug] = useState(product?.slug ?? '');
+  const [description, setDescription] = useState(product?.description ?? '');
+  const [price, setPrice] = useState(
+    product ? String(product.priceInPaise / 100) : '',
+  );
+  const [categoryId, setCategoryId] = useState(product?.category?.id ?? '');
   const [newCategoryName, setNewCategoryName] = useState('');
   const [newCategoryDescription, setNewCategoryDescription] = useState('');
-  const [status, setStatus] = useState<AdminProductStatus>('DRAFT');
-  const [variants, setVariants] = useState<VariantForm[]>([emptyVariant()]);
+  const [status, setStatus] = useState<AdminProductStatus>(
+    product?.status ?? 'DRAFT',
+  );
+  const [variants, setVariants] = useState<VariantForm[]>(
+    productToVariants(product),
+  );
   const [formError, setFormError] = useState<string | null>(null);
   const [categoryError, setCategoryError] = useState<string | null>(null);
   const [uploadErrors, setUploadErrors] = useState<Record<number, string>>({});
@@ -147,7 +182,9 @@ export function AdminProductForm() {
       try {
         const nextCategories = await getAdminCategories();
         setCategories(nextCategories);
-        setCategoryId(nextCategories[0]?.id ?? '');
+        setCategoryId((currentCategoryId) =>
+          currentCategoryId || nextCategories[0]?.id || '',
+        );
       } catch (loadError) {
         setFormError(getReadableError(loadError, 'Unable to load categories.'));
       }
@@ -175,13 +212,15 @@ export function AdminProductForm() {
     setUploadErrors((current) => ({ ...current, [index]: '' }));
   };
 
-  const removeVariantImage = (variantIndex: number, publicId: string) => {
+  const removeVariantImage = (variantIndex: number, imageKey: string) => {
     setVariants((current) =>
       current.map((variant, index) =>
         index === variantIndex
           ? {
               ...variant,
-              images: variant.images.filter((image) => image.publicId !== publicId),
+              images: variant.images.filter(
+                (image) => (image.publicId ?? image.url) !== imageKey,
+              ),
             }
           : variant,
       ),
@@ -307,7 +346,7 @@ export function AdminProductForm() {
 
     try {
       setIsSubmitting(true);
-      const product = await createAdminProduct({
+      const payload = {
         name: name.trim(),
         slug: productSlug,
         description: description.trim() || undefined,
@@ -323,12 +362,25 @@ export function AdminProductForm() {
           sku: variant.sku.trim() || undefined,
           images: variant.images,
         })),
-      });
-      setSuccess('Product created.');
-      router.push(`/admin/products?created=${product.id}`);
+      };
+      const savedProduct = product
+        ? await updateAdminProduct(product.id, payload)
+        : await createAdminProduct(payload);
+
+      setSuccess(product ? 'Product updated.' : 'Product created.');
+      router.push(
+        product
+          ? `/admin/products?updated=${savedProduct.id}`
+          : `/admin/products?created=${savedProduct.id}`,
+      );
       router.refresh();
     } catch (submitError) {
-      setFormError(getReadableError(submitError, 'Unable to create product.'));
+      setFormError(
+        getReadableError(
+          submitError,
+          product ? 'Unable to update product.' : 'Unable to create product.',
+        ),
+      );
     } finally {
       setIsSubmitting(false);
     }
@@ -539,7 +591,7 @@ export function AdminProductForm() {
                 {variant.images.length > 0 && (
                   <div className="mt-5 grid grid-cols-2 gap-4 sm:grid-cols-5">
                     {variant.images.map((image, imageIndex) => (
-                      <div key={image.publicId} className="group">
+                      <div key={image.publicId ?? image.url} className="group">
                         <div className="aspect-square overflow-hidden bg-[#f5f5f5]">
                           <img
                             src={image.url}
@@ -553,7 +605,9 @@ export function AdminProductForm() {
                           </span>
                           <button
                             type="button"
-                            onClick={() => removeVariantImage(index, image.publicId)}
+                            onClick={() =>
+                              removeVariantImage(index, image.publicId ?? image.url)
+                            }
                             className="cursor-pointer underline-offset-4 hover:underline"
                           >
                             Remove
@@ -570,8 +624,8 @@ export function AdminProductForm() {
       </section>
 
       <aside className="h-fit border border-[#e5e5e5] bg-white p-5 sm:p-6 lg:sticky lg:top-24">
-        <p className="text-xs uppercase tracking-[0.2em] text-[#777777]">
-          Publish checklist
+          <p className="text-xs uppercase tracking-[0.2em] text-[#777777]">
+          {isEditMode ? 'Update checklist' : 'Publish checklist'}
         </p>
         <div className="mt-5 space-y-3 border-b border-[#eeeeee] pb-5 text-sm text-[#555555]">
           <p>Name: {name.trim() ? 'Ready' : 'Missing'}</p>
@@ -629,7 +683,13 @@ export function AdminProductForm() {
           disabled={isSubmitting}
           className="mt-6 h-12 w-full cursor-pointer border border-[#111111] text-sm font-medium uppercase tracking-[0.08em] hover:bg-[#111111] hover:text-white disabled:cursor-not-allowed disabled:border-[#d9d9d9] disabled:text-[#777777] disabled:hover:bg-white"
         >
-          {isSubmitting ? 'Creating product' : 'Create product'}
+          {isSubmitting
+            ? isEditMode
+              ? 'Updating product'
+              : 'Creating product'
+            : isEditMode
+              ? 'Update product'
+              : 'Create product'}
         </button>
       </aside>
     </form>
