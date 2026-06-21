@@ -35,6 +35,28 @@ const ALLOWED_IMAGE_TYPES = new Set([
   'image/webp',
 ]);
 
+const COLOR_HEX_BY_NAME: Record<string, string> = {
+  beige: '#D8C8A8',
+  black: '#111111',
+  blue: '#1F4E79',
+  brown: '#6B4F3A',
+  charcoal: '#36454F',
+  cream: '#F5F1E8',
+  green: '#2F6B4F',
+  grey: '#808080',
+  gray: '#808080',
+  khaki: '#C3B091',
+  maroon: '#800000',
+  navy: '#0B1F3A',
+  olive: '#708238',
+  onyx: '#111111',
+  pink: '#D8A7B1',
+  purple: '#6D4C8D',
+  red: '#B22222',
+  tan: '#D2B48C',
+  white: '#FFFFFF',
+};
+
 const emptyVariant = (): VariantForm => ({
   colorName: 'Black',
   colorSlug: 'black',
@@ -51,6 +73,14 @@ function slugify(value: string) {
     .trim()
     .replace(/[^a-z0-9]+/g, '-')
     .replace(/(^-|-$)/g, '');
+}
+
+function normalizeColorName(value: string) {
+  return value.toLowerCase().trim().replace(/\s+/g, ' ');
+}
+
+function getHexForColorName(value: string) {
+  return COLOR_HEX_BY_NAME[normalizeColorName(value)];
 }
 
 function getReadableError(error: unknown, fallback: string) {
@@ -120,6 +150,37 @@ function TextInput({
         onChange={(event) => onChange(event.target.value)}
         className="h-11 w-full border border-[#d9d9d9] px-4 text-sm outline-none focus:border-[#111111]"
       />
+    </label>
+  );
+}
+
+function ColorHexInput({
+  value,
+  onChange,
+}: {
+  value: string;
+  onChange: (value: string) => void;
+}) {
+  const safeColor = /^#[0-9a-fA-F]{6}$/.test(value) ? value : '#111111';
+
+  return (
+    <label className="block">
+      <FieldLabel>Color hex</FieldLabel>
+      <div className="grid grid-cols-[52px_1fr]">
+        <input
+          type="color"
+          value={safeColor}
+          onChange={(event) => onChange(event.target.value.toUpperCase())}
+          className="h-11 w-full cursor-pointer border border-r-0 border-[#d9d9d9] bg-white p-1"
+          aria-label="Pick variant color"
+        />
+        <input
+          value={value}
+          placeholder="#111111"
+          onChange={(event) => onChange(event.target.value)}
+          className="h-11 w-full border border-[#d9d9d9] px-4 text-sm outline-none focus:border-[#111111]"
+        />
+      </div>
     </label>
   );
 }
@@ -507,22 +568,23 @@ export function AdminProductForm({ product }: AdminProductFormProps) {
                 <TextInput
                   label="Color name"
                   value={variant.colorName}
-                  onChange={(value) =>
+                  onChange={(value) => {
+                    const matchedHex = getHexForColorName(value);
+
                     updateVariant(index, {
                       colorName: value,
                       colorSlug: slugify(value),
-                    })
-                  }
+                      ...(matchedHex ? { colorHex: matchedHex } : {}),
+                    });
+                  }}
                 />
                 <TextInput
                   label="Color slug"
                   value={variant.colorSlug}
                   onChange={(value) => updateVariant(index, { colorSlug: slugify(value) })}
                 />
-                <TextInput
-                  label="Color hex"
+                <ColorHexInput
                   value={variant.colorHex}
-                  placeholder="#111111"
                   onChange={(value) => updateVariant(index, { colorHex: value })}
                 />
                 <TextInput
