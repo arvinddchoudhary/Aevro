@@ -270,7 +270,7 @@ export function CheckoutPageContent() {
             {pendingOrderId && (
               <Link
                 href={`/checkout/confirmation/${pendingOrderId}`}
-                className="mt-3 inline-flex underline underline-offset-4"
+                className="mt-3 inline-flex cursor-pointer underline underline-offset-4"
               >
                 View pending order
               </Link>
@@ -329,13 +329,13 @@ export function CheckoutPageContent() {
         </p>
         <button
           disabled={isSubmitting}
-          className="mt-6 h-12 w-full border border-[#111111] text-sm font-medium uppercase tracking-[0.08em] hover:bg-[#111111] hover:text-white disabled:cursor-not-allowed disabled:border-[#bdbdbd] disabled:text-[#777777] disabled:hover:bg-white"
+          className="mt-6 h-12 w-full cursor-pointer border border-[#111111] text-sm font-medium uppercase tracking-[0.08em] hover:bg-[#111111] hover:text-white disabled:cursor-not-allowed disabled:border-[#bdbdbd] disabled:text-[#777777] disabled:hover:bg-white"
         >
           {isSubmitting ? submitLabel : submitLabel}
         </button>
         <Link
           href="/cart"
-          className="mt-3 inline-flex h-12 w-full items-center justify-center border border-[#d9d9d9] text-sm font-medium uppercase tracking-[0.08em] hover:border-[#111111]"
+          className="mt-3 inline-flex h-12 w-full cursor-pointer items-center justify-center border border-[#d9d9d9] text-sm font-medium uppercase tracking-[0.08em] hover:border-[#111111]"
         >
           Back to cart
         </Link>

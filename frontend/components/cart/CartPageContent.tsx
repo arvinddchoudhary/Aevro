@@ -28,7 +28,7 @@ export function CartPageContent() {
           >
             <Link
               href={`/products/${item.slug}`}
-              className="aspect-[3/4] overflow-hidden bg-[#f5f5f5]"
+              className="aspect-[3/4] cursor-pointer overflow-hidden bg-[#f5f5f5]"
             >
               {item.imageUrl ? (
                 <img
@@ -50,7 +50,7 @@ export function CartPageContent() {
                 </p>
                 <Link
                   href={`/products/${item.slug}`}
-                  className="mt-2 block text-lg underline-offset-4 hover:underline"
+                  className="mt-2 block cursor-pointer text-lg underline-offset-4 hover:underline"
                 >
                   {item.name}
                 </Link>
@@ -101,20 +101,20 @@ export function CartPageContent() {
         <div className="mt-6 flex flex-col gap-3">
           <Link
             href="/checkout"
-            className="inline-flex h-12 items-center justify-center border border-[#111111] px-6 text-sm font-medium uppercase tracking-[0.08em] hover:bg-[#111111] hover:text-white"
+            className="inline-flex h-12 cursor-pointer items-center justify-center border border-[#111111] px-6 text-sm font-medium uppercase tracking-[0.08em] hover:bg-[#111111] hover:text-white"
           >
             Continue to checkout
           </Link>
           <Link
             href="/products"
-            className="inline-flex h-12 items-center justify-center border border-[#d9d9d9] px-6 text-sm font-medium uppercase tracking-[0.08em] hover:border-[#111111]"
+            className="inline-flex h-12 cursor-pointer items-center justify-center border border-[#d9d9d9] px-6 text-sm font-medium uppercase tracking-[0.08em] hover:border-[#111111]"
           >
             Continue shopping
           </Link>
           <button
             type="button"
             onClick={clearCart}
-            className="h-12 border border-[#d9d9d9] text-sm font-medium uppercase tracking-[0.08em] hover:border-[#111111]"
+            className="h-12 cursor-pointer border border-[#d9d9d9] text-sm font-medium uppercase tracking-[0.08em] hover:border-[#111111]"
           >
             Clear cart
           </button>

@@ -8,11 +8,11 @@ type ProductCardProps = {
 };
 
 export function ProductCard({ product }: ProductCardProps) {
-  const primaryImage = product.images[0];
+  const primaryImage = product.primaryImage ?? product.images[0];
 
   return (
     <article className="group">
-      <Link href={`/products/${product.slug}`} className="group block">
+      <Link href={`/products/${product.slug}`} className="group block cursor-pointer">
         <ProductImageFrame
           image={primaryImage}
           productName={product.name}
@@ -37,7 +37,7 @@ export function ProductCard({ product }: ProductCardProps) {
       </Link>
       <Link
         href={`/products/${product.slug}`}
-        className="mt-4 inline-flex h-11 w-full items-center justify-center border border-[#111111] bg-white px-5 text-sm font-medium uppercase tracking-[0.08em] text-[#111111] transition hover:bg-[#111111] hover:text-white"
+        className="mt-4 inline-flex h-11 w-full cursor-pointer items-center justify-center border border-[#111111] bg-white px-5 text-sm font-medium uppercase tracking-[0.08em] text-[#111111] transition hover:bg-[#111111] hover:text-white"
       >
         Select options
       </Link>

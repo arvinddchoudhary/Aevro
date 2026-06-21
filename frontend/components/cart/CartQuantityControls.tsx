@@ -21,7 +21,7 @@ export function CartQuantityControls({
         <button
           type="button"
           onClick={() => decrementItem(itemKey)}
-          className="h-full w-10 text-lg"
+          className="h-full w-10 cursor-pointer text-lg"
           aria-label="Decrease quantity"
         >
           -
@@ -31,7 +31,7 @@ export function CartQuantityControls({
           type="button"
           onClick={() => incrementItem(itemKey)}
           disabled={quantity >= stock}
-          className="h-full w-10 text-lg disabled:cursor-not-allowed disabled:text-[#bbbbbb]"
+          className="h-full w-10 cursor-pointer text-lg disabled:cursor-not-allowed disabled:text-[#bbbbbb]"
           aria-label="Increase quantity"
         >
           +
@@ -40,7 +40,7 @@ export function CartQuantityControls({
       <button
         type="button"
         onClick={() => removeItem(itemKey)}
-        className="text-sm underline underline-offset-4"
+        className="cursor-pointer text-sm underline underline-offset-4"
       >
         Remove
       </button>
