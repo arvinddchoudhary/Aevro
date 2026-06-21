@@ -89,7 +89,7 @@ export class AdminProductsService {
     const firstVariant = variantData?.[0];
     const totalStock = variantData?.reduce((total, variant) => total + variant.stock, 0);
 
-    const product = await this.prisma.$transaction(async (tx) => {
+    await this.prisma.$transaction(async (tx) => {
       await tx.product.update({
         where: { id },
         data: {
@@ -113,8 +113,19 @@ export class AdminProductsService {
         await this.createVariants(tx, id, variantData);
       }
 
-      return this.findProductOrThrow(tx, id);
+    }, {
+      maxWait: 10000,
+      timeout: 20000,
     });
+
+    const product = await this.prisma.product.findUnique({
+      where: { id },
+      include: this.productInclude(),
+    });
+
+    if (!product) {
+      throw new NotFoundException('Product not found.');
+    }
 
     return this.serializeProduct(product);
   }
