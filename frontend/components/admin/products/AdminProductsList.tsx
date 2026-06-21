@@ -83,8 +83,14 @@ export function AdminProductsList() {
               Created {new Date(product.createdAt).toLocaleDateString()}
             </p>
           </div>
-          <div className="text-left md:text-right">
+          <div className="flex flex-col items-start gap-4 text-left md:items-end md:text-right">
             <p className="text-lg">{formatPrice(product.priceInPaise)}</p>
+            <Link
+              href={`/admin/products/${product.id}/edit`}
+              className="inline-flex h-10 cursor-pointer items-center justify-center border border-[#111111] px-4 text-xs font-medium uppercase tracking-[0.1em] hover:bg-[#111111] hover:text-white"
+            >
+              Edit
+            </Link>
           </div>
         </article>
       ))}
