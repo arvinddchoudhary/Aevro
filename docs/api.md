@@ -362,7 +362,6 @@ Response shape:
       "slug": "wide-leg-pleated-trouser-black",
       "description": "A high-rise double-pleated wide-leg trouser.",
       "priceInPaise": 189900,
-      "sku": "AEVRO-WLPT-BLK",
       "color": "Black",
       "size": "30",
       "stock": 12,

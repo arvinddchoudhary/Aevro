@@ -12,7 +12,6 @@ export type Category = {
 export type ProductImage = {
   id: string;
   url: string;
-  publicId?: string | null;
   altText: string | null;
   sortOrder: number;
   isPrimary?: boolean;
@@ -49,7 +48,7 @@ export type Product = {
   slug: string;
   description: string | null;
   priceInPaise: number;
-  sku: string | null;
+  sku?: string | null;
   color: string | null;
   size: string | null;
   stock: number;

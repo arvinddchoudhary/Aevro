@@ -128,7 +128,7 @@ export function ProductVariantSelection({ product }: ProductVariantSelectionProp
               key={image?.id ?? index}
               type="button"
               onClick={() => setSelectedImageId(image?.id ?? null)}
-              className={`border ${
+              className={`cursor-pointer border ${
                 image?.id === selectedImage?.id ? 'border-[#111111]' : 'border-[#eeeeee]'
               }`}
               aria-label={`View ${product.name} image ${index + 1}`}
@@ -172,7 +172,7 @@ export function ProductVariantSelection({ product }: ProductVariantSelectionProp
                   key={color.colorSlug}
                   type="button"
                   onClick={() => selectColor(color.colorSlug)}
-                  className={`flex h-11 items-center gap-3 border px-4 text-sm ${
+                  className={`flex h-11 cursor-pointer items-center gap-3 border px-4 text-sm ${
                     selectedColorSlug === color.colorSlug
                       ? 'border-[#111111]'
                       : 'border-[#d9d9d9]'
@@ -202,7 +202,7 @@ export function ProductVariantSelection({ product }: ProductVariantSelectionProp
                   type="button"
                   disabled={size.stock <= 0}
                   onClick={() => setSelectedSize(size.size)}
-                  className={`h-11 border text-sm disabled:cursor-not-allowed disabled:border-[#eeeeee] disabled:text-[#bbbbbb] ${
+                  className={`h-11 cursor-pointer border text-sm disabled:cursor-not-allowed disabled:border-[#eeeeee] disabled:text-[#bbbbbb] ${
                     selectedSize === size.size
                       ? 'border-[#111111] bg-[#111111] text-white'
                       : 'border-[#d9d9d9]'
@@ -248,7 +248,7 @@ export function ProductVariantSelection({ product }: ProductVariantSelectionProp
           {product.category && (
             <Link
               href={`/products?category=${product.category.slug}`}
-              className="inline-flex h-12 min-w-40 items-center justify-center border border-[#d9d9d9] px-7 text-sm font-medium uppercase tracking-[0.08em] hover:border-[#111111]"
+              className="inline-flex h-12 min-w-40 cursor-pointer items-center justify-center border border-[#d9d9d9] px-7 text-sm font-medium uppercase tracking-[0.08em] hover:border-[#111111]"
             >
               More {product.category.name}
             </Link>
