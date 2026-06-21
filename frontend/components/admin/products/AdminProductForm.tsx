@@ -1,6 +1,6 @@
 'use client';
 
-import { FormEvent, useEffect, useMemo, useState } from 'react';
+import { ChangeEvent, FormEvent, useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import {
   createAdminCategory,
@@ -9,7 +9,10 @@ import {
   uploadProductImages,
 } from '../../../lib/api/admin-products';
 import type { Category } from '../../../types/catalog';
-import type { AdminProductStatus, UploadedProductImage } from '../../../types/admin/products';
+import type {
+  AdminProductStatus,
+  UploadedProductImage,
+} from '../../../types/admin/products';
 
 type VariantForm = {
   colorName: string;
@@ -20,6 +23,15 @@ type VariantForm = {
   sku: string;
   images: UploadedProductImage[];
 };
+
+const MAX_IMAGES_PER_COLOR = 5;
+const MAX_IMAGE_SIZE_BYTES = 5 * 1024 * 1024;
+const ALLOWED_IMAGE_TYPES = new Set([
+  'image/jpeg',
+  'image/jpg',
+  'image/png',
+  'image/webp',
+]);
 
 const emptyVariant = (): VariantForm => ({
   colorName: 'Black',
@@ -39,6 +51,77 @@ function slugify(value: string) {
     .replace(/(^-|-$)/g, '');
 }
 
+function getReadableError(error: unknown, fallback: string) {
+  if (!(error instanceof Error)) {
+    return fallback;
+  }
+
+  if (error.message.toLowerCase().includes('internal server error')) {
+    return 'The server could not complete this admin request. Check backend logs and required environment variables.';
+  }
+
+  return error.message;
+}
+
+function validateImageFiles(files: File[], existingCount: number) {
+  if (files.length === 0) {
+    return 'Select at least one image.';
+  }
+
+  if (existingCount + files.length > MAX_IMAGES_PER_COLOR) {
+    return `Upload up to ${MAX_IMAGES_PER_COLOR} images for this color.`;
+  }
+
+  const invalidType = files.find((file) => !ALLOWED_IMAGE_TYPES.has(file.type));
+
+  if (invalidType) {
+    return 'Only jpg, jpeg, png, and webp images are allowed.';
+  }
+
+  const oversizedFile = files.find((file) => file.size > MAX_IMAGE_SIZE_BYTES);
+
+  if (oversizedFile) {
+    return 'Each image must be 5MB or smaller.';
+  }
+
+  return null;
+}
+
+function FieldLabel({ children }: { children: string }) {
+  return (
+    <span className="mb-2 block text-xs uppercase tracking-[0.16em] text-[#777777]">
+      {children}
+    </span>
+  );
+}
+
+function TextInput({
+  label,
+  value,
+  placeholder,
+  inputMode,
+  onChange,
+}: {
+  label: string;
+  value: string;
+  placeholder?: string;
+  inputMode?: 'text' | 'numeric' | 'decimal';
+  onChange: (value: string) => void;
+}) {
+  return (
+    <label className="block">
+      <FieldLabel>{label}</FieldLabel>
+      <input
+        value={value}
+        placeholder={placeholder}
+        inputMode={inputMode}
+        onChange={(event) => onChange(event.target.value)}
+        className="h-11 w-full border border-[#d9d9d9] px-4 text-sm outline-none focus:border-[#111111]"
+      />
+    </label>
+  );
+}
+
 export function AdminProductForm() {
   const router = useRouter();
   const [categories, setCategories] = useState<Category[]>([]);
@@ -48,11 +131,15 @@ export function AdminProductForm() {
   const [price, setPrice] = useState('');
   const [categoryId, setCategoryId] = useState('');
   const [newCategoryName, setNewCategoryName] = useState('');
+  const [newCategoryDescription, setNewCategoryDescription] = useState('');
   const [status, setStatus] = useState<AdminProductStatus>('DRAFT');
   const [variants, setVariants] = useState<VariantForm[]>([emptyVariant()]);
-  const [error, setError] = useState<string | null>(null);
+  const [formError, setFormError] = useState<string | null>(null);
+  const [categoryError, setCategoryError] = useState<string | null>(null);
+  const [uploadErrors, setUploadErrors] = useState<Record<number, string>>({});
   const [success, setSuccess] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isCreatingCategory, setIsCreatingCategory] = useState(false);
   const [uploadingIndex, setUploadingIndex] = useState<number | null>(null);
 
   useEffect(() => {
@@ -62,9 +149,7 @@ export function AdminProductForm() {
         setCategories(nextCategories);
         setCategoryId(nextCategories[0]?.id ?? '');
       } catch (loadError) {
-        setError(
-          loadError instanceof Error ? loadError.message : 'Unable to load categories.',
-        );
+        setFormError(getReadableError(loadError, 'Unable to load categories.'));
       }
     }
 
@@ -75,6 +160,11 @@ export function AdminProductForm() {
     () => categories.find((category) => category.id === categoryId),
     [categories, categoryId],
   );
+  const productSlug = slug || slugify(name);
+  const totalImages = variants.reduce(
+    (total, variant) => total + variant.images.length,
+    0,
+  );
 
   const updateVariant = (index: number, patch: Partial<VariantForm>) => {
     setVariants((current) =>
@@ -82,73 +172,144 @@ export function AdminProductForm() {
         variantIndex === index ? { ...variant, ...patch } : variant,
       ),
     );
+    setUploadErrors((current) => ({ ...current, [index]: '' }));
+  };
+
+  const removeVariantImage = (variantIndex: number, publicId: string) => {
+    setVariants((current) =>
+      current.map((variant, index) =>
+        index === variantIndex
+          ? {
+              ...variant,
+              images: variant.images.filter((image) => image.publicId !== publicId),
+            }
+          : variant,
+      ),
+    );
   };
 
   const handleCreateCategory = async () => {
+    setCategoryError(null);
+
     if (!newCategoryName.trim()) {
+      setCategoryError('Enter a category name first.');
       return;
     }
 
     try {
+      setIsCreatingCategory(true);
       const category = await createAdminCategory({
         name: newCategoryName.trim(),
         slug: slugify(newCategoryName),
+        description: newCategoryDescription.trim() || undefined,
       });
       setCategories((current) => [...current, category]);
       setCategoryId(category.id);
       setNewCategoryName('');
+      setNewCategoryDescription('');
     } catch (createError) {
-      setError(
-        createError instanceof Error ? createError.message : 'Unable to create category.',
-      );
+      setCategoryError(getReadableError(createError, 'Unable to create category.'));
+    } finally {
+      setIsCreatingCategory(false);
     }
   };
 
-  const handleUploadImages = async (index: number, files: FileList | null) => {
-    if (!files || files.length === 0) {
-      return;
-    }
+  const handleUploadImages = async (
+    index: number,
+    event: ChangeEvent<HTMLInputElement>,
+  ) => {
+    const files = Array.from(event.target.files ?? []);
+    event.target.value = '';
 
     const variant = variants[index];
-    const productSlug = slug || slugify(name);
+    const validationError = validateImageFiles(files, variant.images.length);
 
-    if (!selectedCategory?.slug || !productSlug || !variant.colorSlug) {
-      setError('Category, product slug, and color slug are required before upload.');
+    if (validationError) {
+      setUploadErrors((current) => ({ ...current, [index]: validationError }));
       return;
     }
 
-    if (files.length > 5) {
-      setError('Upload up to 5 images per color.');
+    if (!selectedCategory?.slug || !productSlug || !variant.colorSlug) {
+      setUploadErrors((current) => ({
+        ...current,
+        [index]: 'Choose a category, product slug, and color slug before upload.',
+      }));
       return;
     }
 
     try {
       setUploadingIndex(index);
-      setError(null);
+      setFormError(null);
+      setUploadErrors((current) => ({ ...current, [index]: '' }));
       const images = await uploadProductImages({
-        files: Array.from(files),
+        files,
         categorySlug: selectedCategory.slug,
         productSlug,
         colorSlug: variant.colorSlug,
       });
-      updateVariant(index, { images });
+      updateVariant(index, {
+        images: [...variant.images, ...images].slice(0, MAX_IMAGES_PER_COLOR),
+      });
     } catch (uploadError) {
-      setError(uploadError instanceof Error ? uploadError.message : 'Upload failed.');
+      setUploadErrors((current) => ({
+        ...current,
+        [index]: getReadableError(uploadError, 'Upload failed.'),
+      }));
     } finally {
       setUploadingIndex(null);
     }
   };
 
+  const validateProduct = () => {
+    if (!name.trim()) {
+      return 'Product name is required.';
+    }
+
+    if (!productSlug) {
+      return 'Product slug is required.';
+    }
+
+    if (!categoryId) {
+      return 'Choose or create a category.';
+    }
+
+    if (!Number.isFinite(Number(price)) || Number(price) <= 0) {
+      return 'Enter a valid product price.';
+    }
+
+    const invalidVariant = variants.find(
+      (variant) =>
+        !variant.colorName.trim() ||
+        !variant.colorSlug.trim() ||
+        !variant.size.trim() ||
+        !Number.isFinite(Number(variant.stock)) ||
+        Number(variant.stock) < 0,
+    );
+
+    if (invalidVariant) {
+      return 'Each variant needs color, size, and valid stock.';
+    }
+
+    return null;
+  };
+
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    setError(null);
+    setFormError(null);
     setSuccess(null);
-    setIsSubmitting(true);
+
+    const validationError = validateProduct();
+
+    if (validationError) {
+      setFormError(validationError);
+      return;
+    }
 
     try {
+      setIsSubmitting(true);
       const product = await createAdminProduct({
         name: name.trim(),
-        slug: (slug || slugify(name)).trim(),
+        slug: productSlug,
         description: description.trim() || undefined,
         priceInPaise: Math.round(Number(price) * 100),
         categoryId,
@@ -167,102 +328,307 @@ export function AdminProductForm() {
       router.push(`/admin/products?created=${product.id}`);
       router.refresh();
     } catch (submitError) {
-      setError(
-        submitError instanceof Error ? submitError.message : 'Unable to create product.',
-      );
+      setFormError(getReadableError(submitError, 'Unable to create product.'));
     } finally {
       setIsSubmitting(false);
     }
   };
 
   return (
-    <form onSubmit={handleSubmit} className="grid gap-10 lg:grid-cols-[minmax(0,1fr)_360px]">
-      <section className="space-y-6">
-        <div className="border border-[#e5e5e5] p-6">
-          <p className="mb-6 text-xs uppercase tracking-[0.2em] text-[#777777]">
-            Product
-          </p>
+    <form onSubmit={handleSubmit} className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_380px]">
+      <section className="space-y-8">
+        <div className="border border-[#e5e5e5] bg-white p-5 sm:p-7">
+          <div className="mb-7 flex flex-col gap-3 border-b border-[#eeeeee] pb-5 sm:flex-row sm:items-end sm:justify-between">
+            <div>
+              <p className="text-xs uppercase tracking-[0.22em] text-[#777777]">
+                Product setup
+              </p>
+              <h2 className="mt-2 text-2xl font-light">Core product details</h2>
+            </div>
+            <p className="text-sm text-[#666666]">
+              Slug preview: {productSlug || 'product-slug'}
+            </p>
+          </div>
+
           <div className="grid gap-5 sm:grid-cols-2">
-            <label className="block sm:col-span-2">
-              <span className="mb-2 block text-xs uppercase tracking-[0.16em] text-[#777777]">Name</span>
-              <input value={name} onChange={(event) => setName(event.target.value)} className="h-11 w-full border border-[#d9d9d9] px-4 text-sm outline-none focus:border-[#111111]" />
-            </label>
+            <div className="sm:col-span-2">
+              <TextInput label="Name" value={name} onChange={setName} />
+            </div>
+            <TextInput
+              label="Slug"
+              value={slug}
+              placeholder={slugify(name)}
+              onChange={(value) => setSlug(slugify(value))}
+            />
+            <TextInput
+              label="Price INR"
+              value={price}
+              inputMode="decimal"
+              onChange={setPrice}
+            />
             <label className="block">
-              <span className="mb-2 block text-xs uppercase tracking-[0.16em] text-[#777777]">Slug</span>
-              <input value={slug} onChange={(event) => setSlug(slugify(event.target.value))} placeholder={slugify(name)} className="h-11 w-full border border-[#d9d9d9] px-4 text-sm outline-none focus:border-[#111111]" />
-            </label>
-            <label className="block">
-              <span className="mb-2 block text-xs uppercase tracking-[0.16em] text-[#777777]">Price INR</span>
-              <input value={price} inputMode="decimal" onChange={(event) => setPrice(event.target.value)} className="h-11 w-full border border-[#d9d9d9] px-4 text-sm outline-none focus:border-[#111111]" />
-            </label>
-            <label className="block">
-              <span className="mb-2 block text-xs uppercase tracking-[0.16em] text-[#777777]">Category</span>
-              <select value={categoryId} onChange={(event) => setCategoryId(event.target.value)} className="h-11 w-full border border-[#d9d9d9] bg-white px-4 text-sm outline-none focus:border-[#111111]">
+              <FieldLabel>Category</FieldLabel>
+              <select
+                value={categoryId}
+                onChange={(event) => setCategoryId(event.target.value)}
+                className="h-11 w-full cursor-pointer border border-[#d9d9d9] bg-white px-4 text-sm outline-none focus:border-[#111111]"
+              >
+                {categories.length === 0 && <option value="">No categories</option>}
                 {categories.map((category) => (
-                  <option key={category.id} value={category.id}>{category.name}</option>
+                  <option key={category.id} value={category.id}>
+                    {category.name}
+                  </option>
                 ))}
               </select>
             </label>
             <label className="block">
-              <span className="mb-2 block text-xs uppercase tracking-[0.16em] text-[#777777]">Status</span>
-              <select value={status} onChange={(event) => setStatus(event.target.value as AdminProductStatus)} className="h-11 w-full border border-[#d9d9d9] bg-white px-4 text-sm outline-none focus:border-[#111111]">
+              <FieldLabel>Status</FieldLabel>
+              <select
+                value={status}
+                onChange={(event) => setStatus(event.target.value as AdminProductStatus)}
+                className="h-11 w-full cursor-pointer border border-[#d9d9d9] bg-white px-4 text-sm outline-none focus:border-[#111111]"
+              >
                 <option value="DRAFT">Draft</option>
                 <option value="ACTIVE">Active</option>
                 <option value="ARCHIVED">Archived</option>
               </select>
             </label>
             <label className="block sm:col-span-2">
-              <span className="mb-2 block text-xs uppercase tracking-[0.16em] text-[#777777]">Description</span>
-              <textarea value={description} onChange={(event) => setDescription(event.target.value)} className="min-h-28 w-full border border-[#d9d9d9] px-4 py-3 text-sm outline-none focus:border-[#111111]" />
+              <FieldLabel>Description</FieldLabel>
+              <textarea
+                value={description}
+                onChange={(event) => setDescription(event.target.value)}
+                className="min-h-32 w-full border border-[#d9d9d9] px-4 py-3 text-sm leading-6 outline-none focus:border-[#111111]"
+              />
             </label>
           </div>
         </div>
 
-        {variants.map((variant, index) => (
-          <div key={index} className="border border-[#e5e5e5] p-6">
-            <div className="mb-6 flex items-center justify-between">
-              <p className="text-xs uppercase tracking-[0.2em] text-[#777777]">Variant {index + 1}</p>
-              {variants.length > 1 && (
-                <button type="button" onClick={() => setVariants((current) => current.filter((_, variantIndex) => variantIndex !== index))} className="text-sm underline-offset-4 hover:underline">Remove</button>
-              )}
-            </div>
-            <div className="grid gap-5 sm:grid-cols-3">
-              <input placeholder="Color name" value={variant.colorName} onChange={(event) => updateVariant(index, { colorName: event.target.value, colorSlug: slugify(event.target.value) })} className="h-11 border border-[#d9d9d9] px-4 text-sm outline-none focus:border-[#111111]" />
-              <input placeholder="Color slug" value={variant.colorSlug} onChange={(event) => updateVariant(index, { colorSlug: slugify(event.target.value) })} className="h-11 border border-[#d9d9d9] px-4 text-sm outline-none focus:border-[#111111]" />
-              <input placeholder="#111111" value={variant.colorHex} onChange={(event) => updateVariant(index, { colorHex: event.target.value })} className="h-11 border border-[#d9d9d9] px-4 text-sm outline-none focus:border-[#111111]" />
-              <input placeholder="Size" value={variant.size} onChange={(event) => updateVariant(index, { size: event.target.value })} className="h-11 border border-[#d9d9d9] px-4 text-sm outline-none focus:border-[#111111]" />
-              <input placeholder="Stock" value={variant.stock} inputMode="numeric" onChange={(event) => updateVariant(index, { stock: event.target.value })} className="h-11 border border-[#d9d9d9] px-4 text-sm outline-none focus:border-[#111111]" />
-              <input placeholder="SKU" value={variant.sku} onChange={(event) => updateVariant(index, { sku: event.target.value })} className="h-11 border border-[#d9d9d9] px-4 text-sm outline-none focus:border-[#111111]" />
-            </div>
-            <div className="mt-5">
-              <input type="file" accept="image/jpeg,image/png,image/webp" multiple onChange={(event) => void handleUploadImages(index, event.target.files)} className="block w-full text-sm" />
-              <p className="mt-2 text-xs uppercase tracking-[0.14em] text-[#777777]">
-                {uploadingIndex === index ? 'Uploading images' : `${variant.images.length} image${variant.images.length === 1 ? '' : 's'} uploaded`}
+        <div className="space-y-5">
+          <div className="flex items-end justify-between gap-4">
+            <div>
+              <p className="text-xs uppercase tracking-[0.22em] text-[#777777]">
+                Variants
               </p>
-              {variant.images.length > 0 && (
-                <div className="mt-4 grid grid-cols-5 gap-3">
-                  {variant.images.map((image) => (
-                    <img key={image.publicId} src={image.url} alt={image.altText ?? 'Product image'} className="aspect-square w-full object-cover" />
-                  ))}
-                </div>
-              )}
+              <h2 className="mt-2 text-2xl font-light">Colors, sizes, and stock</h2>
             </div>
+            <button
+              type="button"
+              onClick={() => setVariants((current) => [...current, emptyVariant()])}
+              className="h-11 cursor-pointer border border-[#111111] px-5 text-sm font-medium uppercase tracking-[0.08em] hover:bg-[#111111] hover:text-white"
+            >
+              Add variant
+            </button>
           </div>
-        ))}
-        <button type="button" onClick={() => setVariants((current) => [...current, emptyVariant()])} className="h-12 border border-[#d9d9d9] px-6 text-sm font-medium uppercase tracking-[0.08em] hover:border-[#111111]">
-          Add variant
-        </button>
+
+          {variants.map((variant, index) => (
+            <div key={index} className="border border-[#e5e5e5] bg-white p-5 sm:p-7">
+              <div className="mb-6 flex flex-col gap-3 border-b border-[#eeeeee] pb-5 sm:flex-row sm:items-center sm:justify-between">
+                <div className="flex items-center gap-4">
+                  <span
+                    className="h-9 w-9 border border-[#d9d9d9]"
+                    style={{ backgroundColor: variant.colorHex || '#ffffff' }}
+                  />
+                  <div>
+                    <p className="text-xs uppercase tracking-[0.2em] text-[#777777]">
+                      Variant {index + 1}
+                    </p>
+                    <p className="mt-1 text-lg">{variant.colorName || 'New color'}</p>
+                  </div>
+                </div>
+                {variants.length > 1 && (
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setVariants((current) =>
+                        current.filter((_, variantIndex) => variantIndex !== index),
+                      )
+                    }
+                    className="cursor-pointer text-sm underline-offset-4 hover:underline"
+                  >
+                    Remove variant
+                  </button>
+                )}
+              </div>
+
+              <div className="grid gap-5 sm:grid-cols-3">
+                <TextInput
+                  label="Color name"
+                  value={variant.colorName}
+                  onChange={(value) =>
+                    updateVariant(index, {
+                      colorName: value,
+                      colorSlug: slugify(value),
+                    })
+                  }
+                />
+                <TextInput
+                  label="Color slug"
+                  value={variant.colorSlug}
+                  onChange={(value) => updateVariant(index, { colorSlug: slugify(value) })}
+                />
+                <TextInput
+                  label="Color hex"
+                  value={variant.colorHex}
+                  placeholder="#111111"
+                  onChange={(value) => updateVariant(index, { colorHex: value })}
+                />
+                <TextInput
+                  label="Size"
+                  value={variant.size}
+                  onChange={(value) => updateVariant(index, { size: value })}
+                />
+                <TextInput
+                  label="Stock"
+                  value={variant.stock}
+                  inputMode="numeric"
+                  onChange={(value) => updateVariant(index, { stock: value })}
+                />
+                <TextInput
+                  label="SKU"
+                  value={variant.sku}
+                  onChange={(value) => updateVariant(index, { sku: value })}
+                />
+              </div>
+
+              <div className="mt-7 border-t border-[#eeeeee] pt-6">
+                <div className="mb-4 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+                  <div>
+                    <p className="text-xs uppercase tracking-[0.18em] text-[#777777]">
+                      Images for {variant.colorName || 'this color'}
+                    </p>
+                    <p className="mt-2 text-sm text-[#555555]">
+                      Upload up to 5 images for this color.
+                    </p>
+                  </div>
+                  <p className="text-sm text-[#555555]">
+                    {variant.images.length}/{MAX_IMAGES_PER_COLOR} uploaded
+                  </p>
+                </div>
+
+                <label
+                  className={`flex min-h-36 cursor-pointer flex-col items-center justify-center border border-dashed px-5 py-8 text-center transition ${
+                    uploadingIndex === index
+                      ? 'border-[#111111] bg-[#fafafa]'
+                      : 'border-[#cfcfcf] hover:border-[#111111]'
+                  }`}
+                >
+                  <input
+                    type="file"
+                    accept="image/jpeg,image/jpg,image/png,image/webp"
+                    multiple
+                    disabled={uploadingIndex === index}
+                    onChange={(event) => void handleUploadImages(index, event)}
+                    className="sr-only"
+                  />
+                  <span className="text-sm font-medium uppercase tracking-[0.1em]">
+                    {uploadingIndex === index ? 'Uploading images' : 'Choose images'}
+                  </span>
+                  <span className="mt-3 max-w-md text-sm leading-6 text-[#666666]">
+                    JPG, JPEG, PNG, or WEBP. Max 5MB each. Multiple selection is
+                    supported.
+                  </span>
+                </label>
+
+                {uploadErrors[index] && (
+                  <p className="mt-3 text-sm leading-6 text-[#8a1f1f]">
+                    {uploadErrors[index]}
+                  </p>
+                )}
+
+                {variant.images.length > 0 && (
+                  <div className="mt-5 grid grid-cols-2 gap-4 sm:grid-cols-5">
+                    {variant.images.map((image, imageIndex) => (
+                      <div key={image.publicId} className="group">
+                        <div className="aspect-square overflow-hidden bg-[#f5f5f5]">
+                          <img
+                            src={image.url}
+                            alt={image.altText ?? 'Product image'}
+                            className="h-full w-full object-cover"
+                          />
+                        </div>
+                        <div className="mt-2 flex items-center justify-between gap-2 text-xs">
+                          <span className="uppercase tracking-[0.14em] text-[#777777]">
+                            {imageIndex === 0 ? 'Primary' : `Image ${imageIndex + 1}`}
+                          </span>
+                          <button
+                            type="button"
+                            onClick={() => removeVariantImage(index, image.publicId)}
+                            className="cursor-pointer underline-offset-4 hover:underline"
+                          >
+                            Remove
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+          ))}
+        </div>
       </section>
 
-      <aside className="h-fit border border-[#e5e5e5] p-6">
-        <p className="text-xs uppercase tracking-[0.2em] text-[#777777]">Publish</p>
-        <div className="mt-5 flex gap-2">
-          <input value={newCategoryName} onChange={(event) => setNewCategoryName(event.target.value)} placeholder="New category" className="h-11 min-w-0 flex-1 border border-[#d9d9d9] px-3 text-sm outline-none focus:border-[#111111]" />
-          <button type="button" onClick={handleCreateCategory} className="h-11 border border-[#111111] px-4 text-sm uppercase tracking-[0.08em]">Add</button>
+      <aside className="h-fit border border-[#e5e5e5] bg-white p-5 sm:p-6 lg:sticky lg:top-24">
+        <p className="text-xs uppercase tracking-[0.2em] text-[#777777]">
+          Publish checklist
+        </p>
+        <div className="mt-5 space-y-3 border-b border-[#eeeeee] pb-5 text-sm text-[#555555]">
+          <p>Name: {name.trim() ? 'Ready' : 'Missing'}</p>
+          <p>Category: {selectedCategory?.name ?? 'Missing'}</p>
+          <p>Variants: {variants.length}</p>
+          <p>Images: {totalImages}</p>
+          <p>Status: {status}</p>
         </div>
-        {error && <p className="mt-5 text-sm leading-6 text-[#8a1f1f]">{error}</p>}
-        {success && <p className="mt-5 text-sm leading-6 text-[#1f6b3a]">{success}</p>}
-        <button disabled={isSubmitting} className="mt-6 h-12 w-full border border-[#111111] text-sm font-medium uppercase tracking-[0.08em] hover:bg-[#111111] hover:text-white disabled:cursor-not-allowed disabled:text-[#777777]">
+
+        <div className="mt-5 border-b border-[#eeeeee] pb-5">
+          <p className="text-xs uppercase tracking-[0.18em] text-[#777777]">
+            Quick category
+          </p>
+          <div className="mt-4 space-y-3">
+            <input
+              value={newCategoryName}
+              onChange={(event) => {
+                setNewCategoryName(event.target.value);
+                setCategoryError(null);
+              }}
+              placeholder="Category name"
+              className="h-11 w-full border border-[#d9d9d9] px-3 text-sm outline-none focus:border-[#111111]"
+            />
+            <input
+              value={newCategoryDescription}
+              onChange={(event) => setNewCategoryDescription(event.target.value)}
+              placeholder="Description optional"
+              className="h-11 w-full border border-[#d9d9d9] px-3 text-sm outline-none focus:border-[#111111]"
+            />
+            <button
+              type="button"
+              disabled={isCreatingCategory}
+              onClick={handleCreateCategory}
+              className="h-11 w-full cursor-pointer border border-[#111111] px-4 text-sm uppercase tracking-[0.08em] hover:bg-[#111111] hover:text-white disabled:cursor-not-allowed disabled:border-[#d9d9d9] disabled:text-[#777777] disabled:hover:bg-white"
+            >
+              {isCreatingCategory ? 'Adding category' : 'Add category'}
+            </button>
+            {categoryError && (
+              <p className="text-sm leading-6 text-[#8a1f1f]">{categoryError}</p>
+            )}
+          </div>
+        </div>
+
+        {formError && (
+          <p className="mt-5 border border-[#8a1f1f] p-4 text-sm leading-6 text-[#8a1f1f]">
+            {formError}
+          </p>
+        )}
+        {success && (
+          <p className="mt-5 border border-[#1f6b3a] p-4 text-sm leading-6 text-[#1f6b3a]">
+            {success}
+          </p>
+        )}
+        <button
+          disabled={isSubmitting}
+          className="mt-6 h-12 w-full cursor-pointer border border-[#111111] text-sm font-medium uppercase tracking-[0.08em] hover:bg-[#111111] hover:text-white disabled:cursor-not-allowed disabled:border-[#d9d9d9] disabled:text-[#777777] disabled:hover:bg-white"
+        >
           {isSubmitting ? 'Creating product' : 'Create product'}
         </button>
       </aside>
