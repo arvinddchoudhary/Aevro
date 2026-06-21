@@ -14,7 +14,8 @@ const adminSections = [
   },
   {
     title: 'Orders',
-    description: 'Order review and fulfillment controls will be added later.',
+    description: 'Review customer orders and update fulfillment status.',
+    href: '/admin/orders',
   },
   {
     title: 'Uploads',
@@ -83,7 +84,7 @@ export function AdminDashboardShell() {
           {adminSections.map((section) => (
             <div key={section.title} className="border-b border-[#eeeeee] pb-3 last:border-b-0">
               {section.href ? (
-                <Link href={section.href} className="hover:text-[#777777]">
+                <Link href={section.href} className="cursor-pointer hover:text-[#777777]">
                   {section.title}
                 </Link>
               ) : (
@@ -120,7 +121,7 @@ export function AdminDashboardShell() {
               {section.href ? (
                 <Link
                   href={section.href}
-                  className="mt-5 inline-flex h-10 items-center justify-center border border-[#111111] px-4 text-xs font-medium uppercase tracking-[0.12em] hover:bg-[#111111] hover:text-white"
+                  className="mt-5 inline-flex h-10 cursor-pointer items-center justify-center border border-[#111111] px-4 text-xs font-medium uppercase tracking-[0.12em] hover:bg-[#111111] hover:text-white"
                 >
                   Open
                 </Link>
