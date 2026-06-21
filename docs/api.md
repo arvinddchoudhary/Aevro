@@ -28,6 +28,13 @@ POST /api/v1/admin/uploads/product-images
 GET /api/v1/categories
 GET /api/v1/products
 GET /api/v1/products/:identifier
+GET /api/v1/users/me
+PATCH /api/v1/users/me
+GET /api/v1/users/me/addresses
+POST /api/v1/users/me/addresses
+PATCH /api/v1/users/me/addresses/:id
+DELETE /api/v1/users/me/addresses/:id
+PATCH /api/v1/users/me/addresses/:id/default
 POST /api/v1/orders
 GET /api/v1/orders/:id
 GET /api/v1/orders/me
@@ -123,6 +130,8 @@ Frontend auth routes:
 GET /login
 GET /register
 GET /account
+GET /account/profile
+GET /account/addresses
 GET /account/orders
 GET /account/orders/:id
 ```
@@ -138,6 +147,48 @@ The frontend uses:
 
 All auth requests use `credentials: include` so browser cookies are sent. JWT
 tokens are not stored in frontend storage.
+
+## Phase 20 User Profile And Addresses
+
+User profile and address routes require the same httpOnly cookie JWT session.
+
+```txt
+GET /api/v1/users/me
+PATCH /api/v1/users/me
+GET /api/v1/users/me/addresses
+POST /api/v1/users/me/addresses
+PATCH /api/v1/users/me/addresses/:id
+DELETE /api/v1/users/me/addresses/:id
+PATCH /api/v1/users/me/addresses/:id/default
+```
+
+Safe profile update body:
+
+```json
+{
+  "name": "Customer Name",
+  "phone": "+91 9999999999"
+}
+```
+
+Address body:
+
+```json
+{
+  "fullName": "Customer Name",
+  "phone": "+91 9999999999",
+  "addressLine1": "Street address",
+  "addressLine2": "Apartment optional",
+  "city": "Hyderabad",
+  "state": "Telangana",
+  "postalCode": "500001",
+  "country": "India"
+}
+```
+
+Users can only read and mutate their own saved addresses. Setting one address
+as default clears the previous default address for the same user. Checkout may
+prefill customer and shipping details from the default saved address.
 
 ## Phase 14 Admin Foundation
 

@@ -77,14 +77,26 @@ export function AccountPageContent() {
         </p>
         <div className="mt-6 flex flex-col gap-3">
           <Link
+            href="/account/profile"
+            className="inline-flex h-12 cursor-pointer items-center justify-center border border-[#111111] px-6 text-sm font-medium uppercase tracking-[0.08em] hover:bg-[#111111] hover:text-white"
+          >
+            Edit profile
+          </Link>
+          <Link
+            href="/account/addresses"
+            className="inline-flex h-12 cursor-pointer items-center justify-center border border-[#d9d9d9] px-6 text-sm font-medium uppercase tracking-[0.08em] hover:border-[#111111]"
+          >
+            Saved addresses
+          </Link>
+          <Link
             href="/account/orders"
-            className="inline-flex h-12 items-center justify-center border border-[#111111] px-6 text-sm font-medium uppercase tracking-[0.08em] hover:bg-[#111111] hover:text-white"
+            className="inline-flex h-12 cursor-pointer items-center justify-center border border-[#d9d9d9] px-6 text-sm font-medium uppercase tracking-[0.08em] hover:border-[#111111]"
           >
             View orders
           </Link>
           <Link
             href="/products"
-            className="inline-flex h-12 items-center justify-center border border-[#d9d9d9] px-6 text-sm font-medium uppercase tracking-[0.08em] hover:border-[#111111]"
+            className="inline-flex h-12 cursor-pointer items-center justify-center border border-[#d9d9d9] px-6 text-sm font-medium uppercase tracking-[0.08em] hover:border-[#111111]"
           >
             Continue shopping
           </Link>
@@ -92,7 +104,7 @@ export function AccountPageContent() {
             type="button"
             disabled={isLoggingOut}
             onClick={handleLogout}
-            className="h-12 border border-[#d9d9d9] text-sm font-medium uppercase tracking-[0.08em] hover:border-[#111111] disabled:cursor-not-allowed disabled:text-[#777777]"
+            className="h-12 cursor-pointer border border-[#d9d9d9] text-sm font-medium uppercase tracking-[0.08em] hover:border-[#111111] disabled:cursor-not-allowed disabled:text-[#777777]"
           >
             {isLoggingOut ? 'Logging out' : 'Logout'}
           </button>
