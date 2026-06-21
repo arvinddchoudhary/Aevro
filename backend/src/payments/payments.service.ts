@@ -11,6 +11,7 @@ import {
   PaymentProvider,
   PaymentStatus,
   Prisma,
+  ProductStatus,
 } from '@prisma/client';
 import { createHmac, timingSafeEqual } from 'crypto';
 import { PrismaService } from '../prisma/prisma.service';
@@ -37,6 +38,10 @@ type PaymentWithOrder = Prisma.PaymentGetPayload<{
   };
 }>;
 
+type PaymentForInventory = Prisma.PaymentGetPayload<{
+  include: ReturnType<PaymentsService['paymentInventoryInclude']>;
+}>;
+
 @Injectable()
 export class PaymentsService {
   private readonly razorpayKeyId: string;
@@ -60,6 +65,25 @@ export class PaymentsService {
       },
       include: {
         payment: true,
+        items: {
+          select: {
+            productName: true,
+            selectedColor: true,
+            selectedSize: true,
+            quantity: true,
+            product: {
+              select: {
+                status: true,
+                stock: true,
+              },
+            },
+            variant: {
+              select: {
+                stock: true,
+              },
+            },
+          },
+        },
       },
     });
 
@@ -74,6 +98,8 @@ export class PaymentsService {
     if (order.payment?.status === PaymentStatus.PAID) {
       throw new BadRequestException('Order is already paid.');
     }
+
+    this.ensureOrderStockAvailable(order.items);
 
     if (order.payment?.providerOrderId && order.payment.status === PaymentStatus.PENDING) {
       return {
@@ -174,20 +200,180 @@ export class PaymentsService {
       throw new BadRequestException('Payment verification failed.');
     }
 
-    const updatedPayment = await this.prisma.payment.update({
-      where: {
-        id: payment.id,
-      },
-      data: {
-        status: PaymentStatus.PAID,
-        providerPaymentId: dto.razorpayPaymentId,
-        providerSignature: dto.razorpaySignature,
-        paidAt: new Date(),
-        order: {
-          update: {
-            status: OrderStatus.CONFIRMED,
+    const updatedPayment = await this.prisma.$transaction(async (tx) => {
+      const currentPayment = await tx.payment.findUnique({
+        where: {
+          id: payment.id,
+        },
+        include: this.paymentInventoryInclude(),
+      });
+
+      if (!currentPayment) {
+        throw new NotFoundException('Payment record not found.');
+      }
+
+      if (currentPayment.status === PaymentStatus.PAID) {
+        return this.findPaymentForResponse(tx, currentPayment.id);
+      }
+
+      if (currentPayment.order.status !== OrderStatus.PENDING) {
+        throw new BadRequestException('Only pending orders can be paid.');
+      }
+
+      const paidAt = new Date();
+      const paymentUpdate = await tx.payment.updateMany({
+        where: {
+          id: currentPayment.id,
+          status: {
+            not: PaymentStatus.PAID,
           },
         },
+        data: {
+          status: PaymentStatus.PAID,
+          providerPaymentId: dto.razorpayPaymentId,
+          providerSignature: dto.razorpaySignature,
+          paidAt,
+        },
+      });
+
+      if (paymentUpdate.count === 0) {
+        return this.findPaymentForResponse(tx, currentPayment.id);
+      }
+
+      await this.deductOrderStock(tx, currentPayment);
+
+      await tx.order.update({
+        where: {
+          id: currentPayment.orderId,
+        },
+        data: {
+          status: OrderStatus.CONFIRMED,
+        },
+      });
+
+      return this.findPaymentForResponse(tx, currentPayment.id);
+    });
+
+    return this.serializePayment(updatedPayment);
+  }
+
+  private async deductOrderStock(
+    tx: Prisma.TransactionClient,
+    payment: PaymentForInventory,
+  ) {
+    for (const item of payment.order.items) {
+      if (item.variantId && item.productId) {
+        const variantUpdate = await tx.productVariant.updateMany({
+          where: {
+            id: item.variantId,
+            productId: item.productId,
+            stock: {
+              gte: item.quantity,
+            },
+          },
+          data: {
+            stock: {
+              decrement: item.quantity,
+            },
+          },
+        });
+
+        if (variantUpdate.count !== 1) {
+          throw new BadRequestException(
+            `${item.productName} in ${item.selectedColor ?? 'selected colour'} / ${item.selectedSize ?? 'selected size'} no longer has enough stock.`,
+          );
+        }
+
+        await this.decrementProductStock(tx, item.productId, item.quantity);
+      } else if (item.productId) {
+        const productOnlyUpdate = await tx.product.updateMany({
+          where: {
+            id: item.productId,
+            status: ProductStatus.ACTIVE,
+            stock: {
+              gte: item.quantity,
+            },
+          },
+          data: {
+            stock: {
+              decrement: item.quantity,
+            },
+          },
+        });
+
+        if (productOnlyUpdate.count !== 1) {
+          throw new BadRequestException(
+            `${item.productName} no longer has enough stock.`,
+          );
+        }
+      } else {
+        throw new BadRequestException(`${item.productName} is unavailable.`);
+      }
+    }
+  }
+
+  private async decrementProductStock(
+    tx: Prisma.TransactionClient,
+    productId: string,
+    quantity: number,
+  ) {
+    const productUpdate = await tx.product.updateMany({
+      where: {
+        id: productId,
+        status: ProductStatus.ACTIVE,
+        stock: {
+          gte: quantity,
+        },
+      },
+      data: {
+        stock: {
+          decrement: quantity,
+        },
+      },
+    });
+
+    if (productUpdate.count !== 1) {
+      throw new BadRequestException('Product stock is no longer available.');
+    }
+  }
+
+  private ensureOrderStockAvailable(
+    items: Array<{
+      productName: string;
+      selectedColor: string | null;
+      selectedSize: string | null;
+      quantity: number;
+      product: {
+        status: ProductStatus;
+        stock: number;
+      } | null;
+      variant: {
+        stock: number;
+      } | null;
+    }>,
+  ) {
+    items.forEach((item) => {
+      if (!item.product || item.product.status !== ProductStatus.ACTIVE) {
+        throw new BadRequestException(`${item.productName} is unavailable.`);
+      }
+
+      const availableStock = item.variant?.stock ?? item.product.stock;
+
+      if (availableStock < item.quantity) {
+        throw new BadRequestException(
+          `${item.productName}${item.selectedColor || item.selectedSize ? ` in ${[item.selectedColor, item.selectedSize].filter(Boolean).join(' / ')}` : ''} has only ${availableStock} in stock.`,
+        );
+      }
+    });
+  }
+
+  private async findPaymentForResponse(
+    tx: Prisma.TransactionClient,
+    paymentId: string,
+  ) {
+    const payment = await tx.payment.findUnique({
+      where: {
+        id: paymentId,
       },
       include: {
         order: {
@@ -200,7 +386,31 @@ export class PaymentsService {
       },
     });
 
-    return this.serializePayment(updatedPayment);
+    if (!payment) {
+      throw new NotFoundException('Payment record not found.');
+    }
+
+    return payment;
+  }
+
+  private paymentInventoryInclude() {
+    return {
+      order: {
+        include: {
+          items: {
+            select: {
+              id: true,
+              productId: true,
+              variantId: true,
+              productName: true,
+              selectedColor: true,
+              selectedSize: true,
+              quantity: true,
+            },
+          },
+        },
+      },
+    } satisfies Prisma.PaymentInclude;
   }
 
   private async createProviderOrder(input: {

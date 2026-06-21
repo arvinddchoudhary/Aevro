@@ -144,6 +144,17 @@ export class AdminOrdersService {
               },
             },
           },
+          variant: {
+            select: {
+              id: true,
+              colorName: true,
+              colorSlug: true,
+              colorHex: true,
+              size: true,
+              stock: true,
+              sku: true,
+            },
+          },
         },
       },
       payment: true,
@@ -194,6 +205,7 @@ export class AdminOrdersService {
       items: order.items.map((item) => ({
         id: item.id,
         productId: item.productId,
+        variantId: item.variantId,
         productName: item.productName,
         productSlug: item.productSlug,
         quantity: item.quantity,
@@ -201,6 +213,7 @@ export class AdminOrdersService {
         lineTotalInPaise: item.lineTotalInPaise,
         selectedColor: item.selectedColor,
         selectedSize: item.selectedSize,
+        variant: item.variant,
         product: item.product
           ? {
               id: item.product.id,

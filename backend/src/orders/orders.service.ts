@@ -18,7 +18,9 @@ export class OrdersService {
 
   async createOrder(createOrderDto: CreateOrderDto, userId?: string) {
     const requestedItems = this.mergeDuplicateItems(createOrderDto);
-    const productIds = requestedItems.map((item) => item.productId);
+    const productIds = Array.from(
+      new Set(requestedItems.map((item) => item.productId)),
+    );
 
     const products = await this.prisma.product.findMany({
       where: {
@@ -39,6 +41,7 @@ export class OrdersService {
           select: {
             id: true,
             colorName: true,
+            colorSlug: true,
             size: true,
             stock: true,
           },
@@ -61,18 +64,28 @@ export class OrdersService {
       const variant = item.variantId
         ? product.variants.find((productVariant) => productVariant.id === item.variantId)
         : null;
-      const stock = variant?.stock ?? product.stock;
 
       if (item.variantId && !variant) {
         throw new BadRequestException(`${product.name} variant is unavailable.`);
       }
 
+      if (product.variants.length > 0 && !variant) {
+        throw new BadRequestException(
+          `${product.name} requires a colour and size selection.`,
+        );
+      }
+
+      const stock = variant?.stock ?? product.stock;
+
       if (stock < item.quantity) {
-        throw new BadRequestException(`${product.name} does not have enough stock.`);
+        throw new BadRequestException(
+          `${product.name}${variant ? ` in ${variant.colorName} / ${variant.size}` : ''} has only ${stock} in stock.`,
+        );
       }
 
       return {
         productId: product.id,
+        variantId: variant?.id,
         productName: product.name,
         productSlug: product.slug,
         quantity: item.quantity,
@@ -212,6 +225,17 @@ export class OrdersService {
               },
             },
           },
+          variant: {
+            select: {
+              id: true,
+              colorName: true,
+              colorSlug: true,
+              colorHex: true,
+              size: true,
+              stock: true,
+              sku: true,
+            },
+          },
         },
       },
       payment: true,
@@ -249,6 +273,7 @@ export class OrdersService {
       items: order.items.map((item) => ({
         id: item.id,
         productId: item.productId,
+        variantId: item.variantId,
         productName: item.productName,
         productSlug: item.productSlug,
         quantity: item.quantity,
@@ -256,6 +281,7 @@ export class OrdersService {
         lineTotalInPaise: item.lineTotalInPaise,
         selectedColor: item.selectedColor,
         selectedSize: item.selectedSize,
+        variant: item.variant,
         product: item.product
           ? {
               id: item.product.id,

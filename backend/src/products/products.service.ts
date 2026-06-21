@@ -8,6 +8,8 @@ import {
 
 @Injectable()
 export class ProductsService {
+  private readonly lowStockThreshold = 5;
+
   constructor(@Inject(PrismaService) private readonly prisma: PrismaService) {}
 
   async listProducts(query: ListProductsQueryDto) {
@@ -199,6 +201,7 @@ export class ProductsService {
       colorHex: variant.colorHex,
       size: variant.size,
       stock: variant.stock,
+      lowStock: variant.stock > 0 && variant.stock <= this.lowStockThreshold,
       images: variant.images,
     }));
     const variantImages = variants.flatMap((variant) => variant.images);
@@ -215,6 +218,7 @@ export class ProductsService {
         colorSlug: string;
         colorHex: string | null;
         totalStock: number;
+        lowStock: boolean;
       }
     >();
     const sizesByColor: Record<
@@ -223,6 +227,7 @@ export class ProductsService {
         variantId: string;
         size: string;
         stock: number;
+        lowStock: boolean;
       }[]
     > = {};
     const imagesByColor: Record<string, typeof product.images> = {};
@@ -235,6 +240,10 @@ export class ProductsService {
         colorSlug: variant.colorSlug,
         colorHex: variant.colorHex,
         totalStock: (existingColor?.totalStock ?? 0) + variant.stock,
+        lowStock:
+          ((existingColor?.totalStock ?? 0) + variant.stock) > 0 &&
+          ((existingColor?.totalStock ?? 0) + variant.stock) <=
+            this.lowStockThreshold,
       });
 
       sizesByColor[variant.colorSlug] = [
@@ -243,6 +252,7 @@ export class ProductsService {
           variantId: variant.id,
           size: variant.size,
           stock: variant.stock,
+          lowStock: variant.lowStock,
         },
       ];
 
@@ -261,6 +271,7 @@ export class ProductsService {
       color: product.color,
       size: product.size,
       stock: product.stock,
+      lowStock: product.stock > 0 && product.stock <= this.lowStockThreshold,
       status: product.status,
       category: product.category,
       images: product.images,

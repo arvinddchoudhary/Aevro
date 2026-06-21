@@ -73,6 +73,12 @@ export function CheckoutPageContent() {
   const [pendingOrderId, setPendingOrderId] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitLabel, setSubmitLabel] = useState('Pay with Razorpay');
+  const stockBlockedItems = items.filter(
+    (item) => item.stock <= 0 || item.quantity > item.stock,
+  );
+  const lowStockItems = items.filter(
+    (item) => item.stock > 0 && item.stock <= 5,
+  );
 
   const updateValue = (name: keyof CheckoutFormValues, value: string) => {
     setValues((currentValues) => ({ ...currentValues, [name]: value }));
@@ -87,6 +93,11 @@ export function CheckoutPageContent() {
 
     const nextErrors = validateCheckoutForm(values);
     setErrors(nextErrors);
+
+    if (stockBlockedItems.length > 0) {
+      setFormError('Update your cart before checkout. One or more items exceed available stock.');
+      return;
+    }
 
     if (Object.keys(nextErrors).length > 0 || items.length === 0) {
       return;
@@ -312,6 +323,19 @@ export function CheckoutPageContent() {
                     {[item.selectedColor, item.selectedSize].filter(Boolean).join(' / ')}
                   </p>
                 )}
+                {item.stock <= 0 ? (
+                  <p className="mt-2 text-xs leading-5 text-[#8a1f1f]">
+                    Out of stock
+                  </p>
+                ) : item.quantity > item.stock ? (
+                  <p className="mt-2 text-xs leading-5 text-[#8a1f1f]">
+                    Only {item.stock} available
+                  </p>
+                ) : item.stock <= 5 ? (
+                  <p className="mt-2 text-xs leading-5 text-[#8a1f1f]">
+                    Only {item.stock} left
+                  </p>
+                ) : null}
                 <p className="mt-2 text-sm">
                   {formatPrice(item.priceInPaise * item.quantity)}
                 </p>
@@ -327,8 +351,14 @@ export function CheckoutPageContent() {
         <p className="mt-4 text-sm leading-6 text-[#666666]">
           This creates a pending order and opens Razorpay checkout securely.
         </p>
+        {lowStockItems.length > 0 && stockBlockedItems.length === 0 ? (
+          <p className="mt-4 border border-[#8a1f1f] p-4 text-sm leading-6 text-[#8a1f1f]">
+            Some selected variants are low in stock. Availability is checked again
+            before payment opens.
+          </p>
+        ) : null}
         <button
-          disabled={isSubmitting}
+          disabled={isSubmitting || stockBlockedItems.length > 0}
           className="mt-6 h-12 w-full cursor-pointer border border-[#111111] text-sm font-medium uppercase tracking-[0.08em] hover:bg-[#111111] hover:text-white disabled:cursor-not-allowed disabled:border-[#bdbdbd] disabled:text-[#777777] disabled:hover:bg-white"
         >
           {isSubmitting ? submitLabel : submitLabel}

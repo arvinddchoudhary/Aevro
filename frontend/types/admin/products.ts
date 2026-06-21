@@ -46,6 +46,7 @@ export type AdminProduct = {
   category: Category | null;
   primaryImage: AdminProductImage | null;
   stock: number;
+  lowStock?: boolean;
   createdAt: string;
   updatedAt: string;
   variants: Array<{
@@ -55,6 +56,7 @@ export type AdminProduct = {
     colorHex: string | null;
     size: string;
     stock: number;
+    lowStock?: boolean;
     sku: string | null;
     images: AdminProductImage[];
   }>;

@@ -11,6 +11,8 @@ import {
 
 @Injectable()
 export class AdminProductsService {
+  private readonly lowStockThreshold = 5;
+
   constructor(@Inject(PrismaService) private readonly prisma: PrismaService) {}
 
   async listCategories() {
@@ -242,6 +244,7 @@ export class AdminProductsService {
       category: product.category,
       primaryImage,
       stock: product.stock,
+      lowStock: product.stock > 0 && product.stock <= this.lowStockThreshold,
       createdAt: product.createdAt,
       updatedAt: product.updatedAt,
       variants: product.variants.map((variant) => ({
@@ -251,6 +254,7 @@ export class AdminProductsService {
         colorHex: variant.colorHex,
         size: variant.size,
         stock: variant.stock,
+        lowStock: variant.stock > 0 && variant.stock <= this.lowStockThreshold,
         sku: variant.sku,
         images: variant.images,
       })),
