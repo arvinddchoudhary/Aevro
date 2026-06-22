@@ -37,7 +37,8 @@ export function AddToCartButton({
         type="button"
         disabled={isDisabled}
         onClick={handleAddToCart}
-        className="inline-flex h-12 w-full cursor-pointer items-center justify-center bg-[#111111] px-5 text-xs font-medium uppercase tracking-[0.08em] text-[#fffaf3] transition hover:bg-[#2a2825] disabled:cursor-not-allowed disabled:border disabled:border-[#ddd4c8] disabled:bg-transparent disabled:text-[#999999]"
+        className="inline-flex h-11 w-full cursor-pointer items-center justify-center bg-[#111111] px-5 text-xs font-medium uppercase tracking-[0.08em] transition hover:bg-[#2a2825] disabled:cursor-not-allowed disabled:border disabled:border-[#ddd4c8] disabled:bg-transparent disabled:text-[#999999]"
+        style={{ color: isDisabled ? undefined : '#fffaf3' }}
       >
         {disabled ? disabledLabel : isAvailable ? 'Add to bag' : 'Out of stock'}
       </button>

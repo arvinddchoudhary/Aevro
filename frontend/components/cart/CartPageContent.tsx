@@ -22,16 +22,16 @@ export function CartPageContent() {
   }
 
   return (
-    <div className="grid gap-12 lg:grid-cols-[minmax(0,1fr)_420px]">
-      <section className="space-y-8">
+    <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_380px]">
+      <section className="space-y-6">
         {items.map((item) => (
           <article
             key={item.itemKey}
-            className="grid gap-7 border-b border-[#ddd4c8] pb-8 sm:grid-cols-[280px_1fr]"
+            className="grid gap-5 border-b border-[#ddd4c8] pb-6 sm:grid-cols-[190px_1fr]"
           >
             <Link
               href={`/products/${item.slug}`}
-              className="aspect-[1/1] cursor-pointer overflow-hidden bg-[#eee8de] sm:aspect-[0.95/1]"
+              className="aspect-[1086/1448] max-w-[190px] cursor-pointer overflow-hidden rounded-[4px] bg-[#eee8de]"
             >
               {item.imageUrl ? (
                 <img
@@ -46,18 +46,18 @@ export function CartPageContent() {
               )}
             </Link>
 
-            <div className="flex flex-col justify-center gap-6 sm:flex-row sm:justify-between">
+            <div className="flex flex-col justify-center gap-5 sm:flex-row sm:justify-between">
               <div>
                 <p className="text-xs uppercase tracking-[0.12em] text-[#77716a]">
                   {item.categoryName ?? 'AEVRO'}
                 </p>
                 <Link
                   href={`/products/${item.slug}`}
-                  className="mt-3 block cursor-pointer text-2xl font-light uppercase leading-tight underline-offset-4 hover:underline"
+                  className="mt-2 block cursor-pointer text-xl font-light uppercase leading-tight underline-offset-4 hover:underline"
                 >
                   {item.name}
                 </Link>
-                <p className="mt-4 text-lg">
+                <p className="mt-3 text-base">
                   {formatPrice(item.priceInPaise)}
                 </p>
                 {(item.selectedColor || item.selectedSize) && (
@@ -80,7 +80,7 @@ export function CartPageContent() {
                     Low stock: only {item.stock} left.
                   </p>
                 ) : null}
-                <div className="mt-5">
+                <div className="mt-4">
                   <CartQuantityControls
                     itemKey={item.itemKey}
                     quantity={item.quantity}
@@ -100,19 +100,19 @@ export function CartPageContent() {
         ))}
       </section>
 
-      <aside className="h-fit border border-[#ddd4c8] bg-[#fffaf3]/70 p-8 lg:sticky lg:top-28">
+      <aside className="h-fit border border-[#ddd4c8] bg-[#fffaf3]/70 p-6 lg:sticky lg:top-24">
         <p className="text-sm font-medium uppercase tracking-[0.08em]">
           Order summary
         </p>
-        <div className="mt-8 flex items-center justify-between text-base">
+        <div className="mt-6 flex items-center justify-between text-sm">
           <span>Subtotal</span>
           <span>{formatPrice(subtotalInPaise)}</span>
         </div>
-        <div className="mt-5 flex items-center justify-between text-base">
+        <div className="mt-4 flex items-center justify-between text-sm">
           <span>Shipping</span>
           <span>Free</span>
         </div>
-        <div className="mt-8 flex items-center justify-between border-t border-[#ddd4c8] pt-8 text-2xl">
+        <div className="mt-6 flex items-center justify-between border-t border-[#ddd4c8] pt-6 text-xl">
           <span>Total</span>
           <span>{formatPrice(subtotalInPaise)}</span>
         </div>
@@ -128,7 +128,8 @@ export function CartPageContent() {
         <div className="mt-6 flex flex-col gap-3">
           <Link
             href="/checkout"
-            className="inline-flex h-14 cursor-pointer items-center justify-center bg-[#111111] px-6 text-xs font-medium uppercase tracking-[0.08em] text-[#fffaf3] hover:bg-[#2a2825]"
+            className="inline-flex h-12 cursor-pointer items-center justify-center bg-[#111111] px-6 text-xs font-medium uppercase tracking-[0.08em] hover:bg-[#2a2825]"
+            style={{ color: '#fffaf3' }}
           >
             Continue to checkout
           </Link>
