@@ -1,10 +1,10 @@
 import Link from 'next/link';
 
 const serviceItems = [
-  ['Delivery', 'Complimentary shipping', 'On all orders'],
-  ['Returns', 'Easy returns', 'Within 14 days'],
-  ['Secure', 'Secure payments', '100% protected'],
-  ['Care', 'Personal assistance', "We're here to help"],
+  ['FS', 'Free shipping', 'On all orders above ₹ 4999'],
+  ['ER', 'Easy returns', '14 days return policy'],
+  ['SP', 'Secure payments', '100% secure checkout'],
+  ['CS', 'Customer support', 'support@aevro.com'],
 ];
 
 const footerGroups = [
@@ -29,18 +29,18 @@ const footerGroups = [
 export function Footer() {
   return (
     <footer className="border-t border-[#ddd4c8] bg-[#fbf7f0]">
-      <section className="border-b border-[#ddd4c8]">
-        <div className="aevro-container grid gap-0 py-5 sm:grid-cols-2 lg:grid-cols-4">
+      <section className="aevro-container py-8">
+        <div className="grid gap-0 rounded-[8px] border border-[#eee5da] bg-[#fffaf3]/60 px-5 py-4 shadow-[0_18px_60px_rgba(17,17,17,0.025)] sm:grid-cols-2 lg:grid-cols-4">
           {serviceItems.map(([label, title, detail]) => (
             <div
               key={title}
-              className="flex gap-4 border-b border-[#ddd4c8] py-5 last:border-b-0 sm:border-r sm:px-6 sm:first:pl-0 sm:last:border-r-0 lg:border-b-0"
+              className="flex gap-4 border-b border-[#ddd4c8] py-4 last:border-b-0 sm:border-r sm:px-6 sm:first:pl-0 sm:last:border-r-0 lg:border-b-0"
             >
-              <span className="flex h-9 w-9 shrink-0 items-center justify-center border border-[#111111] text-[10px] uppercase">
-                {label.slice(0, 2)}
+              <span className="flex h-8 w-8 shrink-0 items-center justify-center border border-[#111111] text-[10px] uppercase">
+                {label}
               </span>
               <div>
-                <p className="text-xs font-medium uppercase tracking-[0.08em]">{title}</p>
+                <p className="text-xs font-semibold uppercase tracking-[0.08em]">{title}</p>
                 <p className="mt-1 text-xs text-[#6f685f]">{detail}</p>
               </div>
             </div>
@@ -48,7 +48,8 @@ export function Footer() {
         </div>
       </section>
 
-      <section className="aevro-container grid gap-10 py-12 lg:grid-cols-[1.1fr_2fr_1fr]">
+      <section className="border-t border-[#ddd4c8] bg-[#f3eadf]/55">
+        <div className="aevro-container grid gap-10 py-9 lg:grid-cols-[1.1fr_2fr_1fr]">
         <div>
           <Link href="/" className="inline-flex" aria-label="AEVRO home">
             <img
@@ -105,6 +106,7 @@ export function Footer() {
               →
             </button>
           </div>
+        </div>
         </div>
       </section>
 

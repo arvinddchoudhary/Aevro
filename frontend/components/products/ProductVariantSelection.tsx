@@ -116,8 +116,8 @@ export function ProductVariantSelection({ product }: ProductVariantSelectionProp
   };
 
   return (
-    <div className="grid gap-10 lg:grid-cols-[minmax(0,1.25fr)_minmax(360px,0.75fr)] lg:gap-12">
-      <section className="grid gap-4 sm:grid-cols-[120px_minmax(0,1fr)]">
+    <div className="grid gap-10 lg:grid-cols-[minmax(0,650px)_minmax(420px,1fr)] lg:gap-12 xl:grid-cols-[minmax(0,680px)_minmax(440px,1fr)]">
+      <section className="grid max-w-[680px] gap-4 sm:grid-cols-[84px_minmax(0,560px)] xl:grid-cols-[88px_minmax(0,580px)]">
         <div className="order-2 grid grid-cols-4 gap-3 sm:order-1 sm:block sm:space-y-4">
           {(colorImages.length > 0 ? colorImages : [undefined]).map((image, index) => (
             <button
@@ -132,35 +132,51 @@ export function ProductVariantSelection({ product }: ProductVariantSelectionProp
               <ProductImageFrame
                 image={image}
                 productName={product.name}
-                className="aspect-square"
+                className="aspect-square rounded-[4px]"
               />
             </button>
           ))}
         </div>
-        <ProductImageFrame
-          image={selectedImage}
-          productName={product.name}
-          className="order-1 aspect-[4/5] w-full rounded-[6px] sm:order-2"
-        />
+        {selectedImage?.url ? (
+          <a
+            href={selectedImage.url}
+            target="_blank"
+            rel="noreferrer"
+            className="order-1 block cursor-zoom-in sm:order-2"
+            aria-label={`Open full image of ${product.name}`}
+          >
+            <ProductImageFrame
+              image={selectedImage}
+              productName={product.name}
+              className="aspect-[1086/1448] w-full max-w-[580px] rounded-[6px]"
+            />
+          </a>
+        ) : (
+          <ProductImageFrame
+            image={selectedImage}
+            productName={product.name}
+            className="order-1 aspect-[1086/1448] w-full max-w-[580px] rounded-[6px] sm:order-2"
+          />
+        )}
       </section>
 
-      <section className="lg:sticky lg:top-28 lg:self-start">
-        <span className="mb-4 inline-flex rounded-full bg-[#efe8df] px-3 py-1 text-[0.68rem] font-semibold uppercase tracking-[0.08em] text-[#514c45]">
+      <section className="max-w-[560px] lg:sticky lg:top-24 lg:self-start">
+        <span className="mb-3 inline-flex rounded-full bg-[#efe8df] px-3 py-1 text-[0.68rem] font-semibold uppercase tracking-[0.08em] text-[#514c45]">
           Best seller
         </span>
-        <h1 className="max-w-2xl text-4xl font-light uppercase leading-[1.02] tracking-[0.01em] md:text-5xl">
+        <h1 className="max-w-2xl text-3xl font-light uppercase leading-[1.03] tracking-[0.01em] md:text-4xl">
           {product.name}
         </h1>
-        <p className="mt-5 text-2xl font-semibold">{formatPrice(product.priceInPaise)}</p>
+        <p className="mt-4 text-xl font-semibold">{formatPrice(product.priceInPaise)}</p>
         <p className="mt-1 text-sm text-[#514c45]">Inclusive of all taxes</p>
 
         {product.description && (
-          <p className="mt-6 max-w-xl text-base leading-7 text-[#2f2a25]">
+          <p className="mt-4 max-w-xl text-sm leading-6 text-[#2f2a25]">
             {product.description}
           </p>
         )}
 
-        <div className="mt-8 border-y border-[#ddd4c8] py-7">
+        <div className="mt-6 border-y border-[#ddd4c8] py-5">
           <div>
             <div className="mb-3 flex items-center justify-between gap-4">
               <p className="text-xs font-semibold uppercase tracking-[0.12em]">
@@ -173,7 +189,7 @@ export function ProductVariantSelection({ product }: ProductVariantSelectionProp
                   key={color.colorSlug}
                   type="button"
                   onClick={() => selectColor(color.colorSlug)}
-                  className={`flex h-11 w-11 cursor-pointer items-center justify-center rounded-full border text-sm transition ${
+                  className={`flex h-9 w-9 cursor-pointer items-center justify-center rounded-full border text-sm transition ${
                     selectedColorSlug === color.colorSlug
                       ? 'border-[#111111] ring-2 ring-[#111111] ring-offset-2 ring-offset-[#fbf7f0]'
                       : 'border-[#ddd4c8]'
@@ -181,7 +197,7 @@ export function ProductVariantSelection({ product }: ProductVariantSelectionProp
                   aria-label={color.colorName}
                 >
                   <span
-                    className="h-7 w-7 rounded-full border border-[#ddd4c8]"
+                    className="h-6 w-6 rounded-full border border-[#ddd4c8]"
                     style={{ backgroundColor: color.colorHex ?? '#111111' }}
                   />
                 </button>
@@ -189,7 +205,7 @@ export function ProductVariantSelection({ product }: ProductVariantSelectionProp
             </div>
           </div>
 
-          <div className="mt-7">
+          <div className="mt-5">
             <div className="mb-3 flex items-center justify-between gap-4">
               <p className="text-xs font-semibold uppercase tracking-[0.12em]">
                 Size: <span className="text-[#77716a]">{selectedSize || 'Select your size'}</span>
@@ -203,7 +219,7 @@ export function ProductVariantSelection({ product }: ProductVariantSelectionProp
                   type="button"
                   disabled={size.stock <= 0}
                   onClick={() => setSelectedSize(size.size)}
-                  className={`h-12 cursor-pointer rounded-[4px] border text-sm transition disabled:cursor-not-allowed disabled:border-[#e8ded2] disabled:text-[#b6aea5] ${
+                  className={`h-10 cursor-pointer rounded-[4px] border text-sm transition disabled:cursor-not-allowed disabled:border-[#e8ded2] disabled:text-[#b6aea5] ${
                     selectedSize === size.size
                       ? 'border-[#111111] bg-[#fffaf3] text-[#111111] shadow-[inset_0_0_0_1px_#111111]'
                       : 'border-[#ddd4c8] bg-transparent hover:border-[#111111]'
@@ -221,7 +237,7 @@ export function ProductVariantSelection({ product }: ProductVariantSelectionProp
           </div>
         </div>
 
-        <div className="mt-7 flex flex-col gap-3">
+        <div className="mt-5 flex flex-col gap-3">
           <AddToCartButton
             product={product}
             selection={{
@@ -239,20 +255,20 @@ export function ProductVariantSelection({ product }: ProductVariantSelectionProp
           {product.category && (
             <Link
               href={`/products?category=${product.category.slug}`}
-              className="inline-flex h-12 w-full cursor-pointer items-center justify-center rounded-[4px] border border-[#111111] px-7 text-xs font-semibold uppercase tracking-[0.08em] hover:bg-[#111111] hover:text-[#fffaf3]"
+              className="inline-flex h-11 w-full cursor-pointer items-center justify-center rounded-[4px] border border-[#111111] px-7 text-xs font-semibold uppercase tracking-[0.08em] hover:bg-[#111111] hover:text-[#fffaf3]"
             >
               More {product.category.name}
             </Link>
           )}
         </div>
-        <div className="mt-8 border-t border-[#ddd4c8]">
+        <div className="mt-6 border-t border-[#ddd4c8]">
           {['Details', 'Fabric & care', 'Shipping & returns'].map((item) => (
-            <details key={item} className="group border-b border-[#ddd4c8] py-4">
+            <details key={item} className="group border-b border-[#ddd4c8] py-3">
               <summary className="flex list-none items-center justify-between text-xs font-semibold uppercase tracking-[0.1em]">
                 {item}
                 <span className="text-lg leading-none group-open:rotate-45">+</span>
               </summary>
-              <p className="mt-4 text-sm leading-7 text-[#514c45]">
+              <p className="mt-3 text-sm leading-6 text-[#514c45]">
                 Premium everyday construction with a clean drape, refined finish,
                 and considered proportions.
               </p>
