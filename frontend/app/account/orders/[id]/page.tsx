@@ -8,7 +8,7 @@ export default async function AccountOrderDetailsPage({
   const { id } = await params;
 
   return (
-    <main className="mx-auto min-h-screen max-w-7xl px-5 py-12 sm:px-8">
+    <main className="aevro-container min-h-screen py-14">
       <AccountOrderDetailsPageContent id={id} />
     </main>
   );

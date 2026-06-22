@@ -5,41 +5,32 @@ import { ProductImageFrame } from './ProductImageFrame';
 
 type ProductCardProps = {
   product: Product;
+  compact?: boolean;
 };
 
-export function ProductCard({ product }: ProductCardProps) {
+export function ProductCard({ product, compact = false }: ProductCardProps) {
   const primaryImage = product.primaryImage ?? product.images[0];
 
   return (
-    <article className="group">
+    <article className="group overflow-hidden rounded-[4px] border border-[#ded6cc] bg-[#fffaf3] transition duration-300 hover:-translate-y-0.5 hover:border-[#bfb4a8] hover:shadow-[0_18px_45px_rgba(49,37,26,0.08)]">
       <Link href={`/products/${product.slug}`} className="group block cursor-pointer">
         <ProductImageFrame
           image={primaryImage}
           productName={product.name}
-          className="aspect-[3/4]"
+          className={compact ? 'aspect-[4/5]' : 'aspect-[3/4]'}
         />
-        <div className="mt-4">
+        <div className="border-t border-[#eee5da] p-4 sm:p-5">
           <div className="flex items-start justify-between gap-3">
-            <h3 className="text-base leading-6 underline-offset-4 group-hover:underline">
+            <h3 className="text-[0.82rem] font-semibold uppercase leading-5 tracking-[0.03em] underline-offset-4 group-hover:underline">
               {product.name}
             </h3>
-            <span className="shrink-0 text-sm font-medium">
-              {formatPrice(product.priceInPaise)}
-            </span>
+            <span className="shrink-0 text-xl leading-none text-[#111111]">+</span>
           </div>
-          <p className="mt-1 text-sm text-[#666666]">
+          <p className="mt-2 text-sm text-[#514c45]">
             {product.category?.name ?? 'AEVRO'}
           </p>
-          <p className="mt-3 text-xs uppercase tracking-[0.14em] text-[#777777]">
-            {product.stock > 0 ? 'Available' : 'Out of stock'}
-          </p>
+          <p className="mt-3 text-sm font-semibold">{formatPrice(product.priceInPaise)}</p>
         </div>
-      </Link>
-      <Link
-        href={`/products/${product.slug}`}
-        className="mt-4 inline-flex h-11 w-full cursor-pointer items-center justify-center border border-[#111111] bg-white px-5 text-sm font-medium uppercase tracking-[0.08em] text-[#111111] transition hover:bg-[#111111] hover:text-white"
-      >
-        Select options
       </Link>
     </article>
   );

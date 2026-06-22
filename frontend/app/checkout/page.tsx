@@ -2,12 +2,14 @@ import { CheckoutPageContent } from '../../components/checkout/CheckoutPageConte
 
 export default function CheckoutPage() {
   return (
-    <main className="mx-auto min-h-screen max-w-7xl px-5 py-12 sm:px-8">
+    <main className="aevro-container min-h-screen py-14">
       <div className="mb-10">
-        <p className="mb-3 text-xs uppercase tracking-[0.22em] text-[#777777]">
+        <p className="mb-3 text-xs uppercase tracking-[0.14em] text-[#77716a]">
           Checkout
         </p>
-        <h1 className="text-4xl font-light md:text-5xl">Customer details</h1>
+        <h1 className="text-5xl font-light uppercase leading-none md:text-6xl">
+          Customer details
+        </h1>
       </div>
 
       <CheckoutPageContent />

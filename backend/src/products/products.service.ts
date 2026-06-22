@@ -19,16 +19,14 @@ export class ProductsService {
     const where = this.buildProductWhere(query);
     const orderBy = this.buildProductOrderBy(query.sort ?? ProductSort.Newest);
 
-    const [products, total] = await this.prisma.$transaction([
-      this.prisma.product.findMany({
-        where,
-        orderBy,
-        skip,
-        take: limit,
-        select: this.productSelect(),
-      }),
-      this.prisma.product.count({ where }),
-    ]);
+    const products = await this.prisma.product.findMany({
+      where,
+      orderBy,
+      skip,
+      take: limit,
+      select: this.productSelect(),
+    });
+    const total = await this.prisma.product.count({ where });
 
     return {
       success: true,

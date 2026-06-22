@@ -40,12 +40,12 @@ export function AdminRouteGuard({ children }: { children: ReactNode }) {
         <p className="mb-3 text-xs uppercase tracking-[0.22em] text-[#777777]">
           Access denied
         </p>
-        <p className="mx-auto max-w-md text-sm leading-6 text-[#555555]">
+        <p className="mx-auto max-w-md text-sm leading-6 text-[#5f5a53]">
           This area is reserved for AEVRO administrators.
         </p>
         <Link
           href="/account"
-          className="mt-6 inline-flex h-12 items-center justify-center border border-[#111111] px-6 text-sm font-medium uppercase tracking-[0.08em] hover:bg-[#111111] hover:text-white"
+          className="mt-6 inline-flex h-12 items-center justify-center border border-[#111111] px-6 text-sm font-medium uppercase tracking-[0.08em] hover:bg-[#111111] hover:text-[#fffaf3]"
         >
           Back to account
         </Link>

@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { Footer } from '../components/layout/Footer';
 import { Header } from '../components/layout/Header';
 import { AuthProvider } from '../lib/auth';
 import { CartProvider } from '../lib/cart';
@@ -16,11 +17,12 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body>
+      <body className="aevro-shell">
         <AuthProvider>
           <CartProvider>
             <Header />
             {children}
+            <Footer />
           </CartProvider>
         </AuthProvider>
       </body>

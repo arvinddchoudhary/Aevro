@@ -80,7 +80,7 @@ export function AccountOrdersPageContent() {
         <Link
           key={order.id}
           href={`/account/orders/${order.id}`}
-          className="grid gap-5 border border-[#e5e5e5] p-5 hover:border-[#111111] md:grid-cols-[1fr_auto]"
+          className="grid gap-5 border border-[#ddd4c8] p-5 hover:border-[#111111] md:grid-cols-[1fr_auto]"
         >
           <div>
             <div className="flex flex-wrap items-center gap-3">
@@ -93,7 +93,7 @@ export function AccountOrdersPageContent() {
             <p className="mt-4 text-lg">
               {order.items.length} item{order.items.length === 1 ? '' : 's'}
             </p>
-            <p className="mt-2 text-sm text-[#555555]">
+            <p className="mt-2 text-sm text-[#5f5a53]">
               Placed {new Date(order.createdAt).toLocaleDateString()}
             </p>
           </div>

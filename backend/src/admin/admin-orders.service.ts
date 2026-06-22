@@ -24,16 +24,14 @@ export class AdminOrdersService {
       createdAt: query.sort === AdminOrderSort.Oldest ? 'asc' : 'desc',
     };
 
-    const [orders, total] = await this.prisma.$transaction([
-      this.prisma.order.findMany({
-        where,
-        orderBy,
-        skip,
-        take: limit,
-        include: this.orderInclude(),
-      }),
-      this.prisma.order.count({ where }),
-    ]);
+    const orders = await this.prisma.order.findMany({
+      where,
+      orderBy,
+      skip,
+      take: limit,
+      include: this.orderInclude(),
+    });
+    const total = await this.prisma.order.count({ where });
 
     return {
       data: orders.map((order) => this.serializeOrder(order)),

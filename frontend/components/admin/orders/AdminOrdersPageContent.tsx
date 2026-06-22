@@ -74,24 +74,24 @@ export function AdminOrdersPageContent() {
 
   return (
     <div>
-      <div className="mb-8 border-b border-[#e5e5e5] pb-6">
+      <div className="mb-8 border-b border-[#ddd4c8] pb-6">
         <p className="mb-3 text-xs uppercase tracking-[0.22em] text-[#777777]">
           Admin
         </p>
         <h1 className="text-4xl font-light md:text-5xl">Orders</h1>
       </div>
 
-      <div className="mb-8 border border-[#e5e5e5] p-5">
+      <div className="mb-8 border border-[#ddd4c8] p-5">
         <form onSubmit={submitSearch} className="grid gap-4 lg:grid-cols-[1fr_auto]">
           <input
             value={searchInput}
             onChange={(event) => setSearchInput(event.target.value)}
             placeholder="Search order id, name, or email"
-            className="h-11 border border-[#d9d9d9] px-4 text-sm outline-none focus:border-[#111111]"
+            className="h-11 border border-[#ddd4c8] px-4 text-sm outline-none focus:border-[#111111]"
           />
           <button
             type="submit"
-            className="h-11 cursor-pointer border border-[#111111] px-6 text-sm font-medium uppercase tracking-[0.08em] hover:bg-[#111111] hover:text-white"
+            className="h-11 cursor-pointer border border-[#111111] px-6 text-sm font-medium uppercase tracking-[0.08em] hover:bg-[#111111] hover:text-[#fffaf3]"
           >
             Search
           </button>
@@ -107,7 +107,7 @@ export function AdminOrdersPageContent() {
                 status: (event.target.value || undefined) as AdminOrderStatus | undefined,
               }))
             }
-            className="h-11 cursor-pointer border border-[#d9d9d9] bg-white px-4 text-sm outline-none focus:border-[#111111]"
+            className="h-11 cursor-pointer border border-[#ddd4c8] bg-[#fffaf3] px-4 text-sm outline-none focus:border-[#111111]"
           >
             {orderStatuses.map((status) => (
               <option key={status || 'all'} value={status}>
@@ -127,7 +127,7 @@ export function AdminOrdersPageContent() {
                   | undefined,
               }))
             }
-            className="h-11 cursor-pointer border border-[#d9d9d9] bg-white px-4 text-sm outline-none focus:border-[#111111]"
+            className="h-11 cursor-pointer border border-[#ddd4c8] bg-[#fffaf3] px-4 text-sm outline-none focus:border-[#111111]"
           >
             {paymentStatuses.map((status) => (
               <option key={status || 'all'} value={status}>
@@ -145,7 +145,7 @@ export function AdminOrdersPageContent() {
                 sort: event.target.value as 'newest' | 'oldest',
               }))
             }
-            className="h-11 cursor-pointer border border-[#d9d9d9] bg-white px-4 text-sm outline-none focus:border-[#111111]"
+            className="h-11 cursor-pointer border border-[#ddd4c8] bg-[#fffaf3] px-4 text-sm outline-none focus:border-[#111111]"
           >
             <option value="newest">Newest first</option>
             <option value="oldest">Oldest first</option>
@@ -167,20 +167,20 @@ export function AdminOrdersPageContent() {
               <Link
                 key={order.id}
                 href={`/admin/orders/${order.id}`}
-                className="grid cursor-pointer gap-5 border border-[#e5e5e5] bg-white p-5 transition hover:border-[#111111] lg:grid-cols-[1.2fr_1fr_auto]"
+                className="grid cursor-pointer gap-5 border border-[#ddd4c8] bg-[#fffaf3] p-5 transition hover:border-[#111111] lg:grid-cols-[1.2fr_1fr_auto]"
               >
                 <div>
                   <p className="text-xs uppercase tracking-[0.18em] text-[#777777]">
                     {order.orderNumber}
                   </p>
                   <p className="mt-3 text-lg">{order.customer.name}</p>
-                  <p className="mt-1 text-sm text-[#555555]">{order.customer.email}</p>
+                  <p className="mt-1 text-sm text-[#5f5a53]">{order.customer.email}</p>
                 </div>
                 <div className="flex flex-wrap items-start gap-2">
-                  <span className="border border-[#d9d9d9] px-3 py-1 text-xs uppercase tracking-[0.14em]">
+                  <span className="border border-[#ddd4c8] px-3 py-1 text-xs uppercase tracking-[0.14em]">
                     {order.status}
                   </span>
-                  <span className="border border-[#d9d9d9] px-3 py-1 text-xs uppercase tracking-[0.14em]">
+                  <span className="border border-[#ddd4c8] px-3 py-1 text-xs uppercase tracking-[0.14em]">
                     {order.payment?.status ?? 'NO PAYMENT'}
                   </span>
                   <span className="text-sm text-[#666666]">
@@ -198,7 +198,7 @@ export function AdminOrdersPageContent() {
           </div>
 
           {meta && (
-            <div className="mt-8 flex items-center justify-between border-t border-[#e5e5e5] pt-5 text-sm">
+            <div className="mt-8 flex items-center justify-between border-t border-[#ddd4c8] pt-5 text-sm">
               <button
                 type="button"
                 disabled={!meta.hasPreviousPage}

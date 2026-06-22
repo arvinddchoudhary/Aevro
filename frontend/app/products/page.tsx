@@ -1,5 +1,4 @@
 import Link from 'next/link';
-import { CategoryPills } from '../../components/products/CategoryPills';
 import { ProductCard } from '../../components/products/ProductCard';
 import { EmptyState } from '../../components/ui/EmptyState';
 import { ErrorState } from '../../components/ui/ErrorState';
@@ -80,7 +79,7 @@ export default async function ProductsPage({
 
   if (productsResult.status === 'rejected') {
     return (
-      <main className="mx-auto min-h-screen max-w-6xl px-5 py-12 sm:px-8">
+      <main className="aevro-container min-h-screen py-12">
         <ErrorState
           title="Products unavailable"
           message="The product API could not be reached. Start the backend and check NEXT_PUBLIC_API_URL."
@@ -98,146 +97,226 @@ export default async function ProductsPage({
     hasNextPage: false,
     hasPreviousPage: false,
   };
-  const sortOptions: { label: string; value: ProductSort }[] = [
-    { label: 'Newest', value: 'newest' },
-    { label: 'Price low to high', value: 'price_asc' },
-    { label: 'Price high to low', value: 'price_desc' },
-  ];
-  const hasActiveFilters = Boolean(category || search || minPrice || maxPrice);
 
   return (
-    <main className="mx-auto min-h-screen max-w-7xl px-5 py-12 sm:px-8">
-      <div className="mb-10">
-        <p className="mb-3 text-xs uppercase tracking-[0.22em] text-[#777777]">
-          Shop
-        </p>
-        <h1 className="text-4xl font-light md:text-5xl">Products</h1>
-      </div>
+    <main>
+      <section className="border-b border-[#ddd4c8]">
+        <div className="relative min-h-[360px] overflow-hidden lg:aspect-[2880/900] lg:min-h-0">
+          <img
+            src="/images/brand/plp-hero.webp"
+            alt="AEVRO trouser collection"
+            className="absolute inset-0 h-full w-full object-cover object-center"
+          />
+          <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(251,247,240,0.95)_0%,rgba(251,247,240,0.86)_35%,rgba(251,247,240,0.18)_65%,rgba(251,247,240,0)_100%)]" />
+          <div className="relative flex min-h-[360px] items-center px-6 py-14 sm:px-12 lg:min-h-full lg:px-20 xl:px-28">
+            <div className="max-w-lg">
+              <p className="text-xs font-semibold uppercase tracking-[0.08em]">
+                Shop / Trousers
+              </p>
+              <h1 className="mt-6 text-5xl font-light uppercase leading-none md:text-7xl">
+                Trousers
+              </h1>
+              <p className="mt-6 text-base leading-7 text-[#2f2a25]">
+                Refined silhouettes. Timeless style. Explore our collection of
+                trousers crafted for comfort, versatility, and effortless
+                elegance.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
 
-      <div className="mb-8 flex flex-col gap-5 border-y border-[#e5e5e5] py-5">
-        <CategoryPills
-          categories={categories}
-          activeCategory={category}
-          getHref={(nextCategory) =>
-            buildProductsHref(params, {
-              category: nextCategory,
-              page: undefined,
-            })
-          }
-        />
-
-        <form className="grid gap-3 lg:grid-cols-[minmax(220px,1fr)_130px_130px_190px_auto] lg:items-end">
-            {category && <input type="hidden" name="category" value={category} />}
-          <label className="block">
-            <span className="mb-2 block text-xs uppercase tracking-[0.16em] text-[#777777]">
-              Search
-            </span>
-            <input
-                name="search"
-                defaultValue={search}
-                placeholder="Search products"
-                className="h-11 w-full border border-[#d9d9d9] px-4 text-sm outline-none focus:border-[#111111]"
-              />
-          </label>
-          <label className="block">
-            <span className="mb-2 block text-xs uppercase tracking-[0.16em] text-[#777777]">
-              Min price
-            </span>
-            <input
-              name="minPrice"
-              defaultValue={minPrice}
-              inputMode="numeric"
-              placeholder="100000"
-              className="h-11 w-full border border-[#d9d9d9] px-4 text-sm outline-none focus:border-[#111111]"
-            />
-          </label>
-          <label className="block">
-            <span className="mb-2 block text-xs uppercase tracking-[0.16em] text-[#777777]">
-              Max price
-            </span>
-            <input
-              name="maxPrice"
-              defaultValue={maxPrice}
-              inputMode="numeric"
-              placeholder="250000"
-              className="h-11 w-full border border-[#d9d9d9] px-4 text-sm outline-none focus:border-[#111111]"
-            />
-          </label>
-          <label className="block">
-            <span className="mb-2 block text-xs uppercase tracking-[0.16em] text-[#777777]">
-              Sort
-            </span>
-            <select
-              name="sort"
-              defaultValue={sort}
-              className="h-11 w-full border border-[#d9d9d9] bg-white px-4 text-sm outline-none focus:border-[#111111]"
+      <section className="aevro-container grid gap-10 py-12 lg:grid-cols-[280px_1fr]">
+        <aside className="border-[#ddd4c8] lg:border-r lg:pr-9">
+          <div className="mb-7 flex items-center justify-between border-b border-[#ddd4c8] pb-5">
+            <p className="text-xs font-semibold uppercase tracking-[0.08em]">
+              Filter
+            </p>
+            <Link
+              href="/products"
+              className="text-xs uppercase tracking-[0.08em] underline-offset-4 hover:underline"
             >
-              {sortOptions.map((option) => (
-                <option key={option.value} value={option.value}>
-                  {option.label}
-                </option>
-              ))}
-            </select>
-          </label>
-          <div className="flex gap-2">
-            <button className="h-11 min-w-28 border border-[#111111] bg-white px-5 text-sm font-medium uppercase tracking-[0.08em] text-[#111111] hover:bg-[#111111] hover:text-white">
-              Apply
-            </button>
-            {hasActiveFilters && (
+              Clear all
+            </Link>
+          </div>
+          <div className="space-y-7">
+            <div className="border-b border-[#ddd4c8] pb-7">
+              <p className="mb-4 text-xs font-semibold uppercase tracking-[0.08em]">
+                Category
+              </p>
+              <div className="space-y-3 text-sm">
+                <Link
+                  href={buildProductsHref(params, { category: undefined, page: undefined })}
+                  className={`block ${!category ? 'font-medium' : 'text-[#514c45]'}`}
+                >
+                  All products
+                </Link>
+                {categories.map((item) => (
+                  <Link
+                    key={item.id}
+                    href={buildProductsHref(params, {
+                      category: item.slug,
+                      page: undefined,
+                    })}
+                    className={`block ${category === item.slug ? 'font-medium' : 'text-[#514c45]'}`}
+                  >
+                    {item.name}
+                    {typeof item.activeProductCount === 'number'
+                      ? ` (${item.activeProductCount})`
+                      : ''}
+                  </Link>
+                ))}
+              </div>
+            </div>
+
+            <div className="border-b border-[#ddd4c8] pb-7">
+              <p className="mb-4 text-xs font-semibold uppercase tracking-[0.08em]">
+                Color
+              </p>
+              <div className="space-y-3 text-sm">
+                {[
+                  ['Ivory', '#f4eadb'],
+                  ['Stone', '#c8b9a8'],
+                  ['Taupe', '#8d7968'],
+                  ['Navy', '#17243a'],
+                  ['Black', '#0f0f0f'],
+                ].map(([name, hex]) => (
+                  <div key={name} className="flex items-center gap-3 text-[#2f2a25]">
+                    <span
+                      className="h-5 w-5 rounded-full border border-[#111111]/30"
+                      style={{ backgroundColor: hex }}
+                    />
+                    <span>{name}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="border-b border-[#ddd4c8] pb-7">
+              <p className="mb-4 text-xs font-semibold uppercase tracking-[0.08em]">
+                Size
+              </p>
+              <div className="grid grid-cols-5 gap-2">
+                {['30', '32', '34', '36', '38'].map((size) => (
+                  <span
+                    key={size}
+                    className="flex h-9 items-center justify-center rounded-[4px] border border-[#ddd4c8] text-sm"
+                  >
+                    {size}
+                  </span>
+                ))}
+              </div>
+            </div>
+
+            <form className="space-y-7">
+              {category && <input type="hidden" name="category" value={category} />}
+              <div className="border-b border-[#ddd4c8] pb-7">
+                <p className="mb-4 text-xs font-semibold uppercase tracking-[0.08em]">
+                  Search
+                </p>
+                <input
+                  name="search"
+                  defaultValue={search}
+                  placeholder="Search products"
+                  className="h-11 w-full border border-[#ddd4c8] bg-transparent px-4 text-sm outline-none focus:border-[#111111]"
+                />
+              </div>
+              <div className="border-b border-[#ddd4c8] pb-7">
+                <p className="mb-4 text-xs font-semibold uppercase tracking-[0.08em]">
+                  Price
+                </p>
+                <div className="grid gap-3">
+                  <input
+                    name="minPrice"
+                    defaultValue={minPrice}
+                    inputMode="numeric"
+                    placeholder="Min price"
+                    className="h-11 w-full border border-[#ddd4c8] bg-transparent px-4 text-sm outline-none focus:border-[#111111]"
+                  />
+                  <input
+                    name="maxPrice"
+                    defaultValue={maxPrice}
+                    inputMode="numeric"
+                    placeholder="Max price"
+                    className="h-11 w-full border border-[#ddd4c8] bg-transparent px-4 text-sm outline-none focus:border-[#111111]"
+                  />
+                </div>
+              </div>
+              <button className="h-12 w-full bg-[#111111] px-5 text-sm font-medium uppercase tracking-[0.08em] text-[#fffaf3] hover:bg-[#2a2825]">
+                Apply filters
+              </button>
+            </form>
+          </div>
+        </aside>
+
+        <div>
+          <div className="mb-7 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <p className="text-xs font-semibold uppercase tracking-[0.08em]">
+              {meta.total} products
+            </p>
+            <div className="flex flex-wrap items-center gap-4 text-xs font-semibold uppercase tracking-[0.08em]">
+              <span>Sort by</span>
               <Link
-                href="/products"
-                className="inline-flex h-11 min-w-24 items-center justify-center border border-[#d9d9d9] px-5 text-sm font-medium uppercase tracking-[0.08em] text-[#111111] hover:border-[#111111]"
+                href={buildProductsHref(params, { sort: 'newest', page: undefined })}
+                className={sort === 'newest' ? 'border-b border-[#111111]' : ''}
               >
-                Clear
+                Featured
               </Link>
+              <Link
+                href={buildProductsHref(params, { sort: 'price_asc', page: undefined })}
+                className={sort === 'price_asc' ? 'border-b border-[#111111]' : ''}
+              >
+                Price low
+              </Link>
+              <Link
+                href={buildProductsHref(params, { sort: 'price_desc', page: undefined })}
+                className={sort === 'price_desc' ? 'border-b border-[#111111]' : ''}
+              >
+                Price high
+              </Link>
+            </div>
+          </div>
+
+          {products.length === 0 ? (
+            <EmptyState
+              title="No products found"
+              message="Try a different category, search term, or sorting option."
+            />
+          ) : (
+            <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-4">
+              {products.map((product) => (
+                <ProductCard key={product.id} product={product} compact />
+              ))}
+            </div>
+          )}
+
+          <div className="mt-12 flex items-center justify-center gap-8 text-sm">
+            {meta.hasPreviousPage ? (
+              <Link
+                href={buildProductsHref(params, { page: meta.page - 1 })}
+                className="underline underline-offset-4"
+              >
+                Previous
+              </Link>
+            ) : (
+              <span className="text-[#aaa39a]">Previous</span>
+            )}
+            <span className="font-medium">
+              Page {meta.page} of {Math.max(meta.totalPages, 1)}
+            </span>
+            {meta.hasNextPage ? (
+              <Link
+                href={buildProductsHref(params, { page: meta.page + 1 })}
+                className="underline underline-offset-4"
+              >
+                Next
+              </Link>
+            ) : (
+              <span className="text-[#aaa39a]">Next</span>
             )}
           </div>
-        </form>
-      </div>
-
-      {products.length === 0 ? (
-        <EmptyState
-          title="No products found"
-          message="Try a different category, search term, or sorting option."
-        />
-      ) : (
-        <>
-          <div className="mb-5 text-sm text-[#666666]">
-            Showing {products.length} of {meta.total} products
-          </div>
-          <div className="grid gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3">
-            {products.map((product) => (
-              <ProductCard key={product.id} product={product} />
-            ))}
-          </div>
-        </>
-      )}
-
-      <div className="mt-10 flex items-center justify-between border-t border-[#e5e5e5] pt-6 text-sm">
-        {meta.hasPreviousPage ? (
-          <Link
-            href={buildProductsHref(params, { page: meta.page - 1 })}
-            className="underline underline-offset-4"
-          >
-            Previous
-          </Link>
-        ) : (
-          <span className="text-[#aaaaaa]">Previous</span>
-        )}
-        <span>
-          Page {meta.page} of {Math.max(meta.totalPages, 1)}
-        </span>
-        {meta.hasNextPage ? (
-          <Link
-            href={buildProductsHref(params, { page: meta.page + 1 })}
-            className="underline underline-offset-4"
-          >
-            Next
-          </Link>
-        ) : (
-          <span className="text-[#aaaaaa]">Next</span>
-        )}
-      </div>
+        </div>
+      </section>
     </main>
   );
 }
