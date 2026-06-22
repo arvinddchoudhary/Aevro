@@ -7,8 +7,8 @@ export function CartNavLink() {
   const { itemCount } = useCart();
 
   return (
-    <Link href="/cart" className="underline-offset-4 hover:underline">
-      Cart ({itemCount})
+    <Link href="/cart" className="underline-offset-8 hover:underline">
+      Bag ({itemCount})
     </Link>
   );
 }

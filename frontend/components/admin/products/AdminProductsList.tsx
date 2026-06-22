@@ -55,7 +55,7 @@ export function AdminProductsList() {
         return (
           <article
             key={product.id}
-            className="grid gap-5 border border-[#e5e5e5] bg-white p-5 transition hover:border-[#111111] md:grid-cols-[96px_1fr_auto]"
+            className="grid gap-5 border border-[#ddd4c8] bg-[#fffaf3] p-5 transition hover:border-[#111111] md:grid-cols-[96px_1fr_auto]"
           >
             <div className="aspect-[3/4] overflow-hidden bg-[#f5f5f5]">
               {product.primaryImage ? (
@@ -75,12 +75,12 @@ export function AdminProductsList() {
                 <p className="text-xs uppercase tracking-[0.18em] text-[#777777]">
                   {product.category?.name ?? 'Uncategorised'}
                 </p>
-                <span className="border border-[#d9d9d9] px-3 py-1 text-xs uppercase tracking-[0.16em] text-[#555555]">
+                <span className="border border-[#ddd4c8] px-3 py-1 text-xs uppercase tracking-[0.16em] text-[#5f5a53]">
                   {product.status}
                 </span>
               </div>
               <p className="mt-3 text-lg">{product.name}</p>
-              <p className="mt-2 text-sm text-[#555555]">
+              <p className="mt-2 text-sm text-[#5f5a53]">
                 {product.variants.length} variant{product.variants.length === 1 ? '' : 's'} / Stock {product.stock}
               </p>
               {(lowStockVariants.length > 0 || outOfStockVariants.length > 0) && (
@@ -98,7 +98,7 @@ export function AdminProductsList() {
               <p className="text-lg">{formatPrice(product.priceInPaise)}</p>
               <Link
                 href={`/admin/products/${product.id}/edit`}
-                className="inline-flex h-10 cursor-pointer items-center justify-center border border-[#111111] px-4 text-xs font-medium uppercase tracking-[0.1em] hover:bg-[#111111] hover:text-white"
+                className="inline-flex h-10 cursor-pointer items-center justify-center border border-[#111111] px-4 text-xs font-medium uppercase tracking-[0.1em] hover:bg-[#111111] hover:text-[#fffaf3]"
               >
                 Edit
               </Link>
@@ -112,7 +112,7 @@ export function AdminProductsList() {
 
 export function AdminProductsHeader() {
   return (
-    <div className="mb-8 flex flex-col gap-5 border-b border-[#e5e5e5] pb-6 sm:flex-row sm:items-end sm:justify-between">
+    <div className="mb-8 flex flex-col gap-5 border-b border-[#ddd4c8] pb-6 sm:flex-row sm:items-end sm:justify-between">
       <div>
         <p className="mb-3 text-xs uppercase tracking-[0.22em] text-[#777777]">
           Admin
@@ -121,7 +121,7 @@ export function AdminProductsHeader() {
       </div>
       <Link
         href="/admin/products/new"
-        className="inline-flex h-12 cursor-pointer items-center justify-center border border-[#111111] px-6 text-sm font-medium uppercase tracking-[0.08em] hover:bg-[#111111] hover:text-white"
+        className="inline-flex h-12 cursor-pointer items-center justify-center border border-[#111111] px-6 text-sm font-medium uppercase tracking-[0.08em] hover:bg-[#111111] hover:text-[#fffaf3]"
       >
         New product
       </Link>

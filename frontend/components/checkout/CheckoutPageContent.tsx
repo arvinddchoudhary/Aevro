@@ -59,7 +59,7 @@ function CheckoutField({
         autoComplete={autoComplete}
         inputMode={inputMode}
         onChange={(event) => onChange(name, event.target.value)}
-        className="h-11 w-full border border-[#d9d9d9] px-4 text-sm outline-none focus:border-[#111111]"
+        className="h-11 w-full border border-[#ddd4c8] bg-transparent px-4 text-sm outline-none focus:border-[#111111]"
       />
       {error && <p className="mt-2 text-sm text-[#8a1f1f]">{error}</p>}
     </label>
@@ -237,11 +237,11 @@ export function CheckoutPageContent() {
   return (
     <form
       onSubmit={handleSubmit}
-      className="grid gap-10 lg:grid-cols-[minmax(0,1fr)_380px]"
+      className="grid gap-12 lg:grid-cols-[minmax(0,1fr)_420px]"
     >
       <section className="space-y-10">
-        <div className="border border-[#e5e5e5] p-5 sm:p-6">
-          <p className="mb-6 text-xs uppercase tracking-[0.2em] text-[#777777]">
+        <div className="border border-[#ddd4c8] bg-[#fffaf3]/60 p-6 sm:p-8">
+          <p className="mb-6 text-xs font-medium uppercase tracking-[0.12em] text-[#77716a]">
             Customer details
           </p>
           <div className="grid gap-5 sm:grid-cols-2">
@@ -276,8 +276,8 @@ export function CheckoutPageContent() {
           </div>
         </div>
 
-        <div className="border border-[#e5e5e5] p-5 sm:p-6">
-          <p className="mb-6 text-xs uppercase tracking-[0.2em] text-[#777777]">
+        <div className="border border-[#ddd4c8] bg-[#fffaf3]/60 p-6 sm:p-8">
+          <p className="mb-6 text-xs font-medium uppercase tracking-[0.12em] text-[#77716a]">
             Shipping address
           </p>
           <div className="grid gap-5 sm:grid-cols-2">
@@ -342,15 +342,15 @@ export function CheckoutPageContent() {
         )}
       </section>
 
-      <aside className="h-fit border border-[#e5e5e5] p-6">
-        <p className="text-xs uppercase tracking-[0.2em] text-[#777777]">
+      <aside className="h-fit border border-[#ddd4c8] bg-[#fffaf3]/70 p-8 lg:sticky lg:top-28">
+        <p className="text-sm font-medium uppercase tracking-[0.08em]">
           Order summary
         </p>
         <div className="mt-6 space-y-5">
           {items.map((item) => (
             <div
               key={item.itemKey}
-              className="flex gap-4 border-b border-[#eeeeee] pb-5 last:border-b-0"
+              className="flex gap-4 border-b border-[#e7ded2] pb-5 last:border-b-0"
             >
               <div className="h-24 w-18 shrink-0 overflow-hidden bg-[#f5f5f5]">
                 {item.imageUrl ? (
@@ -371,7 +371,7 @@ export function CheckoutPageContent() {
                   Qty {item.quantity}
                 </p>
                 {(item.selectedColor || item.selectedSize) && (
-                  <p className="mt-2 text-xs leading-5 text-[#555555]">
+                  <p className="mt-2 text-xs leading-5 text-[#5f5a53]">
                     {[item.selectedColor, item.selectedSize].filter(Boolean).join(' / ')}
                   </p>
                 )}
@@ -396,11 +396,11 @@ export function CheckoutPageContent() {
           ))}
         </div>
 
-        <div className="mt-6 flex items-center justify-between border-t border-[#e5e5e5] pt-5 text-lg">
+        <div className="mt-8 flex items-center justify-between border-t border-[#ddd4c8] pt-7 text-2xl">
           <span>Total</span>
           <span>{formatPrice(subtotalInPaise)}</span>
         </div>
-        <p className="mt-4 text-sm leading-6 text-[#666666]">
+        <p className="mt-4 text-sm leading-6 text-[#514c45]">
           This creates a pending order and opens Razorpay checkout securely.
         </p>
         {lowStockItems.length > 0 && stockBlockedItems.length === 0 ? (
@@ -411,13 +411,13 @@ export function CheckoutPageContent() {
         ) : null}
         <button
           disabled={isSubmitting || stockBlockedItems.length > 0}
-          className="mt-6 h-12 w-full cursor-pointer border border-[#111111] text-sm font-medium uppercase tracking-[0.08em] hover:bg-[#111111] hover:text-white disabled:cursor-not-allowed disabled:border-[#bdbdbd] disabled:text-[#777777] disabled:hover:bg-white"
+          className="mt-6 h-14 w-full cursor-pointer bg-[#111111] text-xs font-medium uppercase tracking-[0.08em] text-[#fffaf3] hover:bg-[#2a2825] disabled:cursor-not-allowed disabled:border disabled:border-[#ddd4c8] disabled:bg-transparent disabled:text-[#777777]"
         >
           {isSubmitting ? submitLabel : submitLabel}
         </button>
         <Link
           href="/cart"
-          className="mt-3 inline-flex h-12 w-full cursor-pointer items-center justify-center border border-[#d9d9d9] text-sm font-medium uppercase tracking-[0.08em] hover:border-[#111111]"
+          className="mt-3 inline-flex h-12 w-full cursor-pointer items-center justify-center border border-[#ddd4c8] text-xs font-medium uppercase tracking-[0.08em] hover:border-[#111111]"
         >
           Back to cart
         </Link>

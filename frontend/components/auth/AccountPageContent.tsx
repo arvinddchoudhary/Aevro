@@ -45,12 +45,12 @@ export function AccountPageContent() {
 
   return (
     <div className="grid gap-10 lg:grid-cols-[minmax(0,1fr)_360px]">
-      <section className="border border-[#e5e5e5] p-6">
+      <section className="border border-[#ddd4c8] p-6">
         <p className="text-xs uppercase tracking-[0.22em] text-[#777777]">
           Account
         </p>
         <h1 className="mt-4 text-4xl font-light md:text-5xl">{user.name}</h1>
-        <div className="mt-8 border-y border-[#e5e5e5]">
+        <div className="mt-8 border-y border-[#ddd4c8]">
           {[
             ['Email', user.email],
             ['Role', user.role],
@@ -58,7 +58,7 @@ export function AccountPageContent() {
           ].map(([label, value]) => (
             <div
               key={label}
-              className="grid grid-cols-[150px_1fr] border-b border-[#eeeeee] py-4 text-sm last:border-b-0"
+              className="grid grid-cols-[150px_1fr] border-b border-[#e7ded2] py-4 text-sm last:border-b-0"
             >
               <span className="text-[#777777]">{label}</span>
               <span>{value}</span>
@@ -67,36 +67,36 @@ export function AccountPageContent() {
         </div>
       </section>
 
-      <aside className="h-fit border border-[#e5e5e5] p-6">
+      <aside className="h-fit border border-[#ddd4c8] p-6">
         <p className="text-xs uppercase tracking-[0.2em] text-[#777777]">
           Session
         </p>
-        <p className="mt-4 text-sm leading-6 text-[#555555]">
+        <p className="mt-4 text-sm leading-6 text-[#5f5a53]">
           Your session is managed with backend httpOnly cookies. No JWT token is
           stored in localStorage or sessionStorage.
         </p>
         <div className="mt-6 flex flex-col gap-3">
           <Link
             href="/account/profile"
-            className="inline-flex h-12 cursor-pointer items-center justify-center border border-[#111111] px-6 text-sm font-medium uppercase tracking-[0.08em] hover:bg-[#111111] hover:text-white"
+            className="inline-flex h-12 cursor-pointer items-center justify-center border border-[#111111] px-6 text-sm font-medium uppercase tracking-[0.08em] hover:bg-[#111111] hover:text-[#fffaf3]"
           >
             Edit profile
           </Link>
           <Link
             href="/account/addresses"
-            className="inline-flex h-12 cursor-pointer items-center justify-center border border-[#d9d9d9] px-6 text-sm font-medium uppercase tracking-[0.08em] hover:border-[#111111]"
+            className="inline-flex h-12 cursor-pointer items-center justify-center border border-[#ddd4c8] px-6 text-sm font-medium uppercase tracking-[0.08em] hover:border-[#111111]"
           >
             Saved addresses
           </Link>
           <Link
             href="/account/orders"
-            className="inline-flex h-12 cursor-pointer items-center justify-center border border-[#d9d9d9] px-6 text-sm font-medium uppercase tracking-[0.08em] hover:border-[#111111]"
+            className="inline-flex h-12 cursor-pointer items-center justify-center border border-[#ddd4c8] px-6 text-sm font-medium uppercase tracking-[0.08em] hover:border-[#111111]"
           >
             View orders
           </Link>
           <Link
             href="/products"
-            className="inline-flex h-12 cursor-pointer items-center justify-center border border-[#d9d9d9] px-6 text-sm font-medium uppercase tracking-[0.08em] hover:border-[#111111]"
+            className="inline-flex h-12 cursor-pointer items-center justify-center border border-[#ddd4c8] px-6 text-sm font-medium uppercase tracking-[0.08em] hover:border-[#111111]"
           >
             Continue shopping
           </Link>
@@ -104,7 +104,7 @@ export function AccountPageContent() {
             type="button"
             disabled={isLoggingOut}
             onClick={handleLogout}
-            className="h-12 cursor-pointer border border-[#d9d9d9] text-sm font-medium uppercase tracking-[0.08em] hover:border-[#111111] disabled:cursor-not-allowed disabled:text-[#777777]"
+            className="h-12 cursor-pointer border border-[#ddd4c8] text-sm font-medium uppercase tracking-[0.08em] hover:border-[#111111] disabled:cursor-not-allowed disabled:text-[#777777]"
           >
             {isLoggingOut ? 'Logging out' : 'Logout'}
           </button>

@@ -4,7 +4,7 @@ type OrderStatusPillProps = {
 
 export function OrderStatusPill({ label }: OrderStatusPillProps) {
   return (
-    <span className="inline-flex border border-[#d9d9d9] px-3 py-1 text-xs uppercase tracking-[0.16em] text-[#555555]">
+    <span className="inline-flex border border-[#ddd4c8] px-3 py-1 text-xs uppercase tracking-[0.16em] text-[#5f5a53]">
       {label}
     </span>
   );

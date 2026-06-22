@@ -36,11 +36,11 @@ export function RegisterForm() {
 
   return (
     <div className="mx-auto w-full max-w-md">
-      <form onSubmit={handleSubmit} className="border border-[#e5e5e5] p-6">
-        <p className="text-xs uppercase tracking-[0.22em] text-[#777777]">
+      <form onSubmit={handleSubmit} className="border border-[#ddd4c8] bg-[#fffaf3]/70 p-8">
+        <p className="text-xs uppercase tracking-[0.14em] text-[#77716a]">
           Create account
         </p>
-        <h1 className="mt-4 text-4xl font-light">Start your AEVRO profile.</h1>
+        <h1 className="mt-4 text-4xl font-light uppercase">Start your AEVRO profile.</h1>
         <div className="mt-8 space-y-5">
           <AuthField
             label="Name"
@@ -73,14 +73,14 @@ export function RegisterForm() {
         {error && <p className="mt-5 text-sm leading-6 text-[#8a1f1f]">{error}</p>}
         <button
           disabled={isSubmitting}
-          className="mt-6 h-12 w-full border border-[#111111] text-sm font-medium uppercase tracking-[0.08em] hover:bg-[#111111] hover:text-white disabled:cursor-not-allowed disabled:border-[#bdbdbd] disabled:text-[#777777] disabled:hover:bg-white"
+          className="mt-6 h-12 w-full bg-[#111111] text-xs font-medium uppercase tracking-[0.08em] text-[#fffaf3] hover:bg-[#2a2825] disabled:cursor-not-allowed disabled:border disabled:border-[#ddd4c8] disabled:bg-transparent disabled:text-[#777777]"
         >
           {isSubmitting ? 'Creating account' : 'Create account'}
         </button>
-        <div className="my-5 border-t border-[#e5e5e5]" />
+        <div className="my-5 border-t border-[#ddd4c8]" />
         <GoogleLoginButton onError={setError} />
       </form>
-      <p className="mt-5 text-center text-sm text-[#555555]">
+      <p className="mt-5 text-center text-sm text-[#5f5a53]">
         Already have an account?{' '}
         <Link href="/login" className="underline underline-offset-4">
           Login

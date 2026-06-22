@@ -23,8 +23,8 @@ export function CategoryPills({
         href={getHref(undefined)}
         className={`inline-flex min-w-16 shrink-0 items-center justify-center border px-4 py-2 text-sm font-medium ${
           !activeCategory
-            ? 'border-[#111111] bg-white text-[#111111]'
-            : 'border-[#dddddd] text-[#555555]'
+            ? 'border-[#111111] bg-[#fffaf3] text-[#111111]'
+            : 'border-[#ddd4c8] text-[#5f5a53]'
         }`}
       >
         All
@@ -35,8 +35,8 @@ export function CategoryPills({
           href={getHref(category.slug)}
           className={`inline-flex min-w-24 shrink-0 items-center justify-center border px-4 py-2 text-sm font-medium ${
             activeCategory === category.slug
-              ? 'border-[#111111] bg-white text-[#111111]'
-              : 'border-[#dddddd] text-[#555555]'
+              ? 'border-[#111111] bg-[#fffaf3] text-[#111111]'
+              : 'border-[#ddd4c8] text-[#5f5a53]'
           }`}
         >
           {category.name}

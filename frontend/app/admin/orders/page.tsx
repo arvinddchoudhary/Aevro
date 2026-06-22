@@ -3,7 +3,7 @@ import { AdminOrdersPageContent } from '../../../components/admin/orders/AdminOr
 
 export default function AdminOrdersPage() {
   return (
-    <main className="mx-auto min-h-screen max-w-7xl px-5 py-12 sm:px-8">
+    <main className="aevro-container min-h-screen py-14">
       <AdminRouteGuard>
         <AdminOrdersPageContent />
       </AdminRouteGuard>

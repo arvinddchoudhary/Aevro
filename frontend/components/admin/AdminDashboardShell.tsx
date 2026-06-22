@@ -61,12 +61,12 @@ export function AdminDashboardShell() {
         <p className="mb-3 text-xs uppercase tracking-[0.22em] text-[#777777]">
           Access denied
         </p>
-        <p className="mx-auto max-w-md text-sm leading-6 text-[#555555]">
+        <p className="mx-auto max-w-md text-sm leading-6 text-[#5f5a53]">
           This area is reserved for AEVRO administrators.
         </p>
         <Link
           href="/account"
-          className="mt-6 inline-flex h-12 items-center justify-center border border-[#111111] px-6 text-sm font-medium uppercase tracking-[0.08em] hover:bg-[#111111] hover:text-white"
+          className="mt-6 inline-flex h-12 items-center justify-center border border-[#111111] px-6 text-sm font-medium uppercase tracking-[0.08em] hover:bg-[#111111] hover:text-[#fffaf3]"
         >
           Back to account
         </Link>
@@ -76,13 +76,13 @@ export function AdminDashboardShell() {
 
   return (
     <div className="grid gap-10 lg:grid-cols-[260px_minmax(0,1fr)]">
-      <aside className="h-fit border border-[#e5e5e5] p-5">
+      <aside className="h-fit border border-[#ddd4c8] p-5">
         <p className="text-xs uppercase tracking-[0.22em] text-[#777777]">
           Admin
         </p>
         <nav className="mt-6 space-y-3 text-sm">
           {adminSections.map((section) => (
-            <div key={section.title} className="border-b border-[#eeeeee] pb-3 last:border-b-0">
+            <div key={section.title} className="border-b border-[#e7ded2] pb-3 last:border-b-0">
               {section.href ? (
                 <Link href={section.href} className="cursor-pointer hover:text-[#777777]">
                   {section.title}
@@ -96,14 +96,14 @@ export function AdminDashboardShell() {
       </aside>
 
       <section>
-        <div className="border-b border-[#e5e5e5] pb-8">
+        <div className="border-b border-[#ddd4c8] pb-8">
           <p className="text-xs uppercase tracking-[0.22em] text-[#777777]">
             AEVRO control
           </p>
           <h1 className="mt-4 text-4xl font-light md:text-5xl">
             Admin foundation
           </h1>
-          <p className="mt-5 max-w-2xl text-sm leading-7 text-[#555555]">
+          <p className="mt-5 max-w-2xl text-sm leading-7 text-[#5f5a53]">
             Role-gated admin access is active. The sections below are reserved
             placeholders for future operational tools.
           </p>
@@ -111,17 +111,17 @@ export function AdminDashboardShell() {
 
         <div className="mt-8 grid gap-4 sm:grid-cols-2">
           {adminSections.map((section) => (
-            <article key={section.title} className="border border-[#e5e5e5] p-5">
+            <article key={section.title} className="border border-[#ddd4c8] p-5">
               <p className="text-xs uppercase tracking-[0.18em] text-[#777777]">
                 {section.title}
               </p>
-              <p className="mt-4 text-sm leading-6 text-[#555555]">
+              <p className="mt-4 text-sm leading-6 text-[#5f5a53]">
                 {section.description}
               </p>
               {section.href ? (
                 <Link
                   href={section.href}
-                  className="mt-5 inline-flex h-10 cursor-pointer items-center justify-center border border-[#111111] px-4 text-xs font-medium uppercase tracking-[0.12em] hover:bg-[#111111] hover:text-white"
+                  className="mt-5 inline-flex h-10 cursor-pointer items-center justify-center border border-[#111111] px-4 text-xs font-medium uppercase tracking-[0.12em] hover:bg-[#111111] hover:text-[#fffaf3]"
                 >
                   Open
                 </Link>

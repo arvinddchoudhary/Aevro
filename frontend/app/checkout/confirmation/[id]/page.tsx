@@ -34,7 +34,7 @@ export default async function OrderConfirmationPage({
 
   return (
     <main className="mx-auto min-h-screen max-w-6xl px-5 py-12 sm:px-8">
-      <div className="border-b border-[#e5e5e5] pb-8">
+      <div className="border-b border-[#ddd4c8] pb-8">
         <p className="mb-3 text-xs uppercase tracking-[0.22em] text-[#777777]">
           Order created
         </p>
@@ -43,12 +43,12 @@ export default async function OrderConfirmationPage({
             <h1 className="text-4xl font-light md:text-5xl">
               Your pending order is ready.
             </h1>
-            <p className="mt-5 max-w-2xl text-sm leading-7 text-[#555555]">
+            <p className="mt-5 max-w-2xl text-sm leading-7 text-[#5f5a53]">
               Use this reference for support and payment tracking. Razorpay
               payment is verified by the backend before the order is confirmed.
             </p>
           </div>
-          <div className="border border-[#e5e5e5] px-5 py-4">
+          <div className="border border-[#ddd4c8] px-5 py-4">
             <p className="text-xs uppercase tracking-[0.18em] text-[#777777]">
               Reference
             </p>
@@ -62,7 +62,7 @@ export default async function OrderConfirmationPage({
           {order.items.map((item) => (
             <article
               key={item.id}
-              className="grid gap-4 border-b border-[#e5e5e5] pb-5 sm:grid-cols-[1fr_auto]"
+              className="grid gap-4 border-b border-[#ddd4c8] pb-5 sm:grid-cols-[1fr_auto]"
             >
               <div>
                 {item.productSlug ? (
@@ -93,11 +93,11 @@ export default async function OrderConfirmationPage({
           ))}
         </section>
 
-        <aside className="h-fit border border-[#e5e5e5] p-6">
+        <aside className="h-fit border border-[#ddd4c8] p-6">
           <p className="text-xs uppercase tracking-[0.2em] text-[#777777]">
             Summary
           </p>
-          <div className="mt-6 space-y-4 border-b border-[#e5e5e5] pb-5 text-sm">
+          <div className="mt-6 space-y-4 border-b border-[#ddd4c8] pb-5 text-sm">
             <div className="flex justify-between">
               <span>Status</span>
               <span>{order.status}</span>
@@ -112,7 +112,7 @@ export default async function OrderConfirmationPage({
             </div>
           </div>
 
-          <div className="mt-5 text-sm leading-7 text-[#555555]">
+          <div className="mt-5 text-sm leading-7 text-[#5f5a53]">
             <p>{order.customer.name}</p>
             <p>{order.customer.email}</p>
             <p>{order.customer.phone}</p>
@@ -128,13 +128,13 @@ export default async function OrderConfirmationPage({
           <div className="mt-6 flex flex-col gap-3">
             <Link
               href="/products"
-              className="inline-flex h-12 items-center justify-center border border-[#111111] px-6 text-sm font-medium uppercase tracking-[0.08em] hover:bg-[#111111] hover:text-white"
+              className="inline-flex h-12 items-center justify-center border border-[#111111] px-6 text-sm font-medium uppercase tracking-[0.08em] hover:bg-[#111111] hover:text-[#fffaf3]"
             >
               Continue shopping
             </Link>
             <Link
               href="/cart"
-              className="inline-flex h-12 items-center justify-center border border-[#d9d9d9] px-6 text-sm font-medium uppercase tracking-[0.08em] hover:border-[#111111]"
+              className="inline-flex h-12 items-center justify-center border border-[#ddd4c8] px-6 text-sm font-medium uppercase tracking-[0.08em] hover:border-[#111111]"
             >
               View cart
             </Link>

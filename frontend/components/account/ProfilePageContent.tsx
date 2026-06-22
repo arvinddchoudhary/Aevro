@@ -63,7 +63,7 @@ export function ProfilePageContent() {
 
   return (
     <div className="grid gap-10 lg:grid-cols-[minmax(0,1fr)_340px]">
-      <form onSubmit={submitProfile} className="border border-[#e5e5e5] p-6">
+      <form onSubmit={submitProfile} className="border border-[#ddd4c8] p-6">
         <p className="text-xs uppercase tracking-[0.22em] text-[#777777]">
           Profile
         </p>
@@ -76,7 +76,7 @@ export function ProfilePageContent() {
             <input
               value={name}
               onChange={(event) => setName(event.target.value)}
-              className="h-11 w-full border border-[#d9d9d9] px-4 text-sm outline-none focus:border-[#111111]"
+              className="h-11 w-full border border-[#ddd4c8] px-4 text-sm outline-none focus:border-[#111111]"
             />
           </label>
           <label>
@@ -87,10 +87,10 @@ export function ProfilePageContent() {
               value={phone}
               inputMode="tel"
               onChange={(event) => setPhone(event.target.value)}
-              className="h-11 w-full border border-[#d9d9d9] px-4 text-sm outline-none focus:border-[#111111]"
+              className="h-11 w-full border border-[#ddd4c8] px-4 text-sm outline-none focus:border-[#111111]"
             />
           </label>
-          <div className="border-t border-[#eeeeee] pt-5 text-sm">
+          <div className="border-t border-[#e7ded2] pt-5 text-sm">
             <div className="grid grid-cols-[130px_1fr] gap-4 py-2">
               <span className="text-[#777777]">Email</span>
               <span>{user.email}</span>
@@ -114,26 +114,26 @@ export function ProfilePageContent() {
         <button
           type="submit"
           disabled={isSaving}
-          className="mt-6 h-12 cursor-pointer border border-[#111111] px-6 text-sm font-medium uppercase tracking-[0.08em] hover:bg-[#111111] hover:text-white disabled:cursor-not-allowed disabled:border-[#d9d9d9] disabled:text-[#777777] disabled:hover:bg-white"
+          className="mt-6 h-12 cursor-pointer border border-[#111111] px-6 text-sm font-medium uppercase tracking-[0.08em] hover:bg-[#111111] hover:text-[#fffaf3] disabled:cursor-not-allowed disabled:border-[#ddd4c8] disabled:text-[#777777] disabled:hover:bg-[#fffaf3]"
         >
           {isSaving ? 'Saving' : 'Save profile'}
         </button>
       </form>
 
-      <aside className="h-fit border border-[#e5e5e5] p-6">
+      <aside className="h-fit border border-[#ddd4c8] p-6">
         <p className="text-xs uppercase tracking-[0.2em] text-[#777777]">
           Account
         </p>
         <div className="mt-6 flex flex-col gap-3">
           <Link
             href="/account/addresses"
-            className="inline-flex h-12 cursor-pointer items-center justify-center border border-[#111111] px-6 text-sm font-medium uppercase tracking-[0.08em] hover:bg-[#111111] hover:text-white"
+            className="inline-flex h-12 cursor-pointer items-center justify-center border border-[#111111] px-6 text-sm font-medium uppercase tracking-[0.08em] hover:bg-[#111111] hover:text-[#fffaf3]"
           >
             Manage addresses
           </Link>
           <Link
             href="/account/orders"
-            className="inline-flex h-12 cursor-pointer items-center justify-center border border-[#d9d9d9] px-6 text-sm font-medium uppercase tracking-[0.08em] hover:border-[#111111]"
+            className="inline-flex h-12 cursor-pointer items-center justify-center border border-[#ddd4c8] px-6 text-sm font-medium uppercase tracking-[0.08em] hover:border-[#111111]"
           >
             View orders
           </Link>

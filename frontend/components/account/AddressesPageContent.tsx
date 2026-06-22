@@ -162,7 +162,7 @@ export function AddressesPageContent() {
   return (
     <div className="grid gap-10 lg:grid-cols-[minmax(0,1fr)_420px]">
       <section>
-        <div className="mb-8 border-b border-[#e5e5e5] pb-6">
+        <div className="mb-8 border-b border-[#ddd4c8] pb-6">
           <p className="mb-3 text-xs uppercase tracking-[0.22em] text-[#777777]">
             Account
           </p>
@@ -183,7 +183,7 @@ export function AddressesPageContent() {
 
         <div className="space-y-4">
           {addresses.map((address) => (
-            <article key={address.id} className="border border-[#e5e5e5] p-5">
+            <article key={address.id} className="border border-[#ddd4c8] p-5">
               <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                 <div>
                   <div className="flex flex-wrap items-center gap-3">
@@ -194,8 +194,8 @@ export function AddressesPageContent() {
                       </span>
                     )}
                   </div>
-                  <p className="mt-2 text-sm text-[#555555]">{address.phone}</p>
-                  <p className="mt-3 max-w-xl text-sm leading-6 text-[#555555]">
+                  <p className="mt-2 text-sm text-[#5f5a53]">{address.phone}</p>
+                  <p className="mt-3 max-w-xl text-sm leading-6 text-[#5f5a53]">
                     {address.addressLine1}
                     {address.addressLine2 ? `, ${address.addressLine2}` : ''}
                     <br />
@@ -209,7 +209,7 @@ export function AddressesPageContent() {
                     <button
                       type="button"
                       onClick={() => void makeDefault(address.id)}
-                      className="h-10 cursor-pointer border border-[#d9d9d9] px-4 text-xs uppercase tracking-[0.1em] hover:border-[#111111]"
+                      className="h-10 cursor-pointer border border-[#ddd4c8] px-4 text-xs uppercase tracking-[0.1em] hover:border-[#111111]"
                     >
                       Set default
                     </button>
@@ -217,14 +217,14 @@ export function AddressesPageContent() {
                   <button
                     type="button"
                     onClick={() => startEditing(address)}
-                    className="h-10 cursor-pointer border border-[#111111] px-4 text-xs uppercase tracking-[0.1em] hover:bg-[#111111] hover:text-white"
+                    className="h-10 cursor-pointer border border-[#111111] px-4 text-xs uppercase tracking-[0.1em] hover:bg-[#111111] hover:text-[#fffaf3]"
                   >
                     Edit
                   </button>
                   <button
                     type="button"
                     onClick={() => void removeAddress(address.id)}
-                    className="h-10 cursor-pointer border border-[#d9d9d9] px-4 text-xs uppercase tracking-[0.1em] hover:border-[#111111]"
+                    className="h-10 cursor-pointer border border-[#ddd4c8] px-4 text-xs uppercase tracking-[0.1em] hover:border-[#111111]"
                   >
                     Delete
                   </button>
@@ -235,7 +235,7 @@ export function AddressesPageContent() {
         </div>
       </section>
 
-      <aside className="h-fit border border-[#e5e5e5] p-6 lg:sticky lg:top-24">
+      <aside className="h-fit border border-[#ddd4c8] p-6 lg:sticky lg:top-24">
         <p className="text-xs uppercase tracking-[0.2em] text-[#777777]">
           {editingAddress ? 'Edit address' : 'New address'}
         </p>
@@ -259,7 +259,7 @@ export function AddressesPageContent() {
               <input
                 value={formValues[name] ?? ''}
                 onChange={(event) => updateField(name, event.target.value)}
-                className="h-11 w-full border border-[#d9d9d9] px-4 text-sm outline-none focus:border-[#111111]"
+                className="h-11 w-full border border-[#ddd4c8] px-4 text-sm outline-none focus:border-[#111111]"
               />
             </label>
           ))}
@@ -276,7 +276,7 @@ export function AddressesPageContent() {
           <button
             type="submit"
             disabled={isSaving}
-            className="h-12 cursor-pointer border border-[#111111] text-sm font-medium uppercase tracking-[0.08em] hover:bg-[#111111] hover:text-white disabled:cursor-not-allowed disabled:border-[#d9d9d9] disabled:text-[#777777] disabled:hover:bg-white"
+            className="h-12 cursor-pointer border border-[#111111] text-sm font-medium uppercase tracking-[0.08em] hover:bg-[#111111] hover:text-[#fffaf3] disabled:cursor-not-allowed disabled:border-[#ddd4c8] disabled:text-[#777777] disabled:hover:bg-[#fffaf3]"
           >
             {isSaving ? 'Saving' : editingId ? 'Update address' : 'Save address'}
           </button>
@@ -284,7 +284,7 @@ export function AddressesPageContent() {
             <button
               type="button"
               onClick={resetForm}
-              className="h-12 cursor-pointer border border-[#d9d9d9] text-sm font-medium uppercase tracking-[0.08em] hover:border-[#111111]"
+              className="h-12 cursor-pointer border border-[#ddd4c8] text-sm font-medium uppercase tracking-[0.08em] hover:border-[#111111]"
             >
               Cancel edit
             </button>

@@ -28,7 +28,7 @@ export function AuthField({
         value={value}
         autoComplete={autoComplete}
         onChange={(event) => onChange(event.target.value)}
-        className="h-11 w-full border border-[#d9d9d9] px-4 text-sm outline-none focus:border-[#111111]"
+        className="h-11 w-full border border-[#ddd4c8] bg-transparent px-4 text-sm outline-none focus:border-[#111111]"
       />
     </label>
   );

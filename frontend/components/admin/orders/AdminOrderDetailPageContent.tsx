@@ -82,19 +82,19 @@ export function AdminOrderDetailPageContent({ orderId }: { orderId: string }) {
 
   return (
     <div>
-      <div className="mb-8 flex flex-col gap-5 border-b border-[#e5e5e5] pb-6 lg:flex-row lg:items-end lg:justify-between">
+      <div className="mb-8 flex flex-col gap-5 border-b border-[#ddd4c8] pb-6 lg:flex-row lg:items-end lg:justify-between">
         <div>
           <p className="mb-3 text-xs uppercase tracking-[0.22em] text-[#777777]">
             {order.orderNumber}
           </p>
           <h1 className="text-4xl font-light md:text-5xl">Order detail</h1>
-          <p className="mt-4 text-sm text-[#555555]">
+          <p className="mt-4 text-sm text-[#5f5a53]">
             Created {new Date(order.createdAt).toLocaleString()}
           </p>
         </div>
         <Link
           href="/admin/orders"
-          className="inline-flex h-11 cursor-pointer items-center justify-center border border-[#d9d9d9] px-5 text-sm font-medium uppercase tracking-[0.08em] hover:border-[#111111]"
+          className="inline-flex h-11 cursor-pointer items-center justify-center border border-[#ddd4c8] px-5 text-sm font-medium uppercase tracking-[0.08em] hover:border-[#111111]"
         >
           Back to orders
         </Link>
@@ -102,7 +102,7 @@ export function AdminOrderDetailPageContent({ orderId }: { orderId: string }) {
 
       <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_360px]">
         <section className="space-y-6">
-          <div className="border border-[#e5e5e5] p-5">
+          <div className="border border-[#ddd4c8] p-5">
             <p className="mb-4 text-xs uppercase tracking-[0.2em] text-[#777777]">
               Items
             </p>
@@ -110,7 +110,7 @@ export function AdminOrderDetailPageContent({ orderId }: { orderId: string }) {
               {order.items.map((item) => (
                 <article
                   key={item.id}
-                  className="grid gap-4 border-b border-[#eeeeee] pb-5 last:border-b-0 md:grid-cols-[96px_1fr_auto]"
+                  className="grid gap-4 border-b border-[#e7ded2] pb-5 last:border-b-0 md:grid-cols-[96px_1fr_auto]"
                 >
                   <div className="aspect-[3/4] overflow-hidden bg-[#f5f5f5]">
                     {item.product?.images[0] ? (
@@ -127,11 +127,11 @@ export function AdminOrderDetailPageContent({ orderId }: { orderId: string }) {
                   </div>
                   <div>
                     <p className="text-lg">{item.productName}</p>
-                    <p className="mt-2 text-sm text-[#555555]">
+                    <p className="mt-2 text-sm text-[#5f5a53]">
                       {[item.selectedColor, item.selectedSize].filter(Boolean).join(' / ') ||
                         'No variant selected'}
                     </p>
-                    <p className="mt-2 text-sm text-[#555555]">
+                    <p className="mt-2 text-sm text-[#5f5a53]">
                       Qty {item.quantity} x {formatPrice(item.unitPriceInPaise)}
                     </p>
                   </div>
@@ -144,19 +144,19 @@ export function AdminOrderDetailPageContent({ orderId }: { orderId: string }) {
           </div>
 
           <div className="grid gap-6 md:grid-cols-2">
-            <div className="border border-[#e5e5e5] p-5">
+            <div className="border border-[#ddd4c8] p-5">
               <p className="mb-4 text-xs uppercase tracking-[0.2em] text-[#777777]">
                 Customer
               </p>
               <p>{order.customer.name}</p>
-              <p className="mt-2 text-sm text-[#555555]">{order.customer.email}</p>
-              <p className="mt-1 text-sm text-[#555555]">{order.customer.phone}</p>
+              <p className="mt-2 text-sm text-[#5f5a53]">{order.customer.email}</p>
+              <p className="mt-1 text-sm text-[#5f5a53]">{order.customer.phone}</p>
             </div>
-            <div className="border border-[#e5e5e5] p-5">
+            <div className="border border-[#ddd4c8] p-5">
               <p className="mb-4 text-xs uppercase tracking-[0.2em] text-[#777777]">
                 Shipping
               </p>
-              <p className="text-sm leading-6 text-[#555555]">
+              <p className="text-sm leading-6 text-[#5f5a53]">
                 {order.shippingAddress.addressLine}
                 <br />
                 {order.shippingAddress.city}, {order.shippingAddress.state}
@@ -167,11 +167,11 @@ export function AdminOrderDetailPageContent({ orderId }: { orderId: string }) {
           </div>
         </section>
 
-        <aside className="h-fit border border-[#e5e5e5] p-5 lg:sticky lg:top-24">
+        <aside className="h-fit border border-[#ddd4c8] p-5 lg:sticky lg:top-24">
           <p className="text-xs uppercase tracking-[0.2em] text-[#777777]">
             Manage order
           </p>
-          <div className="mt-5 space-y-3 border-b border-[#eeeeee] pb-5 text-sm">
+          <div className="mt-5 space-y-3 border-b border-[#e7ded2] pb-5 text-sm">
             <div className="flex justify-between gap-4">
               <span className="text-[#666666]">Total</span>
               <span>{formatPrice(order.totalInPaise)}</span>
@@ -193,7 +193,7 @@ export function AdminOrderDetailPageContent({ orderId }: { orderId: string }) {
             <select
               value={selectedStatus}
               onChange={(event) => setSelectedStatus(event.target.value as AdminOrderStatus)}
-              className="h-11 w-full cursor-pointer border border-[#d9d9d9] bg-white px-4 text-sm outline-none focus:border-[#111111]"
+              className="h-11 w-full cursor-pointer border border-[#ddd4c8] bg-[#fffaf3] px-4 text-sm outline-none focus:border-[#111111]"
             >
               {orderStatuses.map((status) => (
                 <option key={status} value={status}>
@@ -217,7 +217,7 @@ export function AdminOrderDetailPageContent({ orderId }: { orderId: string }) {
             type="button"
             disabled={isSaving || selectedStatus === order.status}
             onClick={saveStatus}
-            className="mt-5 h-12 w-full cursor-pointer border border-[#111111] text-sm font-medium uppercase tracking-[0.08em] hover:bg-[#111111] hover:text-white disabled:cursor-not-allowed disabled:border-[#d9d9d9] disabled:text-[#777777] disabled:hover:bg-white"
+            className="mt-5 h-12 w-full cursor-pointer border border-[#111111] text-sm font-medium uppercase tracking-[0.08em] hover:bg-[#111111] hover:text-[#fffaf3] disabled:cursor-not-allowed disabled:border-[#ddd4c8] disabled:text-[#777777] disabled:hover:bg-[#fffaf3]"
           >
             {isSaving ? 'Saving status' : 'Update status'}
           </button>

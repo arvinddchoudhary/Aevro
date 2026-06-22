@@ -12,7 +12,7 @@ export function ProductImageFrame({
   className = '',
 }: ProductImageFrameProps) {
   return (
-    <div className={`overflow-hidden bg-[#f5f5f5] ${className}`}>
+    <div className={`overflow-hidden bg-[#eee8de] ${className}`}>
       {image ? (
         <img
           src={image.url}
@@ -20,7 +20,7 @@ export function ProductImageFrame({
           className="h-full w-full object-cover transition duration-500 group-hover:scale-[1.02]"
         />
       ) : (
-        <div className="flex h-full w-full items-center justify-center border border-[#e5e5e5] bg-[linear-gradient(135deg,#f7f7f7_0%,#f7f7f7_48%,#eeeeee_48%,#eeeeee_52%,#f7f7f7_52%,#f7f7f7_100%)] px-6 text-center text-xs uppercase tracking-[0.18em] text-[#777777]">
+        <div className="flex h-full w-full items-center justify-center border border-[#ddd4c8] bg-[#eee8de] px-6 text-center text-xs uppercase tracking-[0.18em] text-[#777777]">
           AEVRO
         </div>
       )}

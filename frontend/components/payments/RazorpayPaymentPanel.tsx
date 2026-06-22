@@ -80,7 +80,7 @@ export function RazorpayPaymentPanel({ order }: { order: Order }) {
         <span>Amount due</span>
         <span>{formatPrice(order.totalInPaise)}</span>
       </div>
-      <p className="mt-4 text-sm leading-6 text-[#555555]">
+      <p className="mt-4 text-sm leading-6 text-[#5f5a53]">
         Razorpay checkout opens securely. AEVRO verifies the payment signature on
         the backend before confirming the order.
       </p>
@@ -97,7 +97,7 @@ export function RazorpayPaymentPanel({ order }: { order: Order }) {
         type="button"
         disabled={isBusy || isPaid}
         onClick={startPayment}
-        className="mt-5 h-12 w-full border border-[#111111] text-sm font-medium uppercase tracking-[0.08em] hover:bg-[#111111] hover:text-white disabled:cursor-not-allowed disabled:border-[#bdbdbd] disabled:text-[#777777] disabled:hover:bg-white"
+        className="mt-5 h-12 w-full border border-[#111111] text-sm font-medium uppercase tracking-[0.08em] hover:bg-[#111111] hover:text-[#fffaf3] disabled:cursor-not-allowed disabled:border-[#bdbdbd] disabled:text-[#777777] disabled:hover:bg-[#fffaf3]"
       >
         {state === 'loading'
           ? 'Starting payment'

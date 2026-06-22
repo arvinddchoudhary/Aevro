@@ -40,7 +40,7 @@ export function GoogleLoginButton({ onError }: GoogleLoginButtonProps) {
       type="button"
       disabled={isLoading}
       onClick={handleGoogleLogin}
-      className="h-12 w-full border border-[#d9d9d9] text-sm font-medium uppercase tracking-[0.08em] hover:border-[#111111] disabled:cursor-not-allowed disabled:text-[#777777]"
+      className="h-12 w-full border border-[#ddd4c8] text-sm font-medium uppercase tracking-[0.08em] hover:border-[#111111] disabled:cursor-not-allowed disabled:text-[#777777]"
     >
       {isLoading ? 'Opening Google' : 'Continue with Google'}
     </button>

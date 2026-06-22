@@ -2,12 +2,14 @@ import { CartPageContent } from '../../components/cart/CartPageContent';
 
 export default function CartPage() {
   return (
-    <main className="mx-auto min-h-screen max-w-7xl px-5 py-12 sm:px-8">
-      <div className="mb-10">
-        <p className="mb-3 text-xs uppercase tracking-[0.22em] text-[#777777]">
-          Bag
+    <main className="aevro-container min-h-screen py-14">
+      <div className="mb-10 md:mb-14">
+        <h1 className="text-5xl font-light uppercase leading-none tracking-[-0.02em] md:text-6xl">
+          Your bag
+        </h1>
+        <p className="mt-5 text-sm text-[#514c45]">
+          Review your items and proceed to checkout.
         </p>
-        <h1 className="text-4xl font-light md:text-5xl">Cart</h1>
       </div>
 
       <CartPageContent />

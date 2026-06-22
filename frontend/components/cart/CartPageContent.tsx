@@ -22,16 +22,16 @@ export function CartPageContent() {
   }
 
   return (
-    <div className="grid gap-10 lg:grid-cols-[minmax(0,1fr)_360px]">
-      <section className="space-y-6">
+    <div className="grid gap-12 lg:grid-cols-[minmax(0,1fr)_420px]">
+      <section className="space-y-8">
         {items.map((item) => (
           <article
             key={item.itemKey}
-            className="grid gap-5 border-b border-[#e5e5e5] pb-6 sm:grid-cols-[140px_1fr]"
+            className="grid gap-7 border-b border-[#ddd4c8] pb-8 sm:grid-cols-[280px_1fr]"
           >
             <Link
               href={`/products/${item.slug}`}
-              className="aspect-[3/4] cursor-pointer overflow-hidden bg-[#f5f5f5]"
+              className="aspect-[1/1] cursor-pointer overflow-hidden bg-[#eee8de] sm:aspect-[0.95/1]"
             >
               {item.imageUrl ? (
                 <img
@@ -46,23 +46,24 @@ export function CartPageContent() {
               )}
             </Link>
 
-            <div className="flex flex-col gap-5 sm:flex-row sm:justify-between">
+            <div className="flex flex-col justify-center gap-6 sm:flex-row sm:justify-between">
               <div>
-                <p className="text-xs uppercase tracking-[0.18em] text-[#777777]">
+                <p className="text-xs uppercase tracking-[0.12em] text-[#77716a]">
                   {item.categoryName ?? 'AEVRO'}
                 </p>
                 <Link
                   href={`/products/${item.slug}`}
-                  className="mt-2 block cursor-pointer text-lg underline-offset-4 hover:underline"
+                  className="mt-3 block cursor-pointer text-2xl font-light uppercase leading-tight underline-offset-4 hover:underline"
                 >
                   {item.name}
                 </Link>
-                <p className="mt-2 text-sm text-[#555555]">
+                <p className="mt-4 text-lg">
                   {formatPrice(item.priceInPaise)}
                 </p>
                 {(item.selectedColor || item.selectedSize) && (
-                  <div className="mt-3 space-y-1 text-sm text-[#555555]">
-                    {item.selectedColor && <p>Colour: {item.selectedColor}</p>}
+                  <div className="mt-3 flex gap-3 text-sm text-[#514c45]">
+                    {item.selectedColor && <p>{item.selectedColor}</p>}
+                    {item.selectedColor && item.selectedSize && <span>/</span>}
                     {item.selectedSize && <p>Size: {item.selectedSize}</p>}
                   </div>
                 )}
@@ -89,7 +90,7 @@ export function CartPageContent() {
               </div>
 
               <div className="text-sm sm:text-right">
-                <p className="text-[#777777]">Subtotal</p>
+                <p className="text-[#77716a]">Subtotal</p>
                 <p className="mt-1 font-medium">
                   {formatPrice(item.priceInPaise * item.quantity)}
                 </p>
@@ -99,19 +100,23 @@ export function CartPageContent() {
         ))}
       </section>
 
-      <aside className="h-fit border border-[#e5e5e5] p-6">
-        <p className="text-xs uppercase tracking-[0.2em] text-[#777777]">
-          Summary
+      <aside className="h-fit border border-[#ddd4c8] bg-[#fffaf3]/70 p-8 lg:sticky lg:top-28">
+        <p className="text-sm font-medium uppercase tracking-[0.08em]">
+          Order summary
         </p>
-        <div className="mt-6 flex items-center justify-between border-b border-[#e5e5e5] pb-4 text-sm">
+        <div className="mt-8 flex items-center justify-between text-base">
           <span>Subtotal</span>
           <span>{formatPrice(subtotalInPaise)}</span>
         </div>
-        <div className="mt-4 flex items-center justify-between text-lg">
+        <div className="mt-5 flex items-center justify-between text-base">
+          <span>Shipping</span>
+          <span>Free</span>
+        </div>
+        <div className="mt-8 flex items-center justify-between border-t border-[#ddd4c8] pt-8 text-2xl">
           <span>Total</span>
           <span>{formatPrice(subtotalInPaise)}</span>
         </div>
-        <p className="mt-4 text-sm leading-6 text-[#666666]">
+        <p className="mt-5 text-sm leading-6 text-[#514c45]">
           Checkout collects customer and shipping details before payment is added.
         </p>
         {hasStockWarnings && (
@@ -123,20 +128,20 @@ export function CartPageContent() {
         <div className="mt-6 flex flex-col gap-3">
           <Link
             href="/checkout"
-            className="inline-flex h-12 cursor-pointer items-center justify-center border border-[#111111] px-6 text-sm font-medium uppercase tracking-[0.08em] hover:bg-[#111111] hover:text-white"
+            className="inline-flex h-14 cursor-pointer items-center justify-center bg-[#111111] px-6 text-xs font-medium uppercase tracking-[0.08em] text-[#fffaf3] hover:bg-[#2a2825]"
           >
             Continue to checkout
           </Link>
           <Link
             href="/products"
-            className="inline-flex h-12 cursor-pointer items-center justify-center border border-[#d9d9d9] px-6 text-sm font-medium uppercase tracking-[0.08em] hover:border-[#111111]"
+            className="inline-flex h-12 cursor-pointer items-center justify-center border border-[#ddd4c8] px-6 text-xs font-medium uppercase tracking-[0.08em] hover:border-[#111111]"
           >
             Continue shopping
           </Link>
           <button
             type="button"
             onClick={clearCart}
-            className="h-12 cursor-pointer border border-[#d9d9d9] text-sm font-medium uppercase tracking-[0.08em] hover:border-[#111111]"
+            className="h-12 cursor-pointer border border-[#ddd4c8] text-xs font-medium uppercase tracking-[0.08em] hover:border-[#111111]"
           >
             Clear cart
           </button>

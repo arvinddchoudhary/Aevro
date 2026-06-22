@@ -17,7 +17,7 @@ export function CartQuantityControls({
 
   return (
     <div className="flex flex-wrap items-center gap-3">
-      <div className="inline-flex h-10 items-center border border-[#d9d9d9]">
+    <div className="inline-flex h-12 items-center border border-[#ddd4c8] bg-transparent">
         <button
           type="button"
           onClick={() => decrementItem(itemKey)}

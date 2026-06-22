@@ -75,7 +75,7 @@ export function AccountOrderDetailsPageContent({ id }: { id: string }) {
         <Link href="/account/orders" className="text-sm underline-offset-4 hover:underline">
           Back to orders
         </Link>
-        <div className="mt-6 border-b border-[#e5e5e5] pb-8">
+        <div className="mt-6 border-b border-[#ddd4c8] pb-8">
           <p className="text-xs uppercase tracking-[0.22em] text-[#777777]">
             {order.orderNumber}
           </p>
@@ -93,7 +93,7 @@ export function AccountOrderDetailsPageContent({ id }: { id: string }) {
             return (
               <article
                 key={item.id}
-                className="grid gap-5 border-b border-[#e5e5e5] pb-5 sm:grid-cols-[110px_1fr_auto]"
+                className="grid gap-5 border-b border-[#ddd4c8] pb-5 sm:grid-cols-[110px_1fr_auto]"
               >
                 <div className="aspect-[3/4] overflow-hidden bg-[#f5f5f5]">
                   {image ? (
@@ -139,11 +139,11 @@ export function AccountOrderDetailsPageContent({ id }: { id: string }) {
         </div>
       </section>
 
-      <aside className="h-fit border border-[#e5e5e5] p-6">
+      <aside className="h-fit border border-[#ddd4c8] p-6">
         <p className="text-xs uppercase tracking-[0.2em] text-[#777777]">
           Summary
         </p>
-        <div className="mt-6 space-y-4 border-b border-[#e5e5e5] pb-5 text-sm">
+        <div className="mt-6 space-y-4 border-b border-[#ddd4c8] pb-5 text-sm">
           <div className="flex justify-between">
             <span>Placed</span>
             <span>{new Date(order.createdAt).toLocaleDateString()}</span>
@@ -157,7 +157,7 @@ export function AccountOrderDetailsPageContent({ id }: { id: string }) {
             <span>{formatPrice(order.totalInPaise)}</span>
           </div>
         </div>
-        <div className="mt-5 text-sm leading-7 text-[#555555]">
+        <div className="mt-5 text-sm leading-7 text-[#5f5a53]">
           <p>{order.customer.name}</p>
           <p>{order.customer.email}</p>
           <p>{order.customer.phone}</p>

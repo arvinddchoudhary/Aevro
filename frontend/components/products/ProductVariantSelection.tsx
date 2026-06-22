@@ -116,22 +116,16 @@ export function ProductVariantSelection({ product }: ProductVariantSelectionProp
   };
 
   return (
-    <div className="grid gap-10 lg:grid-cols-[minmax(0,1.08fr)_minmax(380px,0.92fr)] lg:gap-14">
-      <section>
-        <ProductImageFrame
-          image={selectedImage}
-          productName={product.name}
-          className="aspect-[4/5] w-full"
-        />
-
-        <div className="mt-4 grid grid-cols-4 gap-3 sm:grid-cols-5">
+    <div className="grid gap-10 lg:grid-cols-[minmax(0,1.25fr)_minmax(360px,0.75fr)] lg:gap-12">
+      <section className="grid gap-4 sm:grid-cols-[120px_minmax(0,1fr)]">
+        <div className="order-2 grid grid-cols-4 gap-3 sm:order-1 sm:block sm:space-y-4">
           {(colorImages.length > 0 ? colorImages : [undefined]).map((image, index) => (
             <button
               key={image?.id ?? index}
               type="button"
               onClick={() => setSelectedImageId(image?.id ?? null)}
-              className={`cursor-pointer border ${
-                image?.id === selectedImage?.id ? 'border-[#111111]' : 'border-[#eeeeee]'
+              className={`cursor-pointer overflow-hidden rounded-[5px] border bg-[#eee8de] transition hover:border-[#111111] ${
+                image?.id === selectedImage?.id ? 'border-[#111111]' : 'border-[#ddd4c8]'
               }`}
               aria-label={`View ${product.name} image ${index + 1}`}
             >
@@ -143,30 +137,35 @@ export function ProductVariantSelection({ product }: ProductVariantSelectionProp
             </button>
           ))}
         </div>
+        <ProductImageFrame
+          image={selectedImage}
+          productName={product.name}
+          className="order-1 aspect-[4/5] w-full rounded-[6px] sm:order-2"
+        />
       </section>
 
-      <section className="lg:sticky lg:top-24 lg:self-start">
-        <p className="mb-4 text-xs uppercase tracking-[0.24em] text-[#777777]">
-          {product.category?.name ?? 'AEVRO'}
-        </p>
-        <h1 className="max-w-2xl text-4xl font-light leading-[1.08] md:text-6xl">
+      <section className="lg:sticky lg:top-28 lg:self-start">
+        <span className="mb-4 inline-flex rounded-full bg-[#efe8df] px-3 py-1 text-[0.68rem] font-semibold uppercase tracking-[0.08em] text-[#514c45]">
+          Best seller
+        </span>
+        <h1 className="max-w-2xl text-4xl font-light uppercase leading-[1.02] tracking-[0.01em] md:text-5xl">
           {product.name}
         </h1>
-        <p className="mt-6 text-2xl">{formatPrice(product.priceInPaise)}</p>
+        <p className="mt-5 text-2xl font-semibold">{formatPrice(product.priceInPaise)}</p>
+        <p className="mt-1 text-sm text-[#514c45]">Inclusive of all taxes</p>
 
         {product.description && (
-          <p className="mt-8 max-w-xl text-base leading-8 text-[#555555]">
+          <p className="mt-6 max-w-xl text-base leading-7 text-[#2f2a25]">
             {product.description}
           </p>
         )}
 
-        <div className="mt-10 border-y border-[#e5e5e5] py-6">
+        <div className="mt-8 border-y border-[#ddd4c8] py-7">
           <div>
             <div className="mb-3 flex items-center justify-between gap-4">
-              <p className="text-xs uppercase tracking-[0.18em] text-[#777777]">
-                Colour
+              <p className="text-xs font-semibold uppercase tracking-[0.12em]">
+                Color: <span className="font-normal">{selectedColor?.colorName ?? 'Select'}</span>
               </p>
-              <p className="text-sm">{selectedColor?.colorName ?? 'Select'}</p>
             </div>
             <div className="flex flex-wrap gap-3">
               {colors.map((color) => (
@@ -174,22 +173,17 @@ export function ProductVariantSelection({ product }: ProductVariantSelectionProp
                   key={color.colorSlug}
                   type="button"
                   onClick={() => selectColor(color.colorSlug)}
-                  className={`flex h-11 cursor-pointer items-center gap-3 border px-4 text-sm ${
+                  className={`flex h-11 w-11 cursor-pointer items-center justify-center rounded-full border text-sm transition ${
                     selectedColorSlug === color.colorSlug
-                      ? 'border-[#111111]'
-                      : 'border-[#d9d9d9]'
+                      ? 'border-[#111111] ring-2 ring-[#111111] ring-offset-2 ring-offset-[#fbf7f0]'
+                      : 'border-[#ddd4c8]'
                   }`}
+                  aria-label={color.colorName}
                 >
                   <span
-                    className="h-4 w-4 border border-[#d9d9d9]"
+                    className="h-7 w-7 rounded-full border border-[#ddd4c8]"
                     style={{ backgroundColor: color.colorHex ?? '#111111' }}
                   />
-                  {color.colorName}
-                  {color.lowStock && color.totalStock > 0 ? (
-                    <span className="text-xs uppercase tracking-[0.12em] text-[#8a1f1f]">
-                      Low
-                    </span>
-                  ) : null}
                 </button>
               ))}
             </div>
@@ -197,10 +191,10 @@ export function ProductVariantSelection({ product }: ProductVariantSelectionProp
 
           <div className="mt-7">
             <div className="mb-3 flex items-center justify-between gap-4">
-              <p className="text-xs uppercase tracking-[0.18em] text-[#777777]">
-                Size
+              <p className="text-xs font-semibold uppercase tracking-[0.12em]">
+                Size: <span className="text-[#77716a]">{selectedSize || 'Select your size'}</span>
               </p>
-              <p className="text-sm text-[#555555]">{stockLabel}</p>
+              <p className="text-xs text-[#514c45]">{stockLabel}</p>
             </div>
             <div className="grid grid-cols-4 gap-3 sm:grid-cols-5">
               {availableSizes.map((size) => (
@@ -209,10 +203,10 @@ export function ProductVariantSelection({ product }: ProductVariantSelectionProp
                   type="button"
                   disabled={size.stock <= 0}
                   onClick={() => setSelectedSize(size.size)}
-                  className={`h-11 cursor-pointer border text-sm disabled:cursor-not-allowed disabled:border-[#eeeeee] disabled:text-[#bbbbbb] ${
+                  className={`h-12 cursor-pointer rounded-[4px] border text-sm transition disabled:cursor-not-allowed disabled:border-[#e8ded2] disabled:text-[#b6aea5] ${
                     selectedSize === size.size
-                      ? 'border-[#111111] bg-[#111111] text-white'
-                      : 'border-[#d9d9d9]'
+                      ? 'border-[#111111] bg-[#fffaf3] text-[#111111] shadow-[inset_0_0_0_1px_#111111]'
+                      : 'border-[#ddd4c8] bg-transparent hover:border-[#111111]'
                   }`}
                 >
                   <span>{size.size}</span>
@@ -227,22 +221,7 @@ export function ProductVariantSelection({ product }: ProductVariantSelectionProp
           </div>
         </div>
 
-        <div className="mt-8 grid gap-3 sm:grid-cols-2">
-          <div className="border border-[#e5e5e5] px-5 py-4">
-            <p className="text-xs uppercase tracking-[0.18em] text-[#777777]">
-              Fit
-            </p>
-            <p className="mt-2 text-sm leading-6">Wide leg, relaxed drape</p>
-          </div>
-          <div className="border border-[#e5e5e5] px-5 py-4">
-            <p className="text-xs uppercase tracking-[0.18em] text-[#777777]">
-              Fabric
-            </p>
-            <p className="mt-2 text-sm leading-6">Premium everyday weight</p>
-          </div>
-        </div>
-
-        <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+        <div className="mt-7 flex flex-col gap-3">
           <AddToCartButton
             product={product}
             selection={{
@@ -255,16 +234,30 @@ export function ProductVariantSelection({ product }: ProductVariantSelectionProp
             }}
             disabled={!canAddToCart}
             disabledLabel={selectedVariant?.stock === 0 ? 'Out of stock' : 'Select options'}
-            className="sm:min-w-48"
+            className="w-full"
           />
           {product.category && (
             <Link
               href={`/products?category=${product.category.slug}`}
-              className="inline-flex h-12 min-w-40 cursor-pointer items-center justify-center border border-[#d9d9d9] px-7 text-sm font-medium uppercase tracking-[0.08em] hover:border-[#111111]"
+              className="inline-flex h-12 w-full cursor-pointer items-center justify-center rounded-[4px] border border-[#111111] px-7 text-xs font-semibold uppercase tracking-[0.08em] hover:bg-[#111111] hover:text-[#fffaf3]"
             >
               More {product.category.name}
             </Link>
           )}
+        </div>
+        <div className="mt-8 border-t border-[#ddd4c8]">
+          {['Details', 'Fabric & care', 'Shipping & returns'].map((item) => (
+            <details key={item} className="group border-b border-[#ddd4c8] py-4">
+              <summary className="flex list-none items-center justify-between text-xs font-semibold uppercase tracking-[0.1em]">
+                {item}
+                <span className="text-lg leading-none group-open:rotate-45">+</span>
+              </summary>
+              <p className="mt-4 text-sm leading-7 text-[#514c45]">
+                Premium everyday construction with a clean drape, refined finish,
+                and considered proportions.
+              </p>
+            </details>
+          ))}
         </div>
       </section>
     </div>

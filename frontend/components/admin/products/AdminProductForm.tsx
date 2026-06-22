@@ -148,7 +148,7 @@ function TextInput({
         placeholder={placeholder}
         inputMode={inputMode}
         onChange={(event) => onChange(event.target.value)}
-        className="h-11 w-full border border-[#d9d9d9] px-4 text-sm outline-none focus:border-[#111111]"
+        className="h-11 w-full border border-[#ddd4c8] px-4 text-sm outline-none focus:border-[#111111]"
       />
     </label>
   );
@@ -171,14 +171,14 @@ function ColorHexInput({
           type="color"
           value={safeColor}
           onChange={(event) => onChange(event.target.value.toUpperCase())}
-          className="h-11 w-full cursor-pointer border border-r-0 border-[#d9d9d9] bg-white p-1"
+          className="h-11 w-full cursor-pointer border border-r-0 border-[#ddd4c8] bg-[#fffaf3] p-1"
           aria-label="Pick variant color"
         />
         <input
           value={value}
           placeholder="#111111"
           onChange={(event) => onChange(event.target.value)}
-          className="h-11 w-full border border-[#d9d9d9] px-4 text-sm outline-none focus:border-[#111111]"
+          className="h-11 w-full border border-[#ddd4c8] px-4 text-sm outline-none focus:border-[#111111]"
         />
       </div>
     </label>
@@ -450,8 +450,8 @@ export function AdminProductForm({ product }: AdminProductFormProps) {
   return (
     <form onSubmit={handleSubmit} className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_380px]">
       <section className="space-y-8">
-        <div className="border border-[#e5e5e5] bg-white p-5 sm:p-7">
-          <div className="mb-7 flex flex-col gap-3 border-b border-[#eeeeee] pb-5 sm:flex-row sm:items-end sm:justify-between">
+        <div className="border border-[#ddd4c8] bg-[#fffaf3] p-5 sm:p-7">
+          <div className="mb-7 flex flex-col gap-3 border-b border-[#e7ded2] pb-5 sm:flex-row sm:items-end sm:justify-between">
             <div>
               <p className="text-xs uppercase tracking-[0.22em] text-[#777777]">
                 Product setup
@@ -484,7 +484,7 @@ export function AdminProductForm({ product }: AdminProductFormProps) {
               <select
                 value={categoryId}
                 onChange={(event) => setCategoryId(event.target.value)}
-                className="h-11 w-full cursor-pointer border border-[#d9d9d9] bg-white px-4 text-sm outline-none focus:border-[#111111]"
+                className="h-11 w-full cursor-pointer border border-[#ddd4c8] bg-[#fffaf3] px-4 text-sm outline-none focus:border-[#111111]"
               >
                 {categories.length === 0 && <option value="">No categories</option>}
                 {categories.map((category) => (
@@ -499,7 +499,7 @@ export function AdminProductForm({ product }: AdminProductFormProps) {
               <select
                 value={status}
                 onChange={(event) => setStatus(event.target.value as AdminProductStatus)}
-                className="h-11 w-full cursor-pointer border border-[#d9d9d9] bg-white px-4 text-sm outline-none focus:border-[#111111]"
+                className="h-11 w-full cursor-pointer border border-[#ddd4c8] bg-[#fffaf3] px-4 text-sm outline-none focus:border-[#111111]"
               >
                 <option value="DRAFT">Draft</option>
                 <option value="ACTIVE">Active</option>
@@ -511,7 +511,7 @@ export function AdminProductForm({ product }: AdminProductFormProps) {
               <textarea
                 value={description}
                 onChange={(event) => setDescription(event.target.value)}
-                className="min-h-32 w-full border border-[#d9d9d9] px-4 py-3 text-sm leading-6 outline-none focus:border-[#111111]"
+                className="min-h-32 w-full border border-[#ddd4c8] px-4 py-3 text-sm leading-6 outline-none focus:border-[#111111]"
               />
             </label>
           </div>
@@ -528,18 +528,18 @@ export function AdminProductForm({ product }: AdminProductFormProps) {
             <button
               type="button"
               onClick={() => setVariants((current) => [...current, emptyVariant()])}
-              className="h-11 cursor-pointer border border-[#111111] px-5 text-sm font-medium uppercase tracking-[0.08em] hover:bg-[#111111] hover:text-white"
+              className="h-11 cursor-pointer border border-[#111111] px-5 text-sm font-medium uppercase tracking-[0.08em] hover:bg-[#111111] hover:text-[#fffaf3]"
             >
               Add variant
             </button>
           </div>
 
           {variants.map((variant, index) => (
-            <div key={index} className="border border-[#e5e5e5] bg-white p-5 sm:p-7">
-              <div className="mb-6 flex flex-col gap-3 border-b border-[#eeeeee] pb-5 sm:flex-row sm:items-center sm:justify-between">
+            <div key={index} className="border border-[#ddd4c8] bg-[#fffaf3] p-5 sm:p-7">
+              <div className="mb-6 flex flex-col gap-3 border-b border-[#e7ded2] pb-5 sm:flex-row sm:items-center sm:justify-between">
                 <div className="flex items-center gap-4">
                   <span
-                    className="h-9 w-9 border border-[#d9d9d9]"
+                    className="h-9 w-9 border border-[#ddd4c8]"
                     style={{ backgroundColor: variant.colorHex || '#ffffff' }}
                   />
                   <div>
@@ -605,17 +605,17 @@ export function AdminProductForm({ product }: AdminProductFormProps) {
                 />
               </div>
 
-              <div className="mt-7 border-t border-[#eeeeee] pt-6">
+              <div className="mt-7 border-t border-[#e7ded2] pt-6">
                 <div className="mb-4 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
                   <div>
                     <p className="text-xs uppercase tracking-[0.18em] text-[#777777]">
                       Images for {variant.colorName || 'this color'}
                     </p>
-                    <p className="mt-2 text-sm text-[#555555]">
+                    <p className="mt-2 text-sm text-[#5f5a53]">
                       Upload up to 5 images for this color.
                     </p>
                   </div>
-                  <p className="text-sm text-[#555555]">
+                  <p className="text-sm text-[#5f5a53]">
                     {variant.images.length}/{MAX_IMAGES_PER_COLOR} uploaded
                   </p>
                 </div>
@@ -623,8 +623,8 @@ export function AdminProductForm({ product }: AdminProductFormProps) {
                 <label
                   className={`flex min-h-36 cursor-pointer flex-col items-center justify-center border border-dashed px-5 py-8 text-center transition ${
                     uploadingIndex === index
-                      ? 'border-[#111111] bg-[#fafafa]'
-                      : 'border-[#cfcfcf] hover:border-[#111111]'
+                      ? 'border-[#111111] bg-[#f5efe6]'
+                      : 'border-[#c8bcae] hover:border-[#111111]'
                   }`}
                 >
                   <input
@@ -685,11 +685,11 @@ export function AdminProductForm({ product }: AdminProductFormProps) {
         </div>
       </section>
 
-      <aside className="h-fit border border-[#e5e5e5] bg-white p-5 sm:p-6 lg:sticky lg:top-24">
+      <aside className="h-fit border border-[#ddd4c8] bg-[#fffaf3] p-5 sm:p-6 lg:sticky lg:top-24">
           <p className="text-xs uppercase tracking-[0.2em] text-[#777777]">
           {isEditMode ? 'Update checklist' : 'Publish checklist'}
         </p>
-        <div className="mt-5 space-y-3 border-b border-[#eeeeee] pb-5 text-sm text-[#555555]">
+        <div className="mt-5 space-y-3 border-b border-[#e7ded2] pb-5 text-sm text-[#5f5a53]">
           <p>Name: {name.trim() ? 'Ready' : 'Missing'}</p>
           <p>Category: {selectedCategory?.name ?? 'Missing'}</p>
           <p>Variants: {variants.length}</p>
@@ -697,7 +697,7 @@ export function AdminProductForm({ product }: AdminProductFormProps) {
           <p>Status: {status}</p>
         </div>
 
-        <div className="mt-5 border-b border-[#eeeeee] pb-5">
+        <div className="mt-5 border-b border-[#e7ded2] pb-5">
           <p className="text-xs uppercase tracking-[0.18em] text-[#777777]">
             Quick category
           </p>
@@ -709,19 +709,19 @@ export function AdminProductForm({ product }: AdminProductFormProps) {
                 setCategoryError(null);
               }}
               placeholder="Category name"
-              className="h-11 w-full border border-[#d9d9d9] px-3 text-sm outline-none focus:border-[#111111]"
+              className="h-11 w-full border border-[#ddd4c8] px-3 text-sm outline-none focus:border-[#111111]"
             />
             <input
               value={newCategoryDescription}
               onChange={(event) => setNewCategoryDescription(event.target.value)}
               placeholder="Description optional"
-              className="h-11 w-full border border-[#d9d9d9] px-3 text-sm outline-none focus:border-[#111111]"
+              className="h-11 w-full border border-[#ddd4c8] px-3 text-sm outline-none focus:border-[#111111]"
             />
             <button
               type="button"
               disabled={isCreatingCategory}
               onClick={handleCreateCategory}
-              className="h-11 w-full cursor-pointer border border-[#111111] px-4 text-sm uppercase tracking-[0.08em] hover:bg-[#111111] hover:text-white disabled:cursor-not-allowed disabled:border-[#d9d9d9] disabled:text-[#777777] disabled:hover:bg-white"
+              className="h-11 w-full cursor-pointer border border-[#111111] px-4 text-sm uppercase tracking-[0.08em] hover:bg-[#111111] hover:text-[#fffaf3] disabled:cursor-not-allowed disabled:border-[#ddd4c8] disabled:text-[#777777] disabled:hover:bg-[#fffaf3]"
             >
               {isCreatingCategory ? 'Adding category' : 'Add category'}
             </button>
@@ -743,7 +743,7 @@ export function AdminProductForm({ product }: AdminProductFormProps) {
         )}
         <button
           disabled={isSubmitting}
-          className="mt-6 h-12 w-full cursor-pointer border border-[#111111] text-sm font-medium uppercase tracking-[0.08em] hover:bg-[#111111] hover:text-white disabled:cursor-not-allowed disabled:border-[#d9d9d9] disabled:text-[#777777] disabled:hover:bg-white"
+          className="mt-6 h-12 w-full cursor-pointer border border-[#111111] text-sm font-medium uppercase tracking-[0.08em] hover:bg-[#111111] hover:text-[#fffaf3] disabled:cursor-not-allowed disabled:border-[#ddd4c8] disabled:text-[#777777] disabled:hover:bg-[#fffaf3]"
         >
           {isSubmitting
             ? isEditMode

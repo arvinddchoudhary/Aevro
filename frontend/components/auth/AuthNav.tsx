@@ -28,27 +28,22 @@ export function AuthNav() {
 
   if (!user) {
     return (
-      <>
-        <Link href="/login" className="underline-offset-4 hover:underline">
-          Login
-        </Link>
-        <Link href="/register" className="underline-offset-4 hover:underline">
-          Register
-        </Link>
-      </>
+      <Link href="/login" className="underline-offset-8 hover:underline">
+        Account
+      </Link>
     );
   }
 
   return (
     <>
-      <Link href="/account" className="underline-offset-4 hover:underline">
+      <Link href="/account" className="underline-offset-8 hover:underline">
         Account
       </Link>
       <button
         type="button"
         disabled={isLoggingOut}
         onClick={handleLogout}
-        className="underline-offset-4 hover:underline disabled:text-[#777777]"
+        className="hidden underline-offset-8 hover:underline disabled:text-[#777777] sm:inline"
       >
         {isLoggingOut ? 'Logging out' : 'Logout'}
       </button>
