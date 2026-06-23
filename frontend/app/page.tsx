@@ -69,7 +69,7 @@ export default async function HomePage() {
           />
         )}
         {products.length > 0 && (
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
             {products.map((product) => (
               <ProductCard key={product.id} product={product} compact />
             ))}
@@ -77,18 +77,20 @@ export default async function HomePage() {
         )}
       </section>
 
-      <section className="relative min-h-[430px] overflow-hidden border-y border-[#ddd4c8]">
-        <img
-          src="/images/brand/fabric-band.webp"
-          alt="Close-up of premium AEVRO fabric"
-          className="absolute inset-0 h-full w-full object-cover"
-        />
-        <div className="relative flex min-h-[430px] items-center justify-end px-6 py-16 sm:px-12 lg:px-20 xl:px-28">
-          <div className="max-w-xl">
+      <section className="grid overflow-hidden border-y border-[#ddd4c8] bg-[#fffaf3]/55 lg:grid-cols-[minmax(260px,420px)_1fr]">
+        <div className="h-[340px] bg-[#eee8de] lg:h-[400px]">
+          <img
+            src="/images/brand/fabric-band.webp"
+            alt="Close-up of premium AEVRO fabric"
+            className="h-full w-full object-cover object-center"
+          />
+        </div>
+        <div className="flex min-h-[340px] items-center px-6 py-10 sm:px-12 lg:min-h-[400px] lg:px-16 xl:px-20">
+          <div className="max-w-lg">
             <p className="text-xs font-medium uppercase tracking-[0.1em]">
               Fabric first
             </p>
-            <h2 className="mt-4 text-4xl font-light uppercase leading-tight md:text-5xl">
+            <h2 className="mt-4 text-3xl font-light uppercase leading-tight md:text-4xl">
               Quality you can feel.
             </h2>
             <p className="mt-5 text-sm leading-7 text-[#514c45]">
@@ -96,7 +98,7 @@ export default async function HomePage() {
               durability. Thoughtful construction gives each piece its quiet
               confidence.
             </p>
-            <div className="mt-10 grid gap-6 text-xs uppercase tracking-[0.08em] sm:grid-cols-3">
+            <div className="mt-8 grid gap-5 text-xs uppercase tracking-[0.08em] sm:grid-cols-3">
               <span>Premium fabrics</span>
               <span>Timeless durability</span>
               <span>Responsible made</span>
