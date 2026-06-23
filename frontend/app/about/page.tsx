@@ -47,48 +47,48 @@ export default function AboutPage() {
       </section>
 
       <section className="grid border-y border-[#ddd4c8] lg:grid-cols-2">
-        <div className="relative min-h-[520px] overflow-hidden">
+        <div className="relative h-[380px] overflow-hidden bg-[#eee8de] lg:h-[460px]">
           <img
             src="/images/brand/fabric-detail.webp"
             alt="AEVRO fabric detail"
-            className="absolute inset-0 h-full w-full object-cover"
+            className="h-full w-full object-cover object-center"
           />
           <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(251,247,240,0.95)_0%,rgba(251,247,240,0.82)_40%,rgba(251,247,240,0.28)_100%)]" />
-          <div className="relative flex min-h-[520px] items-center px-6 py-14 sm:px-12 lg:px-20">
-          <div className="max-w-lg">
-          <p className="text-xs font-medium uppercase tracking-[0.12em]">
-            Crafted with intention
-          </p>
-          <h2 className="mt-5 text-3xl font-light uppercase leading-tight">
-            The details make the difference.
-          </h2>
-          <p className="mt-5 text-sm leading-7 text-[#514c45]">
-            From fabric drape to tailoring precision, every element is carefully
-            considered.
-          </p>
-          </div>
+          <div className="absolute inset-0 flex items-center px-6 py-14 sm:px-12 lg:px-20">
+            <div className="max-w-lg">
+              <p className="text-xs font-medium uppercase tracking-[0.12em]">
+                Crafted with intention
+              </p>
+              <h2 className="mt-5 text-3xl font-light uppercase leading-tight">
+                The details make the difference.
+              </h2>
+              <p className="mt-5 text-sm leading-7 text-[#514c45]">
+                From fabric drape to tailoring precision, every element is carefully
+                considered.
+              </p>
+            </div>
           </div>
         </div>
-        <div className="relative min-h-[520px] overflow-hidden">
+        <div className="relative min-h-[380px] overflow-hidden lg:min-h-[460px]">
           <img
             src="/images/brand/product-detail-black.webp"
             alt="AEVRO trouser detail"
             className="absolute inset-0 h-full w-full object-cover"
           />
           <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(251,247,240,0.18)_0%,rgba(251,247,240,0.72)_58%,rgba(251,247,240,0.96)_100%)]" />
-          <div className="relative flex min-h-[520px] items-center justify-end px-6 py-14 sm:px-12 lg:px-20">
-          <div className="max-w-md">
-          <p className="text-xs font-medium uppercase tracking-[0.12em]">
-            Sustainability
-          </p>
-          <h2 className="mt-5 text-3xl font-light uppercase leading-tight">
-            Better for people. Better for tomorrow.
-          </h2>
-          <p className="mt-5 text-sm leading-7 text-[#514c45]">
-            We choose responsible materials, reduce waste, and build lasting
-            pieces that encourage mindful consumption.
-          </p>
-          </div>
+          <div className="relative flex min-h-[380px] items-center justify-end px-6 py-12 sm:px-12 lg:min-h-[460px] lg:px-20">
+            <div className="max-w-md">
+              <p className="text-xs font-medium uppercase tracking-[0.12em]">
+                Sustainability
+              </p>
+              <h2 className="mt-5 text-3xl font-light uppercase leading-tight">
+                Better for people. Better for tomorrow.
+              </h2>
+              <p className="mt-5 text-sm leading-7 text-[#514c45]">
+                We choose responsible materials, reduce waste, and build lasting
+                pieces that encourage mindful consumption.
+              </p>
+            </div>
           </div>
         </div>
       </section>

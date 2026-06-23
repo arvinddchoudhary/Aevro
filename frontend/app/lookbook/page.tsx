@@ -61,27 +61,28 @@ export default function LookbookPage() {
         </div>
       </section>
 
-      <section className="relative min-h-[330px] overflow-hidden border-y border-[#ddd4c8]">
-        <img
-          src="/images/brand/fabric-detail.webp"
-          alt="AEVRO fabric detail"
-          className="absolute inset-0 h-full w-full object-cover"
-        />
-        <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(251,247,240,0.1)_0%,rgba(251,247,240,0.44)_42%,rgba(251,247,240,0.96)_70%,rgba(251,247,240,0.98)_100%)]" />
-        <div className="relative flex min-h-[330px] items-center justify-end px-6 py-12 sm:px-12 lg:px-20 xl:px-28">
-        <div className="max-w-lg">
-          <h2 className="text-3xl font-light uppercase">Style that lasts.</h2>
-          <p className="mt-5 max-w-md text-sm leading-7 text-[#514c45]">
-            True style is not about trends. It is about pieces that stand the
-            test of time and move with the moments that matter.
-          </p>
-          <Link
-            href="/products"
-            className="mt-7 inline-flex text-xs font-medium uppercase tracking-[0.08em] underline-offset-8 hover:underline"
-          >
-            Explore the collection →
-          </Link>
+      <section className="grid overflow-hidden border-y border-[#ddd4c8] bg-[#fffaf3]/55 lg:grid-cols-[minmax(260px,400px)_1fr]">
+        <div className="h-[320px] bg-[#eee8de] lg:h-[380px]">
+          <img
+            src="/images/brand/fabric-detail.webp"
+            alt="AEVRO fabric detail"
+            className="h-full w-full object-cover object-center"
+          />
         </div>
+        <div className="flex min-h-[320px] items-center px-6 py-10 sm:px-12 lg:min-h-[380px] lg:px-16 xl:px-20">
+          <div className="max-w-md">
+            <h2 className="text-3xl font-light uppercase">Style that lasts.</h2>
+            <p className="mt-5 max-w-md text-sm leading-7 text-[#514c45]">
+              True style is not about trends. It is about pieces that stand the
+              test of time and move with the moments that matter.
+            </p>
+            <Link
+              href="/products"
+              className="mt-7 inline-flex text-xs font-medium uppercase tracking-[0.08em] underline-offset-8 hover:underline"
+            >
+              Explore the collection →
+            </Link>
+          </div>
         </div>
       </section>
     </main>
