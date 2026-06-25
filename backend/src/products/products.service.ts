@@ -98,6 +98,26 @@ export class ProductsService {
       });
     }
 
+    if (query.color) {
+      and.push({
+        variants: {
+          some: {
+            colorSlug: query.color,
+          },
+        },
+      });
+    }
+
+    if (query.size) {
+      and.push({
+        variants: {
+          some: {
+            size: query.size,
+          },
+        },
+      });
+    }
+
     const minPrice =
       query.minPrice === undefined ? undefined : Number(query.minPrice);
     const maxPrice =

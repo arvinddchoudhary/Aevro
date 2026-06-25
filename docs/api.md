@@ -434,12 +434,15 @@ limit=12
 category=trousers
 search=pleated
 status=ACTIVE
+color=black
+size=32
 minPrice=100000
 maxPrice=250000
 sort=newest|price_asc|price_desc
 ```
 
-Price filters use integer paise, matching the backend money model.
+`color` filters by a product variant `colorSlug`. `size` filters by a product
+variant `size`. Price filters use integer paise, matching the backend money model.
 
 Example:
 

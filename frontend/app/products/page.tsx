@@ -57,6 +57,8 @@ export default async function ProductsPage({
   const page = Math.max(getNumberParam(params, 'page') ?? 1, 1);
   const category = getStringParam(params, 'category');
   const search = getStringParam(params, 'search');
+  const color = getStringParam(params, 'color');
+  const size = getStringParam(params, 'size');
   const minPrice = getNumberParam(params, 'minPrice');
   const maxPrice = getNumberParam(params, 'maxPrice');
   const sort = (getStringParam(params, 'sort') as ProductSort | undefined) ?? 'newest';
@@ -68,6 +70,8 @@ export default async function ProductsPage({
       limit: 12,
       category,
       search,
+      color,
+      size,
       minPrice,
       maxPrice,
       sort,
@@ -147,7 +151,7 @@ export default async function ProductsPage({
               <div className="space-y-3 text-sm">
                 <Link
                   href={buildProductsHref(params, { category: undefined, page: undefined })}
-                  className={`block ${!category ? 'font-medium' : 'text-[#514c45]'}`}
+                  className={`block underline-offset-4 hover:underline ${!category ? 'font-medium text-[#111111]' : 'text-[#514c45]'}`}
                 >
                   All products
                 </Link>
@@ -158,7 +162,7 @@ export default async function ProductsPage({
                       category: item.slug,
                       page: undefined,
                     })}
-                    className={`block ${category === item.slug ? 'font-medium' : 'text-[#514c45]'}`}
+                    className={`block underline-offset-4 hover:underline ${category === item.slug ? 'font-medium text-[#111111]' : 'text-[#514c45]'}`}
                   >
                     {item.name}
                     {typeof item.activeProductCount === 'number'
@@ -175,20 +179,31 @@ export default async function ProductsPage({
               </p>
               <div className="space-y-3 text-sm">
                 {[
-                  ['Ivory', '#f4eadb'],
-                  ['Stone', '#c8b9a8'],
-                  ['Taupe', '#8d7968'],
-                  ['Navy', '#17243a'],
-                  ['Black', '#0f0f0f'],
-                ].map(([name, hex]) => (
-                  <div key={name} className="flex items-center gap-3 text-[#2f2a25]">
-                    <span
-                      className="h-5 w-5 rounded-full border border-[#111111]/30"
-                      style={{ backgroundColor: hex }}
-                    />
-                    <span>{name}</span>
-                  </div>
-                ))}
+                  ['Ivory', 'ivory', '#f4eadb'],
+                  ['Stone', 'stone', '#c8b9a8'],
+                  ['Taupe', 'taupe', '#8d7968'],
+                  ['Navy', 'navy', '#17243a'],
+                  ['Black', 'black', '#0f0f0f'],
+                ].map(([name, slug, hex]) => {
+                  const isActive = color === slug;
+
+                  return (
+                    <Link
+                      key={name}
+                      href={buildProductsHref(params, {
+                        color: isActive ? undefined : slug,
+                        page: undefined,
+                      })}
+                      className={`flex items-center gap-3 ${isActive ? 'font-medium text-[#111111]' : 'text-[#514c45] hover:text-[#111111]'}`}
+                    >
+                      <span
+                        className={`h-5 w-5 rounded-full border ${isActive ? 'border-[#111111] ring-1 ring-[#111111] ring-offset-1 ring-offset-[#fbf7f0]' : 'border-[#111111]/30'}`}
+                        style={{ backgroundColor: hex }}
+                      />
+                      <span>{name}</span>
+                    </Link>
+                  );
+                })}
               </div>
             </div>
 
@@ -197,19 +212,30 @@ export default async function ProductsPage({
                 Size
               </p>
               <div className="grid grid-cols-5 gap-2">
-                {['30', '32', '34', '36', '38'].map((size) => (
-                  <span
-                    key={size}
-                    className="flex h-9 items-center justify-center rounded-[4px] border border-[#ddd4c8] text-sm"
-                  >
-                    {size}
-                  </span>
-                ))}
+                {['30', '32', '34', '36', '38'].map((sizeOption) => {
+                  const isActive = size === sizeOption;
+
+                  return (
+                    <Link
+                      key={sizeOption}
+                      href={buildProductsHref(params, {
+                        size: isActive ? undefined : sizeOption,
+                        page: undefined,
+                      })}
+                      className={`flex h-9 items-center justify-center rounded-[4px] border text-sm transition ${isActive ? 'border-[#111111] bg-[#fffaf3] shadow-[inset_0_0_0_1px_#111111]' : 'border-[#ddd4c8] text-[#514c45] hover:border-[#111111] hover:text-[#111111]'}`}
+                    >
+                      {sizeOption}
+                    </Link>
+                  );
+                })}
               </div>
             </div>
 
             <form className="space-y-7">
               {category && <input type="hidden" name="category" value={category} />}
+              {color && <input type="hidden" name="color" value={color} />}
+              {size && <input type="hidden" name="size" value={size} />}
+              {sort && sort !== 'newest' && <input type="hidden" name="sort" value={sort} />}
               <div className="border-b border-[#ddd4c8] pb-7">
                 <p className="mb-4 text-xs font-semibold uppercase tracking-[0.08em]">
                   Search

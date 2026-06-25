@@ -77,31 +77,60 @@ export default async function HomePage() {
         )}
       </section>
 
-      <section className="grid overflow-hidden border-y border-[#ddd4c8] bg-[#fffaf3]/55 lg:grid-cols-[minmax(260px,420px)_1fr]">
-        <div className="h-[340px] bg-[#eee8de] lg:h-[400px]">
+      <section className="grid overflow-hidden border-y border-[#ddd4c8] bg-[#fffaf3] lg:grid-cols-[40%_60%]">
+        <div className="h-[360px] bg-[#111] sm:h-[420px] lg:h-[520px]">
           <img
             src="/images/brand/fabric-band.webp"
             alt="Close-up of premium AEVRO fabric"
-            className="h-full w-full object-cover object-center"
+            className="h-full w-full object-cover object-top"
           />
         </div>
-        <div className="flex min-h-[340px] items-center px-6 py-10 sm:px-12 lg:min-h-[400px] lg:px-16 xl:px-20">
-          <div className="max-w-lg">
+        <div className="flex min-h-[360px] items-center px-6 py-12 sm:min-h-[420px] sm:px-12 lg:min-h-[520px] lg:px-20 xl:px-24">
+          <div className="w-full max-w-3xl">
             <p className="text-xs font-medium uppercase tracking-[0.1em]">
               Fabric first
             </p>
-            <h2 className="mt-4 text-3xl font-light uppercase leading-tight md:text-4xl">
-              Quality you can feel.
+            <h2 className="mt-5 max-w-xl font-serif text-4xl font-light uppercase leading-[1.08] tracking-[-0.02em] md:text-5xl">
+              The difference is in the details.
             </h2>
-            <p className="mt-5 text-sm leading-7 text-[#514c45]">
-              We use premium natural fabrics chosen for comfort, drape, and
-              durability. Thoughtful construction gives each piece its quiet
-              confidence.
+            <p className="mt-5 max-w-xl text-base leading-7 text-[#514c45]">
+              Every pair is crafted from carefully selected natural fabrics,
+              chosen for their feel, fall, and lasting quality.
             </p>
-            <div className="mt-8 grid gap-5 text-xs uppercase tracking-[0.08em] sm:grid-cols-3">
-              <span>Premium fabrics</span>
-              <span>Timeless durability</span>
-              <span>Responsible made</span>
+            <div className="mt-12 grid gap-8 sm:grid-cols-3">
+              <div className="border-[#ddd4c8] sm:border-r sm:pr-8">
+                <span className="block text-4xl font-light leading-none text-[#6d665d]">
+                  #
+                </span>
+                <h3 className="mt-7 text-xs font-semibold uppercase tracking-[0.08em]">
+                  Premium fabrics
+                </h3>
+                <p className="mt-3 text-sm leading-6 text-[#514c45]">
+                  Natural, breathable, and chosen for lasting comfort.
+                </p>
+              </div>
+              <div className="border-[#ddd4c8] sm:border-r sm:px-8">
+                <span className="flex h-10 w-10 items-center justify-center rounded-full border border-[#6d665d] text-xl font-light text-[#6d665d]">
+                  ⌚
+                </span>
+                <h3 className="mt-7 text-xs font-semibold uppercase tracking-[0.08em]">
+                  Timeless durability
+                </h3>
+                <p className="mt-3 text-sm leading-6 text-[#514c45]">
+                  Thoughtfully constructed to stand the test of time.
+                </p>
+              </div>
+              <div className="sm:pl-8">
+                <span className="flex h-10 w-10 items-center justify-center rounded-full border border-[#6d665d] text-xl font-light text-[#6d665d]">
+                  ♧
+                </span>
+                <h3 className="mt-7 text-xs font-semibold uppercase tracking-[0.08em]">
+                  Responsible made
+                </h3>
+                <p className="mt-3 text-sm leading-6 text-[#514c45]">
+                  Ethically sourced materials with a lighter footprint.
+                </p>
+              </div>
             </div>
           </div>
         </div>

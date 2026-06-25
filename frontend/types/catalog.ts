@@ -73,6 +73,8 @@ export type ProductListQuery = {
   limit?: number;
   category?: string;
   search?: string;
+  color?: string;
+  size?: string;
   status?: ProductStatus;
   minPrice?: number;
   maxPrice?: number;

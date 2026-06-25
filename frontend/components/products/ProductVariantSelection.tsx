@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { AddToCartButton } from '../cart/AddToCartButton';
 import { formatPrice } from '../../lib/format';
 import type {
@@ -11,6 +11,7 @@ import type {
   ProductSizeOption,
 } from '../../types/catalog';
 import { ProductImageFrame } from './ProductImageFrame';
+import { ProductImageLightbox } from './ProductImageLightbox';
 
 type ProductVariantSelectionProps = {
   product: Product;
@@ -86,6 +87,7 @@ export function ProductVariantSelection({ product }: ProductVariantSelectionProp
   const [selectedImageId, setSelectedImageId] = useState<string | null>(
     (colorImages.find((image) => image.isPrimary) ?? colorImages[0])?.id ?? null,
   );
+  const [isLightboxOpen, setIsLightboxOpen] = useState(false);
   const selectedColor = colors.find((color) => color.colorSlug === selectedColorSlug);
   const availableSizes = sizesByColor[selectedColorSlug] ?? [];
   const selectedVariant = availableSizes.find((size) => size.size === selectedSize);
@@ -115,6 +117,35 @@ export function ProductVariantSelection({ product }: ProductVariantSelectionProp
     setSelectedImageId(nextPrimaryImage?.id ?? null);
   };
 
+  const selectedImageIndex = colorImages.findIndex((image) => image.id === selectedImage?.id);
+  const canGoPrevious = selectedImageIndex > 0;
+  const canGoNext = selectedImageIndex < colorImages.length - 1;
+
+  const goToPreviousImage = () => {
+    if (!canGoPrevious) return;
+    setSelectedImageId(colorImages[selectedImageIndex - 1].id);
+  };
+
+  const goToNextImage = () => {
+    if (!canGoNext) return;
+    setSelectedImageId(colorImages[selectedImageIndex + 1].id);
+  };
+
+  useEffect(() => {
+    if (colorImages.length <= 1) return;
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'ArrowLeft') {
+        goToPreviousImage();
+      } else if (event.key === 'ArrowRight') {
+        goToNextImage();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [colorImages, selectedImageIndex]);
+
   return (
     <div className="grid gap-10 lg:grid-cols-[minmax(0,650px)_minmax(420px,1fr)] lg:gap-12 xl:grid-cols-[minmax(0,680px)_minmax(440px,1fr)]">
       <section className="grid max-w-[680px] gap-4 sm:grid-cols-[84px_minmax(0,560px)] xl:grid-cols-[88px_minmax(0,580px)]">
@@ -137,12 +168,11 @@ export function ProductVariantSelection({ product }: ProductVariantSelectionProp
             </button>
           ))}
         </div>
-        {selectedImage?.url ? (
-          <a
-            href={selectedImage.url}
-            target="_blank"
-            rel="noreferrer"
-            className="order-1 block cursor-zoom-in sm:order-2"
+        <div className="order-1 relative sm:order-2">
+          <button
+            type="button"
+            onClick={() => setIsLightboxOpen(true)}
+            className="block w-full cursor-zoom-in text-left"
             aria-label={`Open full image of ${product.name}`}
           >
             <ProductImageFrame
@@ -150,14 +180,60 @@ export function ProductVariantSelection({ product }: ProductVariantSelectionProp
               productName={product.name}
               className="aspect-[1086/1448] w-full max-w-[580px] rounded-[6px]"
             />
-          </a>
-        ) : (
-          <ProductImageFrame
-            image={selectedImage}
-            productName={product.name}
-            className="order-1 aspect-[1086/1448] w-full max-w-[580px] rounded-[6px] sm:order-2"
-          />
-        )}
+          </button>
+
+          {colorImages.length > 1 && (
+            <>
+              <button
+                type="button"
+                onClick={goToPreviousImage}
+                disabled={!canGoPrevious}
+                className="absolute left-2 top-1/2 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full border border-[#e8e0d6] bg-[#fffaf3]/90 text-[#111111] shadow-sm backdrop-blur-sm transition hover:bg-white disabled:cursor-not-allowed disabled:opacity-30 sm:left-3 sm:h-10 sm:w-10"
+                aria-label="Previous image"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="1.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  aria-hidden="true"
+                >
+                  <path d="m15 18-6-6 6-6" />
+                </svg>
+              </button>
+              <button
+                type="button"
+                onClick={goToNextImage}
+                disabled={!canGoNext}
+                className="absolute right-2 top-1/2 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full border border-[#e8e0d6] bg-[#fffaf3]/90 text-[#111111] shadow-sm backdrop-blur-sm transition hover:bg-white disabled:cursor-not-allowed disabled:opacity-30 sm:right-3 sm:h-10 sm:w-10"
+                aria-label="Next image"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="1.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  aria-hidden="true"
+                >
+                  <path d="m9 18 6-6-6-6" />
+                </svg>
+              </button>
+              <div className="pointer-events-none absolute bottom-3 left-1/2 -translate-x-1/2 rounded-full bg-[#fffaf3]/90 px-3 py-1 text-[10px] font-medium uppercase tracking-[0.08em] text-[#514c45] shadow-sm backdrop-blur-sm">
+                {selectedImageIndex + 1} / {colorImages.length}
+              </div>
+            </>
+          )}
+        </div>
       </section>
 
       <section className="max-w-[560px] lg:sticky lg:top-24 lg:self-start">
@@ -276,6 +352,16 @@ export function ProductVariantSelection({ product }: ProductVariantSelectionProp
           ))}
         </div>
       </section>
+
+      <ProductImageLightbox
+        images={colorImages}
+        currentIndex={selectedImageIndex >= 0 ? selectedImageIndex : 0}
+        productName={product.name}
+        isOpen={isLightboxOpen}
+        onClose={() => setIsLightboxOpen(false)}
+        onPrevious={goToPreviousImage}
+        onNext={goToNextImage}
+      />
     </div>
   );
 }
