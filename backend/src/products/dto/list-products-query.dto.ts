@@ -37,6 +37,14 @@ export class ListProductsQueryDto {
   @IsOptional()
   search?: string;
 
+  @IsString()
+  @IsOptional()
+  color?: string;
+
+  @IsString()
+  @IsOptional()
+  size?: string;
+
   @IsEnum(ProductStatus)
   @IsOptional()
   status: ProductStatus = ProductStatus.ACTIVE;
