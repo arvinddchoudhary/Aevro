@@ -72,6 +72,20 @@ export class UploadsService {
     );
   }
 
+  async uploadHomepageImage(file: UploadFile) {
+    this.assertCloudinaryConfigured();
+    this.validateImage(file);
+
+    const folder = 'aevro/homepage';
+    const result = await this.uploadToCloudinary(file, folder);
+
+    return {
+      url: result.secure_url,
+      publicId: result.public_id,
+      altText: 'Homepage section image',
+    };
+  }
+
   private validateImage(file: UploadFile) {
     if (!ALLOWED_MIME_TYPES.has(file.mimetype)) {
       throw new BadRequestException('Only jpg, jpeg, png, and webp images are allowed.');

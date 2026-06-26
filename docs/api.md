@@ -24,7 +24,14 @@ POST /api/v1/admin/products
 GET /api/v1/admin/products/:id
 PATCH /api/v1/admin/products/:id
 PATCH /api/v1/admin/products/:id/status
+GET /api/v1/admin/homepage-sections
+POST /api/v1/admin/homepage-sections
+PATCH /api/v1/admin/homepage-sections/:id
+PATCH /api/v1/admin/homepage-sections/:id/status
+DELETE /api/v1/admin/homepage-sections/:id
 POST /api/v1/admin/uploads/product-images
+POST /api/v1/admin/uploads/homepage-image
+GET /api/v1/homepage
 GET /api/v1/categories
 GET /api/v1/products
 GET /api/v1/products/:identifier
@@ -216,6 +223,7 @@ Frontend admin route:
 
 ```txt
 GET /admin
+GET /admin/homepage
 GET /admin/orders
 GET /admin/orders/:id
 GET /admin/products
@@ -224,6 +232,67 @@ GET /admin/products/new
 
 The frontend shows login-required, access-denied, or the admin shell depending
 on the current authenticated user.
+
+## Phase 21 Homepage CMS
+
+Homepage CMS routes allow admins to manage public homepage sections without
+hardcoding content in the frontend.
+
+Public route:
+
+```txt
+GET /api/v1/homepage
+```
+
+Returns only active homepage sections ordered by `sortOrder`.
+
+Admin routes require httpOnly cookie auth and `role: ADMIN`:
+
+```txt
+GET /api/v1/admin/homepage-sections
+POST /api/v1/admin/homepage-sections
+PATCH /api/v1/admin/homepage-sections/:id
+PATCH /api/v1/admin/homepage-sections/:id/status
+DELETE /api/v1/admin/homepage-sections/:id
+POST /api/v1/admin/uploads/homepage-image
+```
+
+Supported section types:
+
+```txt
+HERO
+FEATURED_COLLECTION
+FEATURED_PRODUCTS
+LOOKBOOK
+CAMPAIGN_BANNER
+```
+
+Create/update body:
+
+```json
+{
+  "type": "HERO",
+  "title": "Tailored to define.",
+  "subtitle": "Timeless form. Modern presence.",
+  "description": "Refined trousers and elevated essentials.",
+  "imageUrl": "https://res.cloudinary.com/.../image.webp",
+  "imagePublicId": "aevro/homepage/example",
+  "ctaLabel": "Shop trousers",
+  "ctaHref": "/products",
+  "sortOrder": 0,
+  "isActive": true,
+  "metadata": "{\"layout\":\"hero\"}"
+}
+```
+
+Frontend admin page:
+
+```txt
+GET /admin/homepage
+```
+
+The public homepage renders CMS sections when active sections exist. If none
+exist, it falls back to the built-in AEVRO homepage content.
 
 ## Phase 18 Admin Order Management
 

@@ -75,4 +75,38 @@ export class AdminUploadsController {
       data: images,
     };
   }
+
+  @Post('homepage-image')
+  async uploadHomepageImage(@Req() request: MultipartRequest) {
+    const files: Array<{ buffer: Buffer; filename: string; mimetype: string }> = [];
+
+    for await (const part of request.parts()) {
+      if (part.type === 'file') {
+        if (!part.toBuffer || !part.filename || !part.mimetype) {
+          throw new BadRequestException('Invalid file upload.');
+        }
+
+        files.push({
+          buffer: await part.toBuffer(),
+          filename: part.filename,
+          mimetype: part.mimetype,
+        });
+      }
+    }
+
+    if (files.length === 0) {
+      throw new BadRequestException('At least one image is required.');
+    }
+
+    if (files.length > 1) {
+      throw new BadRequestException('Upload one image at a time for homepage sections.');
+    }
+
+    const image = await this.uploadsService.uploadHomepageImage(files[0]);
+
+    return {
+      success: true,
+      data: image,
+    };
+  }
 }

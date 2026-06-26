@@ -8,6 +8,11 @@ import { EmptyState } from '../ui/EmptyState';
 
 const adminSections = [
   {
+    title: 'Homepage',
+    description: 'Manage homepage sections, banners, and dynamic content.',
+    href: '/admin/homepage',
+  },
+  {
     title: 'Products',
     description: 'Create catalog products, variants, stock, and product media.',
     href: '/admin/products',

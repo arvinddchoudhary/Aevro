@@ -70,6 +70,7 @@ http://localhost:3000/account/addresses
 http://localhost:3000/account/orders
 http://localhost:3000/account/orders/order_id
 http://localhost:3000/admin
+http://localhost:3000/admin/homepage
 http://localhost:3000/admin/products
 http://localhost:3000/admin/products/new
 ```
@@ -98,6 +99,10 @@ orders are linked to the current user; guest checkout still works.
 The admin area uses the same auth session and requires `role: ADMIN`.
 Product management pages call admin-only backend routes with credentials
 included.
+
+The homepage CMS page lets admins create and manage dynamic homepage sections.
+Public `/` reads from `GET /api/v1/homepage` and falls back to built-in content
+when no active CMS sections exist.
 
 The orders foundation in Phase 8 adds backend order creation. Run migrations
 before testing order creation so the shipping country column exists:
@@ -166,6 +171,7 @@ backend/prisma/migrations/000003_hybrid_auth_foundation/migration.sql
 backend/prisma/migrations/000004_product_variants_cloudinary/migration.sql
 backend/prisma/migrations/000005_inventory_variant_order_items/migration.sql
 backend/prisma/migrations/000006_user_profile_addresses/migration.sql
+backend/prisma/migrations/000007_homepage_cms/migration.sql
 ```
 
 For deployed environments, use:
@@ -259,3 +265,24 @@ aevro/products/{categorySlug}/{productSlug}/{colorSlug}
 
 The upload endpoint accepts up to 5 images per color. Allowed formats are jpg,
 jpeg, png, and webp.
+
+## Cloudinary Homepage CMS Image Setup
+
+Homepage section images are uploaded through the backend admin route:
+
+```txt
+POST /api/v1/admin/uploads/homepage-image
+```
+
+The endpoint accepts one jpg, jpeg, png, or webp image at a time and stores it
+under:
+
+```txt
+aevro/homepage
+```
+
+Open the admin CMS UI at:
+
+```txt
+http://localhost:3000/admin/homepage
+```

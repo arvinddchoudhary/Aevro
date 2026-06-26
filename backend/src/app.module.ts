@@ -5,6 +5,7 @@ import { AuthModule } from './auth/auth.module';
 import { CategoriesModule } from './categories/categories.module';
 import { validateEnvironment } from './config/env.validation';
 import { HealthModule } from './health/health.module';
+import { HomepageModule } from './homepage/homepage.module';
 import { OrdersModule } from './orders/orders.module';
 import { PaymentsModule } from './payments/payments.module';
 import { ProductsModule } from './products/products.module';
@@ -18,6 +19,7 @@ import { UsersModule } from './users/users.module';
       validate: validateEnvironment,
     }),
     HealthModule,
+    HomepageModule,
     UsersModule,
     UsersApiModule,
     AuthModule,
