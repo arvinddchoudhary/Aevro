@@ -49,6 +49,10 @@ class EnvironmentVariables {
 
   @IsString()
   @IsOptional()
+  RAZORPAY_WEBHOOK_SECRET?: string;
+
+  @IsString()
+  @IsOptional()
   JWT_ACCESS_SECRET?: string;
 
   @IsString()

@@ -17,6 +17,23 @@ export class OrdersService {
   constructor(@Inject(PrismaService) private readonly prisma: PrismaService) {}
 
   async createOrder(createOrderDto: CreateOrderDto, userId?: string) {
+    if (createOrderDto.idempotencyKey) {
+      const existingOrder = await this.prisma.order.findUnique({
+        where: {
+          idempotencyKey: createOrderDto.idempotencyKey,
+        },
+        include: this.orderInclude(),
+      });
+
+      if (existingOrder) {
+        if (existingOrder.userId && userId && existingOrder.userId !== userId) {
+          throw new BadRequestException('Order idempotency key is already used.');
+        }
+
+        return this.serializeOrder(existingOrder);
+      }
+    }
+
     const requestedItems = this.mergeDuplicateItems(createOrderDto);
     const productIds = Array.from(
       new Set(requestedItems.map((item) => item.productId)),
@@ -101,28 +118,49 @@ export class OrdersService {
     );
     const { customer, shippingAddress } = createOrderDto;
 
-    const order = await this.prisma.order.create({
-      data: {
-        orderNumber: this.createOrderNumber(),
-        userId,
-        customerName: customer.fullName.trim(),
-        customerEmail: customer.email.trim().toLowerCase(),
-        customerPhone: customer.phone.trim(),
-        shippingAddress: shippingAddress.addressLine.trim(),
-        shippingCity: shippingAddress.city.trim(),
-        shippingState: shippingAddress.state.trim(),
-        shippingPincode: shippingAddress.postalCode.trim(),
-        shippingCountry: shippingAddress.country.trim(),
-        totalInPaise,
-        status: OrderStatus.PENDING,
-        items: {
-          create: orderItems,
+    try {
+      const order = await this.prisma.order.create({
+        data: {
+          orderNumber: this.createOrderNumber(),
+          userId,
+          idempotencyKey: createOrderDto.idempotencyKey,
+          customerName: customer.fullName.trim(),
+          customerEmail: customer.email.trim().toLowerCase(),
+          customerPhone: customer.phone.trim(),
+          shippingAddress: shippingAddress.addressLine.trim(),
+          shippingCity: shippingAddress.city.trim(),
+          shippingState: shippingAddress.state.trim(),
+          shippingPincode: shippingAddress.postalCode.trim(),
+          shippingCountry: shippingAddress.country.trim(),
+          totalInPaise,
+          status: OrderStatus.PENDING,
+          items: {
+            create: orderItems,
+          },
         },
-      },
-      include: this.orderInclude(),
-    });
+        include: this.orderInclude(),
+      });
 
-    return this.serializeOrder(order);
+      return this.serializeOrder(order);
+    } catch (error) {
+      if (
+        this.isUniqueConstraintError(error) &&
+        createOrderDto.idempotencyKey
+      ) {
+        const existingOrder = await this.prisma.order.findUnique({
+          where: {
+            idempotencyKey: createOrderDto.idempotencyKey,
+          },
+          include: this.orderInclude(),
+        });
+
+        if (existingOrder) {
+          return this.serializeOrder(existingOrder);
+        }
+      }
+
+      throw error;
+    }
   }
 
   async getOrder(id: string) {
@@ -199,6 +237,13 @@ export class OrdersService {
     const random = Math.random().toString(36).slice(2, 8).toUpperCase();
 
     return `AEVRO-${timestamp}-${random}`;
+  }
+
+  private isUniqueConstraintError(error: unknown) {
+    return (
+      error instanceof Prisma.PrismaClientKnownRequestError &&
+      error.code === 'P2002'
+    );
   }
 
   private orderInclude() {

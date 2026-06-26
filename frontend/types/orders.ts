@@ -1,4 +1,5 @@
 export type CreateOrderPayload = {
+  idempotencyKey?: string;
   customer: {
     fullName: string;
     email: string;

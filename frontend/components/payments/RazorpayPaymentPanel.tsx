@@ -2,7 +2,11 @@
 
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
-import { createRazorpayOrder, verifyRazorpayPayment } from '../../lib/api/payments';
+import {
+  createPaymentIdempotencyKey,
+  createRazorpayOrder,
+  verifyRazorpayPayment,
+} from '../../lib/api/payments';
 import { formatPrice } from '../../lib/format';
 import { loadRazorpayScript, openRazorpayCheckout } from '../../lib/razorpay';
 import type { Order } from '../../types/orders';
@@ -15,6 +19,9 @@ export function RazorpayPaymentPanel({ order }: { order: Order }) {
     order.status === 'CONFIRMED' ? 'paid' : 'idle',
   );
   const [message, setMessage] = useState<string | null>(null);
+  const [paymentIdempotencyKey, setPaymentIdempotencyKey] = useState(
+    createPaymentIdempotencyKey,
+  );
 
   const startPayment = async () => {
     setMessage(null);
@@ -22,7 +29,10 @@ export function RazorpayPaymentPanel({ order }: { order: Order }) {
 
     try {
       await loadRazorpayScript();
-      const razorpayOrder = await createRazorpayOrder(order.id);
+      const razorpayOrder = await createRazorpayOrder(
+        order.id,
+        paymentIdempotencyKey,
+      );
 
       openRazorpayCheckout({
         razorpayOrder,
@@ -40,6 +50,7 @@ export function RazorpayPaymentPanel({ order }: { order: Order }) {
 
             setState('paid');
             setMessage('Payment verified. Your order is confirmed.');
+            setPaymentIdempotencyKey(createPaymentIdempotencyKey());
             router.refresh();
           } catch (error) {
             setState('failed');

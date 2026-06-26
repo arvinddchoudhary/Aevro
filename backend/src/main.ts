@@ -6,6 +6,7 @@ import {
 } from '@nestjs/platform-fastify';
 import fastifyCookie from '@fastify/cookie';
 import fastifyMultipart from '@fastify/multipart';
+import fastifyRawBody from 'fastify-raw-body';
 import { ConfigService } from '@nestjs/config';
 import { ValidationPipe, VersioningType } from '@nestjs/common';
 import { AppModule } from './app.module';
@@ -25,6 +26,13 @@ async function bootstrap() {
     [frontendUrl];
 
   await app.register(fastifyCookie);
+  await app.register(fastifyRawBody, {
+    field: 'rawBody',
+    global: false,
+    encoding: 'utf8',
+    runFirst: true,
+    routes: ['/api/v1/webhooks/razorpay'],
+  });
   await app.register(fastifyMultipart, {
     limits: {
       fileSize: 5 * 1024 * 1024,
@@ -40,7 +48,7 @@ async function bootstrap() {
     origin: corsOrigins,
     credentials: true,
     methods: ['GET', 'HEAD', 'PUT', 'PATCH', 'POST', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-Razorpay-Signature'],
   });
   app.useGlobalFilters(new HttpExceptionFilter());
   app.useGlobalPipes(

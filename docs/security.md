@@ -107,9 +107,11 @@ Razorpay security expectations:
 
 - Backend creates Razorpay orders.
 - Backend verifies Razorpay signatures.
+- Backend verifies Razorpay webhook signatures with the raw request body.
 - Frontend amount is never trusted.
 - Backend uses existing order total from the database.
 - Payment verification must be idempotent.
+- Webhook processing must be idempotent.
 - Retried verification must not double-update payment/order status.
 - Retried verification must not double-deduct inventory.
 
@@ -157,6 +159,7 @@ CLOUDINARY_API_KEY
 CLOUDINARY_API_SECRET
 RAZORPAY_KEY_ID
 RAZORPAY_KEY_SECRET
+RAZORPAY_WEBHOOK_SECRET
 NODE_ENV
 PORT
 ```
@@ -183,5 +186,6 @@ Before switching to live traffic:
 - Razorpay test payment succeeds.
 - Failed Razorpay verification does not mark payment successful.
 - Repeated successful Razorpay verification does not double-deduct stock.
+- Duplicate Razorpay webhook delivery is stored and ignored safely.
 - Checkout shows safe error messages for insufficient stock.
 - No real secrets are committed to Git.
