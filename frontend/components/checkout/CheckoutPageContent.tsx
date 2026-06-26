@@ -10,7 +10,11 @@ import {
   validateCheckoutForm,
 } from '../../lib/checkout';
 import { createOrder } from '../../lib/api/orders';
-import { createRazorpayOrder, verifyRazorpayPayment } from '../../lib/api/payments';
+import {
+  createPaymentIdempotencyKey,
+  createRazorpayOrder,
+  verifyRazorpayPayment,
+} from '../../lib/api/payments';
 import { getUserAddresses } from '../../lib/api/users';
 import { useAuth } from '../../lib/auth';
 import { formatPrice } from '../../lib/format';
@@ -74,6 +78,9 @@ export function CheckoutPageContent() {
   const [errors, setErrors] = useState<CheckoutFormErrors>({});
   const [formError, setFormError] = useState<string | null>(null);
   const [pendingOrderId, setPendingOrderId] = useState<string | null>(null);
+  const [paymentIdempotencyKey, setPaymentIdempotencyKey] = useState(
+    createPaymentIdempotencyKey,
+  );
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitLabel, setSubmitLabel] = useState('Proceed to payment');
   const stockBlockedItems = items.filter(
@@ -137,6 +144,7 @@ export function CheckoutPageContent() {
     setErrors((currentErrors) => ({ ...currentErrors, [name]: undefined }));
     setFormError(null);
     setPendingOrderId(null);
+    setPaymentIdempotencyKey(createPaymentIdempotencyKey());
   };
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
@@ -160,7 +168,10 @@ export function CheckoutPageContent() {
       setSubmitLabel(pendingOrderId ? 'Opening Razorpay' : 'Creating order');
       const order = pendingOrderId
         ? null
-        : await createOrder(createOrderPayload(values, items));
+        : await createOrder({
+            ...createOrderPayload(values, items),
+            idempotencyKey: paymentIdempotencyKey,
+          });
       const orderId = pendingOrderId ?? order?.id;
 
       if (!orderId) {
@@ -171,7 +182,10 @@ export function CheckoutPageContent() {
 
       setSubmitLabel('Opening Razorpay');
       await loadRazorpayScript();
-      const razorpayOrder = await createRazorpayOrder(orderId);
+      const razorpayOrder = await createRazorpayOrder(
+        orderId,
+        paymentIdempotencyKey,
+      );
 
       openRazorpayCheckout({
         razorpayOrder,
@@ -192,6 +206,7 @@ export function CheckoutPageContent() {
             });
 
             clearCart();
+            setPaymentIdempotencyKey(createPaymentIdempotencyKey());
             router.push(`/checkout/confirmation/${orderId}`);
           } catch (error) {
             setIsSubmitting(false);

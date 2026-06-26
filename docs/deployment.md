@@ -66,6 +66,7 @@ CLOUDINARY_API_KEY=your-api-key
 CLOUDINARY_API_SECRET=your-api-secret
 RAZORPAY_KEY_ID=rzp_live_or_test_key
 RAZORPAY_KEY_SECRET=your-razorpay-secret
+RAZORPAY_WEBHOOK_SECRET=your-razorpay-webhook-secret
 NODE_ENV=production
 PORT=10000
 ```
@@ -108,9 +109,20 @@ Add Razorpay credentials only to the backend Render service:
 ```bash
 RAZORPAY_KEY_ID=
 RAZORPAY_KEY_SECRET=
+RAZORPAY_WEBHOOK_SECRET=
 ```
 
-The frontend can receive the Razorpay key id only through safe backend-created payment order flows. Never expose `RAZORPAY_KEY_SECRET`.
+The frontend can receive the Razorpay key id only through safe backend-created
+payment order flows. Never expose `RAZORPAY_KEY_SECRET` or
+`RAZORPAY_WEBHOOK_SECRET`.
+
+Configure Razorpay webhook URL after Render deployment:
+
+```txt
+https://your-render-api.onrender.com/api/v1/webhooks/razorpay
+```
+
+Subscribe to `payment.captured`, `payment.failed`, and `order.paid`.
 
 ## Google Login
 
@@ -163,7 +175,8 @@ Expected:
 - Vercel frontend environment variables configured.
 - `NEXT_PUBLIC_API_URL` points to deployed Render API with `/api/v1`.
 - Cloudinary credentials added only to backend.
-- Razorpay test or live keys added only to backend.
+- Razorpay test or live keys and webhook secret added only to backend.
+- Razorpay webhook points to `/api/v1/webhooks/razorpay`.
 - Google OAuth origins configured for localhost and deployed frontend.
 - `FRONTEND_URL` matches deployed frontend URL exactly.
 - CORS credentials enabled.

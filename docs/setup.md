@@ -134,6 +134,7 @@ DATABASE_URL=postgresql://USER:PASSWORD@HOST/aevro?sslmode=require&connect_timeo
 DIRECT_URL=postgresql://USER:PASSWORD@DIRECT_HOST/aevro?sslmode=require&connect_timeout=10
 RAZORPAY_KEY_ID=rzp_test_your_key_id
 RAZORPAY_KEY_SECRET=your_razorpay_key_secret
+RAZORPAY_WEBHOOK_SECRET=your_razorpay_webhook_secret
 JWT_ACCESS_SECRET=replace_with_long_random_access_secret
 JWT_REFRESH_SECRET=replace_with_long_random_refresh_secret
 JWT_ACCESS_EXPIRES_IN=15m
@@ -201,9 +202,29 @@ NEXT_PUBLIC_GOOGLE_CLIENT_ID=your_google_oauth_client_id.apps.googleusercontent.
 2. Use test mode and copy the key id and key secret.
 3. Add them to `backend/.env` as `RAZORPAY_KEY_ID` and
    `RAZORPAY_KEY_SECRET`.
-4. Restart the backend after changing `.env`.
-5. Run the frontend and complete checkout. The frontend receives only the
+4. Create a webhook in Razorpay and copy the webhook secret into
+   `RAZORPAY_WEBHOOK_SECRET`.
+5. Restart the backend after changing `.env`.
+6. Run the frontend and complete checkout. The frontend receives only the
    public Razorpay key id from the backend-created payment order.
+
+Local webhook URL:
+
+```txt
+http://localhost:8000/api/v1/webhooks/razorpay
+```
+
+Production webhook URL:
+
+```txt
+https://your-render-api.onrender.com/api/v1/webhooks/razorpay
+```
+
+Subscribe the webhook to:
+
+- `payment.captured`
+- `payment.failed`
+- `order.paid`
 
 ## Google Login Setup
 

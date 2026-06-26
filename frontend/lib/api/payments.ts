@@ -33,6 +33,7 @@ async function parseErrorMessage(response: Response) {
 async function postPaymentRequest<T>(path: string, body: unknown) {
   const response = await fetch(`${API_URL}${path}`, {
     method: 'POST',
+    credentials: 'include',
     headers: {
       'Content-Type': 'application/json',
     },
@@ -55,9 +56,18 @@ async function postPaymentRequest<T>(path: string, body: unknown) {
   return payload.data;
 }
 
-export function createRazorpayOrder(orderId: string) {
+export function createPaymentIdempotencyKey() {
+  if (typeof crypto !== 'undefined' && 'randomUUID' in crypto) {
+    return crypto.randomUUID();
+  }
+
+  return `payment-${Date.now()}-${Math.random().toString(36).slice(2, 12)}`;
+}
+
+export function createRazorpayOrder(orderId: string, idempotencyKey: string) {
   return postPaymentRequest<RazorpayOrder>('/payments/razorpay/order', {
     orderId,
+    idempotencyKey,
   });
 }
 

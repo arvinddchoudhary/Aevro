@@ -6,6 +6,7 @@ import {
   IsInt,
   IsOptional,
   IsString,
+  Length,
   Matches,
   Max,
   Min,
@@ -64,6 +65,11 @@ export class CreateOrderItemDto {
 }
 
 export class CreateOrderDto {
+  @IsString()
+  @IsOptional()
+  @Length(16, 128)
+  idempotencyKey?: string;
+
   @ValidateNested()
   @Type(() => CreateOrderCustomerDto)
   customer!: CreateOrderCustomerDto;

@@ -37,6 +37,20 @@ enum PaymentProvider {
   RAZORPAY
 }
 
+enum PaymentAttemptStatus {
+  CREATED
+  CAPTURED
+  FAILED
+  VERIFIED
+}
+
+enum WebhookEventStatus {
+  RECEIVED
+  PROCESSED
+  FAILED
+  IGNORED
+}
+
 enum AuthProvider {
   EMAIL
   GOOGLE
@@ -231,6 +245,7 @@ model Order {
   shippingCountry String      @default("India")
   totalInPaise    Int
   status          OrderStatus @default(PENDING)
+  idempotencyKey  String?     @unique
   items           OrderItem[]
   payment         Payment?
   createdAt       DateTime    @default(now())
@@ -266,22 +281,64 @@ model OrderItem {
 }
 
 model Payment {
-  id                String          @id @default(cuid())
-  orderId           String          @unique
-  order             Order           @relation(fields: [orderId], references: [id], onDelete: Cascade)
-  provider          PaymentProvider @default(RAZORPAY)
-  status            PaymentStatus   @default(PENDING)
+  id                String           @id @default(cuid())
+  orderId           String           @unique
+  order             Order            @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  provider          PaymentProvider  @default(RAZORPAY)
+  status            PaymentStatus    @default(PENDING)
   amountInPaise     Int
-  currency          String          @default("INR")
-  providerOrderId   String?         @unique
-  providerPaymentId String?         @unique
+  currency          String           @default("INR")
+  providerOrderId   String?          @unique
+  providerPaymentId String?          @unique
   providerSignature String?
   paidAt            DateTime?
-  createdAt         DateTime        @default(now())
-  updatedAt         DateTime        @updatedAt
+  stockDeductedAt   DateTime?
+  attempts          PaymentAttempt[]
+  createdAt         DateTime         @default(now())
+  updatedAt         DateTime         @updatedAt
 
   @@index([status])
   @@map("payments")
+}
+
+model PaymentAttempt {
+  id                String               @id @default(cuid())
+  paymentId         String
+  payment           Payment              @relation(fields: [paymentId], references: [id], onDelete: Cascade)
+  provider          PaymentProvider      @default(RAZORPAY)
+  providerOrderId   String?
+  providerPaymentId String?              @unique
+  status            PaymentAttemptStatus @default(CREATED)
+  amountInPaise     Int?
+  currency          String?
+  rawStatus         String?
+  errorCode         String?
+  errorDescription  String?
+  createdAt         DateTime             @default(now())
+  updatedAt         DateTime             @updatedAt
+
+  @@index([paymentId])
+  @@index([providerOrderId])
+  @@index([status])
+  @@map("payment_attempts")
+}
+
+model WebhookEvent {
+  id           String             @id @default(cuid())
+  provider     PaymentProvider    @default(RAZORPAY)
+  eventId      String             @unique
+  eventType    String
+  signature    String
+  payload      Json
+  status       WebhookEventStatus @default(RECEIVED)
+  processedAt  DateTime?
+  errorMessage String?
+  createdAt    DateTime           @default(now())
+  updatedAt    DateTime           @updatedAt
+
+  @@index([provider, eventType])
+  @@index([status])
+  @@map("webhook_events")
 }
 
 model HomepageSection {

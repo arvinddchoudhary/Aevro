@@ -48,6 +48,7 @@ GET /api/v1/orders/me
 GET /api/v1/orders/me/:id
 POST /api/v1/payments/razorpay/order
 POST /api/v1/payments/razorpay/verify
+POST /api/v1/webhooks/razorpay
 ```
 
 `GET /api/v1/health/database` verifies Prisma can connect to PostgreSQL.
@@ -828,7 +829,8 @@ Request body:
 
 ```json
 {
-  "orderId": "internal_order_id"
+  "orderId": "internal_order_id",
+  "idempotencyKey": "stable-client-generated-payment-attempt-key"
 }
 ```
 
@@ -865,9 +867,36 @@ Request body:
 }
 ```
 
-On successful verification, the payment is marked `PAID` and the order status is
-updated to `CONFIRMED`. Invalid signatures are rejected and the payment is
-marked `FAILED`.
+On successful verification, the backend verifies Razorpay's checkout signature,
+fetches the payment from Razorpay, checks captured status, amount, currency, and
+Razorpay order id, then marks the payment `PAID` and the order `CONFIRMED`.
+Invalid signatures are rejected and pending payments are marked `FAILED`.
+
+### Razorpay Webhook
+
+```txt
+POST /api/v1/webhooks/razorpay
+```
+
+Configure this URL in Razorpay with the backend public URL:
+
+```txt
+https://your-render-api.onrender.com/api/v1/webhooks/razorpay
+```
+
+Required header:
+
+```txt
+X-Razorpay-Signature: webhook_signature_from_razorpay
+```
+
+The webhook uses `RAZORPAY_WEBHOOK_SECRET` and the raw request body for
+signature verification. Duplicate webhook events are stored and ignored safely.
+Supported events:
+
+- `payment.captured`
+- `order.paid`
+- `payment.failed`
 
 ## Phase 19 Inventory And Stock Handling
 
@@ -880,11 +909,15 @@ Stock is deducted only after successful Razorpay payment verification. The
 payment verification transaction:
 
 - marks the payment `PAID` only once
+- claims stock deduction using `Payment.stockDeductedAt`
 - decrements the ordered `ProductVariant.stock`
 - decrements the parent `Product.stock` total
 - updates the order status to `CONFIRMED`
 - returns the existing paid result on payment verification retries without
   deducting stock again
+
+The Razorpay webhook and manual verify endpoint use the same duplicate-safe
+payment success path, so webhook retries do not double-deduct inventory.
 
 If stock is no longer available at payment verification time, the backend returns
 a clear insufficient-stock error and the payment/order confirmation is not

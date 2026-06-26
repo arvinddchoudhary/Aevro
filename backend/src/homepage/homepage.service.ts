@@ -1,4 +1,5 @@
 import { Inject, Injectable, NotFoundException } from '@nestjs/common';
+import { Prisma } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import {
   CreateHomepageSectionDto,
@@ -50,7 +51,7 @@ export class HomepageService {
 
   async createSection(dto: CreateHomepageSectionDto) {
     const section = await this.prisma.homepageSection.create({
-      data: this.buildSectionData(dto),
+      data: this.buildSectionData(dto) as Prisma.HomepageSectionCreateInput,
     });
 
     return {
@@ -64,7 +65,7 @@ export class HomepageService {
 
     const section = await this.prisma.homepageSection.update({
       where: { id },
-      data: this.buildSectionData(dto, true),
+      data: this.buildSectionData(dto, true) as Prisma.HomepageSectionUpdateInput,
     });
 
     return {
