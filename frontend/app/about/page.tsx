@@ -2,14 +2,14 @@ export default function AboutPage() {
   return (
     <main>
       <section className="border-b border-[#ddd4c8]">
-        <div className="relative min-h-[540px] overflow-hidden">
+        <div className="relative h-[430px] overflow-hidden sm:h-[500px] lg:h-auto lg:aspect-[2029/775]">
           <img
-            src="/images/brand/atelier-rack.webp"
-            alt="AEVRO studio with clothing rack"
+            src="/images/brand/About-Top-Image.webp"
+            alt="AEVRO studio tailoring scene"
             className="absolute inset-0 h-full w-full object-cover object-center"
           />
-          <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(251,247,240,0.98)_0%,rgba(251,247,240,0.9)_34%,rgba(251,247,240,0.3)_62%,rgba(251,247,240,0)_100%)]" />
-          <div className="relative flex min-h-[540px] items-center px-6 py-16 sm:px-12 lg:px-20 xl:px-28">
+          <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(251,247,240,0.98)_0%,rgba(251,247,240,0.88)_32%,rgba(251,247,240,0.28)_64%,rgba(251,247,240,0)_100%)]" />
+          <div className="relative flex h-full items-center px-6 py-16 sm:px-12 lg:px-20 xl:px-28">
             <div>
             <p className="text-xs font-medium uppercase tracking-[0.12em]">
               Our story

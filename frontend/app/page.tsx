@@ -3,16 +3,32 @@ import { ProductCard } from '../components/products/ProductCard';
 import { EmptyState } from '../components/ui/EmptyState';
 import { ErrorState } from '../components/ui/ErrorState';
 import { getProducts } from '../lib/api/catalog';
+import { getHomepageSections } from '../lib/api/homepage';
+import type { HomepageSection } from '../types/homepage';
+import type { Product } from '../types/catalog';
 
 export const dynamic = 'force-dynamic';
 
 export default async function HomePage() {
-  const productsResult = await Promise.allSettled([
+  const [catalogResult, homepageResult] = await Promise.allSettled([
     getProducts({ limit: 4, sort: 'newest' }),
+    getHomepageSections(),
   ]);
   const products =
-    productsResult[0].status === 'fulfilled' ? productsResult[0].value.data : [];
-  const hasCatalogError = productsResult[0].status === 'rejected';
+    catalogResult.status === 'fulfilled' ? catalogResult.value.data : [];
+  const hasCatalogError = catalogResult.status === 'rejected';
+  const homepageSections =
+    homepageResult.status === 'fulfilled' ? homepageResult.value : [];
+
+  if (homepageSections.length > 0) {
+    return (
+      <main className="text-[#111111]">
+        {homepageSections.map((section) =>
+          renderHomepageSection(section, products, hasCatalogError),
+        )}
+      </main>
+    );
+  }
 
   return (
     <main className="text-[#111111]">
@@ -164,5 +180,136 @@ export default async function HomePage() {
         </div>
       </section>
     </main>
+  );
+}
+
+function renderHomepageSection(
+  section: HomepageSection,
+  products: Product[],
+  hasCatalogError: boolean,
+) {
+  if (section.type === 'HERO') {
+    return (
+      <section key={section.id} className="border-b border-[#ddd4c8]">
+        <div className="relative min-h-[620px] overflow-hidden md:min-h-[680px] lg:aspect-[2880/1100] lg:min-h-0">
+          <img
+            src={section.imageUrl ?? '/images/brand/hero-trousers.webp'}
+            alt={section.title ?? 'AEVRO homepage hero'}
+            className="absolute inset-0 h-full w-full object-cover object-center"
+          />
+          <div className="relative flex min-h-[620px] items-center px-6 py-14 sm:px-12 md:min-h-[680px] lg:min-h-full lg:px-20 xl:px-28">
+            <div className="max-w-2xl">
+              {section.subtitle ? (
+                <p className="text-xs font-medium uppercase tracking-[0.14em]">
+                  {section.subtitle}
+                </p>
+              ) : null}
+              <h1 className="mt-7 text-6xl font-light uppercase leading-[0.98] tracking-[-0.02em] md:text-7xl xl:text-8xl">
+                {section.title ?? 'Tailored to define.'}
+              </h1>
+              {section.description ? (
+                <p className="mt-7 max-w-md text-sm leading-7 text-[#514c45]">
+                  {section.description}
+                </p>
+              ) : null}
+              {section.ctaLabel && section.ctaHref ? (
+                <Link
+                  href={section.ctaHref}
+                  className="mt-8 inline-flex min-h-[3.25rem] min-w-44 items-center justify-center border border-[#111111] bg-[#111111] px-8 py-4 text-sm font-medium uppercase tracking-[0.08em] text-[#fffaf3] transition duration-300 hover:bg-[#fffaf3] hover:text-[#111111]"
+                >
+                  {section.ctaLabel}
+                </Link>
+              ) : null}
+            </div>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  if (section.type === 'FEATURED_PRODUCTS') {
+    return (
+      <section key={section.id} className="aevro-container py-14">
+        <div className="mb-6 flex items-center justify-between">
+          <div>
+            {section.subtitle ? (
+              <p className="text-xs font-medium uppercase tracking-[0.08em]">
+                {section.subtitle}
+              </p>
+            ) : null}
+            <h2 className="mt-2 text-3xl font-light uppercase">
+              {section.title ?? 'Best sellers'}
+            </h2>
+          </div>
+          {section.ctaHref ? (
+            <Link
+              href={section.ctaHref}
+              className="text-xs font-medium uppercase tracking-[0.08em] underline-offset-8 hover:underline"
+            >
+              {section.ctaLabel ?? 'View all'}
+            </Link>
+          ) : null}
+        </div>
+        {hasCatalogError ? (
+          <ErrorState
+            title="Catalog unavailable"
+            message="The product API could not be reached. Check the backend URL and try again."
+          />
+        ) : null}
+        {!hasCatalogError && products.length === 0 ? (
+          <EmptyState
+            title="No products yet"
+            message="Once active products are added, they will appear here."
+          />
+        ) : null}
+        {products.length > 0 ? (
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
+            {products.map((product) => (
+              <ProductCard key={product.id} product={product} compact />
+            ))}
+          </div>
+        ) : null}
+      </section>
+    );
+  }
+
+  return (
+    <section
+      key={section.id}
+      className="grid overflow-hidden border-y border-[#ddd4c8] bg-[#fffaf3] lg:grid-cols-2"
+    >
+      <div className="h-[360px] bg-[#eee8de] sm:h-[440px] lg:h-[560px]">
+        <img
+          src={section.imageUrl ?? '/images/brand/atelier-band.webp'}
+          alt={section.title ?? 'AEVRO homepage section'}
+          className="h-full w-full object-cover object-center"
+        />
+      </div>
+      <div className="flex min-h-[360px] items-center px-6 py-12 sm:min-h-[440px] sm:px-12 lg:min-h-[560px] lg:px-20 xl:px-28">
+        <div className="max-w-xl">
+          {section.subtitle ? (
+            <p className="text-xs font-medium uppercase tracking-[0.1em]">
+              {section.subtitle}
+            </p>
+          ) : null}
+          <h2 className="mt-5 text-4xl font-light uppercase leading-tight md:text-5xl">
+            {section.title ?? 'AEVRO essentials'}
+          </h2>
+          {section.description ? (
+            <p className="mt-5 text-sm leading-7 text-[#514c45]">
+              {section.description}
+            </p>
+          ) : null}
+          {section.ctaLabel && section.ctaHref ? (
+            <Link
+              href={section.ctaHref}
+              className="mt-8 inline-flex text-xs font-medium uppercase tracking-[0.08em] underline-offset-8 hover:underline"
+            >
+              {section.ctaLabel} →
+            </Link>
+          ) : null}
+        </div>
+      </div>
+    </section>
   );
 }

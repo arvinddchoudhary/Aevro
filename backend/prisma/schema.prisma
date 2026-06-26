@@ -42,6 +42,14 @@ enum AuthProvider {
   GOOGLE
 }
 
+enum HomepageSectionType {
+  HERO
+  FEATURED_COLLECTION
+  FEATURED_PRODUCTS
+  LOOKBOOK
+  CAMPAIGN_BANNER
+}
+
 model User {
   id              String           @id @default(cuid())
   name            String
@@ -274,4 +282,25 @@ model Payment {
 
   @@index([status])
   @@map("payments")
+}
+
+model HomepageSection {
+  id            String              @id @default(cuid())
+  type          HomepageSectionType
+  title         String?
+  subtitle      String?
+  description   String?
+  imageUrl      String?
+  imagePublicId String?
+  ctaLabel      String?
+  ctaHref       String?
+  sortOrder     Int                 @default(0)
+  isActive      Boolean             @default(true)
+  metadata      Json?               @default("{}")
+  createdAt     DateTime            @default(now())
+  updatedAt     DateTime            @updatedAt
+
+  @@index([isActive, sortOrder])
+  @@index([type, isActive])
+  @@map("homepage_sections")
 }
