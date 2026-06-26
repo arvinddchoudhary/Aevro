@@ -18,6 +18,9 @@ export function Header() {
           />
         </Link>
         <nav className="hidden items-center justify-center gap-10 text-xs font-medium uppercase tracking-[0.04em] lg:flex">
+          <Link href="/" className="underline-offset-8 hover:underline">
+            Home
+          </Link>
           <Link href="/products" className="underline-offset-8 hover:underline">
             Shop
           </Link>
