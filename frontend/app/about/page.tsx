@@ -1,97 +1,164 @@
+import Link from 'next/link';
+
+const values = [
+  {
+    title: 'Timeless design',
+    copy: 'We believe in creating pieces that never go out of style: refined, versatile, and enduring.',
+    icon: (
+      <svg viewBox="0 0 32 32" aria-hidden="true">
+        <path d="M16 3v26M3 16h26M6.8 6.8l18.4 18.4M25.2 6.8 6.8 25.2" />
+        <circle cx="16" cy="16" r="5.5" />
+      </svg>
+    ),
+  },
+  {
+    title: 'Quality first',
+    copy: 'Premium fabrics, meticulous craftsmanship, and attention to detail in everything we do.',
+    icon: (
+      <svg viewBox="0 0 32 32" aria-hidden="true">
+        <path d="M10 4h12M10 28h12M13 8c0 4 6 4 6 8s-6 4-6 8M19 8c0 4-6 4-6 8s6 4 6 8" />
+      </svg>
+    ),
+  },
+  {
+    title: 'Responsible made',
+    copy: 'We take responsibility for our impact: ethical production, conscious choices, better future.',
+    icon: (
+      <svg viewBox="0 0 32 32" aria-hidden="true">
+        <circle cx="16" cy="16" r="11" />
+        <path d="M21 10c-6 1-10 5-10 11 6-1 10-5 10-11Z" />
+        <path d="M12 20c3-1 5-3 7-6" />
+      </svg>
+    ),
+  },
+  {
+    title: 'Made for real life',
+    copy: 'Clothing that fits your life beautifully: comfort, function, and effortless style.',
+    icon: (
+      <svg viewBox="0 0 32 32" aria-hidden="true">
+        <circle cx="16" cy="10" r="5" />
+        <path d="M7 28c1.2-6 4.4-9 9-9s7.8 3 9 9" />
+      </svg>
+    ),
+  },
+];
+
 export default function AboutPage() {
   return (
-    <main>
-      <section className="border-b border-[#ddd4c8]">
-        <div className="relative h-[430px] overflow-hidden sm:h-[500px] lg:h-auto lg:aspect-[2029/775]">
-          <img
-            src="/images/brand/About-Top-Image.webp"
-            alt="AEVRO studio tailoring scene"
-            className="absolute inset-0 h-full w-full object-cover object-center"
-          />
-          <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(251,247,240,0.98)_0%,rgba(251,247,240,0.88)_32%,rgba(251,247,240,0.28)_64%,rgba(251,247,240,0)_100%)]" />
-          <div className="relative flex h-full items-center px-6 py-16 sm:px-12 lg:px-20 xl:px-28">
-            <div>
-            <p className="text-xs font-medium uppercase tracking-[0.12em]">
-              Our story
-            </p>
-            <h1 className="mt-6 max-w-3xl text-5xl font-light uppercase leading-[1.02] md:text-6xl">
-              Built on simplicity. Driven by purpose.
-            </h1>
-            <p className="mt-7 max-w-xl text-sm leading-7 text-[#514c45]">
-              AEVRO was created with a simple belief: the best wardrobe starts
-              with the essentials. We design timeless pieces that combine modern
-              tailoring, premium fabrics, and thoughtful details.
-            </p>
+    <main className="px-4 py-6 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-[1500px] overflow-hidden rounded-[12px] border border-[#ddd4c8] bg-[#fbf7f0] shadow-[0_22px_70px_rgba(17,17,17,0.08)]">
+        <section className="border-b border-[#ddd4c8]">
+          <div className="relative h-[540px] overflow-hidden md:h-auto md:aspect-[2029/775]">
+            <img
+              src="/images/brand/About-Top-Image.webp"
+              alt="Folded AEVRO trousers in a calm studio setting"
+              className="absolute inset-0 h-full w-full object-cover object-center"
+            />
+            <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(251,247,240,0.98)_0%,rgba(251,247,240,0.92)_31%,rgba(251,247,240,0.5)_50%,rgba(251,247,240,0.04)_76%)]" />
+            <div className="relative flex h-full items-center px-6 py-12 sm:px-12 lg:px-20">
+              <div className="max-w-[470px]">
+                <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[#4d473f]">
+                  Our story
+                </p>
+                <h1 className="mt-6 font-serif text-[3.35rem] font-light uppercase leading-[0.98] tracking-normal text-[#111111] sm:text-[4.8rem] lg:text-[4.7rem]">
+                  Built on simplicity. Driven by purpose.
+                </h1>
+                <p className="mt-8 max-w-[390px] text-sm leading-7 text-[#3f3932]">
+                  AEVRO was created for those who value clarity in design and
+                  intention in every detail. We craft timeless trousers and
+                  modern essentials that elevate the way you live and dress,
+                  every single day.
+                </p>
+              </div>
+            </div>
           </div>
-          </div>
-        </div>
-      </section>
+        </section>
 
-      <section className="aevro-container py-14 text-center">
-        <p className="text-xs font-medium uppercase tracking-[0.12em]">
-          Our values
-        </p>
-        <div className="mt-9 grid gap-8 md:grid-cols-4">
-          {[
-            ['Timeless design', 'Modern essentials with a refined aesthetic that stand the test of time.'],
-            ['Quality first', 'Premium fabrics and meticulous construction for comfort you can feel.'],
-            ['Responsible made', 'Trusted partners and thoughtful production choices.'],
-            ['Built to last', 'Durable materials made to wear, day after day.'],
-          ].map(([title, copy]) => (
-            <article key={title} className="border-r border-[#ddd4c8] px-6 last:border-r-0">
-              <p className="text-sm font-medium uppercase tracking-[0.08em]">{title}</p>
-              <p className="mt-4 text-sm leading-7 text-[#514c45]">{copy}</p>
+        <section className="grid border-b border-[#ddd4c8] bg-[#fffaf3]/70 sm:grid-cols-2 lg:grid-cols-4">
+          {values.map((value) => (
+            <article
+              key={value.title}
+              className="flex min-h-[220px] flex-col items-center justify-center border-b border-[#ddd4c8] px-8 py-9 text-center last:border-b-0 sm:even:border-l lg:border-b-0 lg:border-l lg:first:border-l-0"
+            >
+              <span className="block h-11 w-11 text-[#111111] [&_svg]:h-full [&_svg]:w-full [&_svg]:fill-none [&_svg]:stroke-current [&_svg]:stroke-[1.15]">
+                {value.icon}
+              </span>
+              <h2 className="mt-6 text-xs font-semibold uppercase tracking-[0.1em]">
+                {value.title}
+              </h2>
+              <p className="mt-4 max-w-[230px] text-sm leading-6 text-[#514c45]">
+                {value.copy}
+              </p>
             </article>
           ))}
-        </div>
-      </section>
+        </section>
 
-      <section className="grid border-y border-[#ddd4c8] lg:grid-cols-2">
-        <div className="relative h-[380px] overflow-hidden bg-[#eee8de] lg:h-[460px]">
-          <img
-            src="/images/brand/fabric-detail.webp"
-            alt="AEVRO fabric detail"
-            className="h-full w-full object-cover object-center"
-          />
-          <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(251,247,240,0.95)_0%,rgba(251,247,240,0.82)_40%,rgba(251,247,240,0.28)_100%)]" />
-          <div className="absolute inset-0 flex items-center px-6 py-14 sm:px-12 lg:px-20">
-            <div className="max-w-lg">
-              <p className="text-xs font-medium uppercase tracking-[0.12em]">
-                Crafted with intention
+        <section className="grid border-b border-[#ddd4c8] lg:grid-cols-2">
+          <div className="relative min-h-[440px] overflow-hidden bg-[#eee6da]">
+            <img
+              src="/images/brand/fabric-detail.webp"
+              alt="AEVRO tailoring craftsmanship"
+              className="absolute inset-0 h-full w-full object-cover object-top"
+            />
+          </div>
+          <div className="flex min-h-[440px] items-center px-6 py-14 sm:px-12 lg:px-20">
+            <div className="max-w-[470px]">
+              <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[#514c45]">
+                Craftsmanship
               </p>
-              <h2 className="mt-5 text-3xl font-light uppercase leading-tight">
-                The details make the difference.
+              <h2 className="mt-6 font-serif text-4xl font-light uppercase leading-[1.04] tracking-normal text-[#111111] sm:text-5xl">
+                Expert tailoring. Premium fabrics. Timeless design.
               </h2>
-              <p className="mt-5 text-sm leading-7 text-[#514c45]">
-                From fabric drape to tailoring precision, every element is carefully
-                considered.
+              <p className="mt-7 text-sm leading-7 text-[#514c45]">
+                Every AEVRO piece is a result of thoughtful design and precision
+                craftsmanship. We work with carefully selected fabrics and
+                trusted makers to deliver trousers and essentials that look
+                sharp, feel exceptional, and last for years.
               </p>
+              <Link
+                href="/products"
+                className="mt-8 inline-flex items-center gap-3 text-xs font-semibold uppercase tracking-[0.1em] underline-offset-8 hover:underline"
+              >
+                Explore our collections
+                <span aria-hidden="true">→</span>
+              </Link>
             </div>
           </div>
-        </div>
-        <div className="relative min-h-[380px] overflow-hidden lg:min-h-[460px]">
-          <img
-            src="/images/brand/product-detail-black.webp"
-            alt="AEVRO trouser detail"
-            className="absolute inset-0 h-full w-full object-cover"
-          />
-          <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(251,247,240,0.18)_0%,rgba(251,247,240,0.72)_58%,rgba(251,247,240,0.96)_100%)]" />
-          <div className="relative flex min-h-[380px] items-center justify-end px-6 py-12 sm:px-12 lg:min-h-[460px] lg:px-20">
-            <div className="max-w-md">
-              <p className="text-xs font-medium uppercase tracking-[0.12em]">
+        </section>
+
+        <section className="grid lg:grid-cols-2">
+          <div className="flex min-h-[420px] items-center px-6 py-14 sm:px-12 lg:px-20">
+            <div className="max-w-[430px]">
+              <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[#514c45]">
                 Sustainability
               </p>
-              <h2 className="mt-5 text-3xl font-light uppercase leading-tight">
-                Better for people. Better for tomorrow.
+              <h2 className="mt-6 font-serif text-4xl font-light uppercase leading-[1.04] tracking-normal text-[#111111] sm:text-5xl">
+                Better choices. Greater impact.
               </h2>
-              <p className="mt-5 text-sm leading-7 text-[#514c45]">
-                We choose responsible materials, reduce waste, and build lasting
-                pieces that encourage mindful consumption.
+              <p className="mt-7 text-sm leading-7 text-[#514c45]">
+                We are committed to building a more responsible brand. From
+                sourcing sustainable materials to ethical production and mindful
+                packaging, we continue to make choices that are better for
+                people and the planet.
               </p>
+              <Link
+                href="/lookbook"
+                className="mt-8 inline-flex items-center gap-3 text-xs font-semibold uppercase tracking-[0.1em] underline-offset-8 hover:underline"
+              >
+                Our commitment
+                <span aria-hidden="true">→</span>
+              </Link>
             </div>
           </div>
-        </div>
-      </section>
+          <div className="relative min-h-[420px] overflow-hidden bg-[#eee6da]">
+            <img
+              src="/images/brand/about-Page-Sample2.webp"
+              alt="AEVRO studio rack and chair"
+              className="absolute inset-0 h-full w-full object-cover object-center"
+            />
+          </div>
+        </section>
+      </div>
     </main>
   );
 }
