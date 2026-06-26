@@ -33,19 +33,19 @@ export default async function HomePage() {
   return (
     <main className="text-[#111111]">
       <section className="border-b border-[#ddd4c8]">
-        <div className="relative min-h-[620px] overflow-hidden md:min-h-[680px] lg:aspect-[2880/1100] lg:min-h-0">
+        <div className="relative min-h-[520px] overflow-hidden sm:min-h-[590px] md:min-h-[640px] lg:aspect-[2880/1100] lg:min-h-0">
           <img
             src="/images/brand/hero-trousers.webp"
             alt="AEVRO tailored ivory trousers"
             className="absolute inset-0 h-full w-full object-cover object-center"
           />
           <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(251,247,240,0.82)_0%,rgba(251,247,240,0.72)_28%,rgba(251,247,240,0.2)_52%,rgba(251,247,240,0)_76%)]" />
-          <div className="relative flex min-h-[620px] items-center px-6 py-14 sm:px-12 md:min-h-[680px] lg:min-h-full lg:px-20 xl:px-28">
+          <div className="relative flex min-h-[520px] items-center px-5 py-12 sm:min-h-[590px] sm:px-12 md:min-h-[640px] lg:min-h-full lg:px-20 xl:px-28">
             <div className="max-w-2xl">
               <p className="text-xs font-medium uppercase tracking-[0.14em]">
                 Timeless form. Modern presence.
               </p>
-              <h1 className="mt-7 text-6xl font-light uppercase leading-[0.98] tracking-[-0.02em] md:text-7xl xl:text-8xl">
+              <h1 className="mt-6 text-[3rem] font-light uppercase leading-[0.98] sm:text-6xl md:text-7xl xl:text-8xl">
                 Tailored to define.
               </h1>
               <p className="mt-7 max-w-md text-sm leading-7 text-[#514c45]">
@@ -63,7 +63,7 @@ export default async function HomePage() {
         </div>
       </section>
 
-      <section className="aevro-container py-14">
+      <section className="aevro-container py-10 sm:py-14">
         <div className="mb-6 flex items-center justify-between">
           <p className="text-xs font-medium uppercase tracking-[0.08em]">
             Best sellers
@@ -85,7 +85,7 @@ export default async function HomePage() {
           />
         )}
         {products.length > 0 && (
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
+          <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4 xl:grid-cols-5">
             {products.map((product) => (
               <ProductCard key={product.id} product={product} compact />
             ))}
@@ -106,7 +106,7 @@ export default async function HomePage() {
             <p className="text-xs font-medium uppercase tracking-[0.1em]">
               Fabric first
             </p>
-            <h2 className="mt-5 max-w-xl font-serif text-4xl font-light uppercase leading-[1.08] tracking-[-0.02em] md:text-5xl">
+            <h2 className="mt-5 max-w-xl font-serif text-3xl font-light uppercase leading-[1.08] sm:text-4xl md:text-5xl">
               The difference is in the details.
             </h2>
             <p className="mt-5 max-w-xl text-base leading-7 text-[#514c45]">
@@ -163,7 +163,7 @@ export default async function HomePage() {
           <p className="text-xs font-medium uppercase tracking-[0.1em]">
             Our philosophy
           </p>
-          <h2 className="mt-4 max-w-xl text-4xl font-light uppercase leading-tight md:text-5xl">
+          <h2 className="mt-4 max-w-xl text-3xl font-light uppercase leading-tight sm:text-4xl md:text-5xl">
             Simplicity. Intention. Lasting style.
           </h2>
           <p className="mt-5 max-w-sm text-sm leading-7 text-[#514c45]">
@@ -191,20 +191,20 @@ function renderHomepageSection(
   if (section.type === 'HERO') {
     return (
       <section key={section.id} className="border-b border-[#ddd4c8]">
-        <div className="relative min-h-[620px] overflow-hidden md:min-h-[680px] lg:aspect-[2880/1100] lg:min-h-0">
+        <div className="relative min-h-[520px] overflow-hidden sm:min-h-[590px] md:min-h-[640px] lg:aspect-[2880/1100] lg:min-h-0">
           <img
             src={section.imageUrl ?? '/images/brand/hero-trousers.webp'}
             alt={section.title ?? 'AEVRO homepage hero'}
             className="absolute inset-0 h-full w-full object-cover object-center"
           />
-          <div className="relative flex min-h-[620px] items-center px-6 py-14 sm:px-12 md:min-h-[680px] lg:min-h-full lg:px-20 xl:px-28">
+          <div className="relative flex min-h-[520px] items-center px-5 py-12 sm:min-h-[590px] sm:px-12 md:min-h-[640px] lg:min-h-full lg:px-20 xl:px-28">
             <div className="max-w-2xl">
               {section.subtitle ? (
                 <p className="text-xs font-medium uppercase tracking-[0.14em]">
                   {section.subtitle}
                 </p>
               ) : null}
-              <h1 className="mt-7 text-6xl font-light uppercase leading-[0.98] tracking-[-0.02em] md:text-7xl xl:text-8xl">
+              <h1 className="mt-6 text-[3rem] font-light uppercase leading-[0.98] sm:text-6xl md:text-7xl xl:text-8xl">
                 {section.title ?? 'Tailored to define.'}
               </h1>
               {section.description ? (
@@ -229,7 +229,7 @@ function renderHomepageSection(
 
   if (section.type === 'FEATURED_PRODUCTS') {
     return (
-      <section key={section.id} className="aevro-container py-14">
+      <section key={section.id} className="aevro-container py-10 sm:py-14">
         <div className="mb-6 flex items-center justify-between">
           <div>
             {section.subtitle ? (
@@ -263,7 +263,7 @@ function renderHomepageSection(
           />
         ) : null}
         {products.length > 0 ? (
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
+          <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4 xl:grid-cols-5">
             {products.map((product) => (
               <ProductCard key={product.id} product={product} compact />
             ))}
@@ -292,7 +292,7 @@ function renderHomepageSection(
               {section.subtitle}
             </p>
           ) : null}
-          <h2 className="mt-5 text-4xl font-light uppercase leading-tight md:text-5xl">
+          <h2 className="mt-5 text-3xl font-light uppercase leading-tight sm:text-4xl md:text-5xl">
             {section.title ?? 'AEVRO essentials'}
           </h2>
           {section.description ? (

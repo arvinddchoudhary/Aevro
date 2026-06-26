@@ -6,7 +6,7 @@ import {
 
 export default function AdminProductsPage() {
   return (
-    <main className="aevro-container min-h-screen py-14">
+    <main className="aevro-container min-h-screen py-8 sm:py-14">
       <AdminRouteGuard>
         <AdminProductsHeader />
         <AdminProductsList />

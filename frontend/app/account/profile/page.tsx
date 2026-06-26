@@ -2,7 +2,7 @@ import { ProfilePageContent } from '../../../components/account/ProfilePageConte
 
 export default function AccountProfilePage() {
   return (
-    <main className="aevro-container min-h-screen py-14">
+    <main className="aevro-container min-h-screen py-8 sm:py-14">
       <ProfilePageContent />
     </main>
   );

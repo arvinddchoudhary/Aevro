@@ -112,14 +112,14 @@ export function AdminHomepagePageContent() {
 
   return (
     <AdminRouteGuard>
-      <div className="grid gap-10 lg:grid-cols-[minmax(0,1fr)_360px]">
+      <div className="grid gap-7 lg:grid-cols-[minmax(0,1fr)_340px] xl:grid-cols-[minmax(0,1fr)_360px]">
         <section>
-          <div className="flex flex-wrap items-end justify-between gap-4 border-b border-[#ddd4c8] pb-8">
+          <div className="flex flex-wrap items-end justify-between gap-4 border-b border-[#ddd4c8] pb-6 sm:pb-8">
             <div>
               <p className="text-xs uppercase tracking-[0.22em] text-[#777777]">
                 Admin
               </p>
-              <h1 className="mt-4 text-4xl font-light md:text-5xl">
+              <h1 className="mt-4 text-3xl font-light sm:text-4xl md:text-5xl">
                 Homepage CMS
               </h1>
               <p className="mt-4 max-w-2xl text-sm leading-7 text-[#5f5a53]">
@@ -130,7 +130,7 @@ export function AdminHomepagePageContent() {
             <button
               type="button"
               onClick={startCreate}
-              className="h-12 cursor-pointer border border-[#111111] px-6 text-xs font-medium uppercase tracking-[0.12em] hover:bg-[#111111] hover:text-[#fffaf3]"
+              className="h-12 w-full cursor-pointer border border-[#111111] px-6 text-xs font-medium uppercase tracking-[0.12em] hover:bg-[#111111] hover:text-[#fffaf3] sm:w-auto"
             >
               New section
             </button>
@@ -179,7 +179,7 @@ export function AdminHomepagePageContent() {
             {sections.map((section) => (
               <article
                 key={section.id}
-                className="grid gap-5 border border-[#ddd4c8] bg-[#fffaf3] p-4 sm:grid-cols-[160px_minmax(0,1fr)]"
+                className="grid gap-4 border border-[#ddd4c8] bg-[#fffaf3] p-4 sm:grid-cols-[150px_minmax(0,1fr)] sm:gap-5"
               >
                 {section.imageUrl ? (
                   <img
@@ -205,7 +205,7 @@ export function AdminHomepagePageContent() {
                       {section.isActive ? 'Active' : 'Inactive'}
                     </span>
                   </div>
-                  <h2 className="mt-4 text-2xl font-light">
+                  <h2 className="mt-4 text-xl font-light sm:text-2xl">
                     {section.title || 'Untitled section'}
                   </h2>
                   {section.subtitle ? (
@@ -247,7 +247,7 @@ export function AdminHomepagePageContent() {
           </div>
         </section>
 
-        <aside className="h-fit border border-[#ddd4c8] bg-[#fffaf3] p-6">
+        <aside className="h-fit border border-[#ddd4c8] bg-[#fffaf3] p-4 sm:p-6">
           <p className="text-xs uppercase tracking-[0.22em] text-[#777777]">
             Section guide
           </p>

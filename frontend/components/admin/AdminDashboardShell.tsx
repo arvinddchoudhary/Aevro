@@ -80,8 +80,8 @@ export function AdminDashboardShell() {
   }
 
   return (
-    <div className="grid gap-10 lg:grid-cols-[260px_minmax(0,1fr)]">
-      <aside className="h-fit border border-[#ddd4c8] p-5">
+    <div className="grid gap-7 lg:grid-cols-[240px_minmax(0,1fr)] xl:grid-cols-[260px_minmax(0,1fr)]">
+      <aside className="h-fit border border-[#ddd4c8] p-4 sm:p-5">
         <p className="text-xs uppercase tracking-[0.22em] text-[#777777]">
           Admin
         </p>
@@ -101,11 +101,11 @@ export function AdminDashboardShell() {
       </aside>
 
       <section>
-        <div className="border-b border-[#ddd4c8] pb-8">
+        <div className="border-b border-[#ddd4c8] pb-6 sm:pb-8">
           <p className="text-xs uppercase tracking-[0.22em] text-[#777777]">
             AEVRO control
           </p>
-          <h1 className="mt-4 text-4xl font-light md:text-5xl">
+          <h1 className="mt-4 text-3xl font-light sm:text-4xl md:text-5xl">
             Admin foundation
           </h1>
           <p className="mt-5 max-w-2xl text-sm leading-7 text-[#5f5a53]">
@@ -114,9 +114,9 @@ export function AdminDashboardShell() {
           </p>
         </div>
 
-        <div className="mt-8 grid gap-4 sm:grid-cols-2">
+        <div className="mt-6 grid gap-4 sm:mt-8 sm:grid-cols-2">
           {adminSections.map((section) => (
-            <article key={section.title} className="border border-[#ddd4c8] p-5">
+            <article key={section.title} className="border border-[#ddd4c8] p-4 sm:p-5">
               <p className="text-xs uppercase tracking-[0.18em] text-[#777777]">
                 {section.title}
               </p>

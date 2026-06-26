@@ -55,7 +55,7 @@ export function AdminProductsList() {
         return (
           <article
             key={product.id}
-            className="grid gap-5 border border-[#ddd4c8] bg-[#fffaf3] p-5 transition hover:border-[#111111] md:grid-cols-[96px_1fr_auto]"
+            className="grid gap-4 border border-[#ddd4c8] bg-[#fffaf3] p-4 transition hover:border-[#111111] sm:gap-5 sm:p-5 md:grid-cols-[96px_1fr_auto]"
           >
             <div className="aspect-[3/4] overflow-hidden bg-[#f5f5f5]">
               {product.primaryImage ? (
@@ -79,7 +79,7 @@ export function AdminProductsList() {
                   {product.status}
                 </span>
               </div>
-              <p className="mt-3 text-lg">{product.name}</p>
+              <p className="mt-3 text-base sm:text-lg">{product.name}</p>
               <p className="mt-2 text-sm text-[#5f5a53]">
                 {product.variants.length} variant{product.variants.length === 1 ? '' : 's'} / Stock {product.stock}
               </p>
@@ -95,7 +95,7 @@ export function AdminProductsList() {
               </p>
             </div>
             <div className="flex flex-col items-start gap-4 text-left md:items-end md:text-right">
-              <p className="text-lg">{formatPrice(product.priceInPaise)}</p>
+              <p className="text-base sm:text-lg">{formatPrice(product.priceInPaise)}</p>
               <Link
                 href={`/admin/products/${product.id}/edit`}
                 className="inline-flex h-10 cursor-pointer items-center justify-center border border-[#111111] px-4 text-xs font-medium uppercase tracking-[0.1em] hover:bg-[#111111] hover:text-[#fffaf3]"
@@ -117,11 +117,11 @@ export function AdminProductsHeader() {
         <p className="mb-3 text-xs uppercase tracking-[0.22em] text-[#777777]">
           Admin
         </p>
-        <h1 className="text-4xl font-light md:text-5xl">Products</h1>
+        <h1 className="text-3xl font-light sm:text-4xl md:text-5xl">Products</h1>
       </div>
       <Link
         href="/admin/products/new"
-        className="inline-flex h-12 cursor-pointer items-center justify-center border border-[#111111] px-6 text-sm font-medium uppercase tracking-[0.08em] hover:bg-[#111111] hover:text-[#fffaf3]"
+        className="inline-flex h-12 w-full cursor-pointer items-center justify-center border border-[#111111] px-6 text-sm font-medium uppercase tracking-[0.08em] hover:bg-[#111111] hover:text-[#fffaf3] sm:w-auto"
       >
         New product
       </Link>

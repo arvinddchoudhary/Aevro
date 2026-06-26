@@ -105,19 +105,19 @@ export default async function ProductsPage({
   return (
     <main>
       <section className="border-b border-[#ddd4c8]">
-        <div className="relative min-h-[360px] overflow-hidden lg:aspect-[2880/900] lg:min-h-0">
+        <div className="relative min-h-[300px] overflow-hidden sm:min-h-[360px] lg:aspect-[2880/900] lg:min-h-0">
           <img
             src="/images/brand/plp-hero.webp"
             alt="AEVRO trouser collection"
             className="absolute inset-0 h-full w-full object-cover object-center"
           />
           <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(251,247,240,0.95)_0%,rgba(251,247,240,0.86)_35%,rgba(251,247,240,0.18)_65%,rgba(251,247,240,0)_100%)]" />
-          <div className="relative flex min-h-[360px] items-center px-6 py-14 sm:px-12 lg:min-h-full lg:px-20 xl:px-28">
+          <div className="relative flex min-h-[300px] items-center px-5 py-10 sm:min-h-[360px] sm:px-12 lg:min-h-full lg:px-20 xl:px-28">
             <div className="max-w-lg">
               <p className="text-xs font-semibold uppercase tracking-[0.08em]">
                 Shop / Trousers
               </p>
-              <h1 className="mt-6 text-5xl font-light uppercase leading-none md:text-7xl">
+              <h1 className="mt-4 text-4xl font-light uppercase leading-none sm:text-5xl md:text-7xl">
                 Trousers
               </h1>
               <p className="mt-6 text-base leading-7 text-[#2f2a25]">
@@ -130,9 +130,9 @@ export default async function ProductsPage({
         </div>
       </section>
 
-      <section className="aevro-container grid gap-10 py-12 lg:grid-cols-[280px_1fr]">
-        <aside className="border-[#ddd4c8] lg:border-r lg:pr-9">
-          <div className="mb-7 flex items-center justify-between border-b border-[#ddd4c8] pb-5">
+      <section className="aevro-container grid gap-8 py-8 sm:py-10 lg:grid-cols-[260px_1fr] lg:gap-10 xl:grid-cols-[280px_1fr]">
+        <aside className="rounded-[6px] border border-[#ddd4c8] p-4 lg:rounded-none lg:border-0 lg:border-r lg:p-0 lg:pr-8 xl:pr-10">
+          <div className="mb-6 flex items-center justify-between border-b border-[#ddd4c8] pb-5">
             <p className="text-xs font-semibold uppercase tracking-[0.08em]">
               Filter
             </p>
@@ -143,8 +143,8 @@ export default async function ProductsPage({
               Clear all
             </Link>
           </div>
-          <div className="space-y-7">
-            <div className="border-b border-[#ddd4c8] pb-7">
+          <div className="space-y-6 lg:space-y-7">
+            <div className="border-b border-[#ddd4c8] pb-6 lg:pb-7">
               <p className="mb-4 text-xs font-semibold uppercase tracking-[0.08em]">
                 Category
               </p>
@@ -173,7 +173,7 @@ export default async function ProductsPage({
               </div>
             </div>
 
-            <div className="border-b border-[#ddd4c8] pb-7">
+            <div className="border-b border-[#ddd4c8] pb-6 lg:pb-7">
               <p className="mb-4 text-xs font-semibold uppercase tracking-[0.08em]">
                 Color
               </p>
@@ -207,7 +207,7 @@ export default async function ProductsPage({
               </div>
             </div>
 
-            <div className="border-b border-[#ddd4c8] pb-7">
+            <div className="border-b border-[#ddd4c8] pb-6 lg:pb-7">
               <p className="mb-4 text-xs font-semibold uppercase tracking-[0.08em]">
                 Size
               </p>
@@ -236,7 +236,7 @@ export default async function ProductsPage({
               {color && <input type="hidden" name="color" value={color} />}
               {size && <input type="hidden" name="size" value={size} />}
               {sort && sort !== 'newest' && <input type="hidden" name="sort" value={sort} />}
-              <div className="border-b border-[#ddd4c8] pb-7">
+              <div className="border-b border-[#ddd4c8] pb-6 lg:pb-7">
                 <p className="mb-4 text-xs font-semibold uppercase tracking-[0.08em]">
                   Search
                 </p>
@@ -247,7 +247,7 @@ export default async function ProductsPage({
                   className="h-11 w-full border border-[#ddd4c8] bg-transparent px-4 text-sm outline-none focus:border-[#111111]"
                 />
               </div>
-              <div className="border-b border-[#ddd4c8] pb-7">
+              <div className="border-b border-[#ddd4c8] pb-6 lg:pb-7">
                 <p className="mb-4 text-xs font-semibold uppercase tracking-[0.08em]">
                   Price
                 </p>
@@ -276,11 +276,11 @@ export default async function ProductsPage({
         </aside>
 
         <div>
-          <div className="mb-7 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <p className="text-xs font-semibold uppercase tracking-[0.08em]">
               {meta.total} products
             </p>
-            <div className="flex flex-wrap items-center gap-4 text-xs font-semibold uppercase tracking-[0.08em]">
+            <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-xs font-semibold uppercase tracking-[0.08em]">
               <span>Sort by</span>
               <Link
                 href={buildProductsHref(params, { sort: 'newest', page: undefined })}
@@ -309,7 +309,7 @@ export default async function ProductsPage({
               message="Try a different category, search term, or sorting option."
             />
           ) : (
-            <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-4">
+            <div className="grid grid-cols-2 gap-3 sm:gap-5 md:grid-cols-3 xl:grid-cols-4">
               {products.map((product) => (
                 <ProductCard key={product.id} product={product} compact />
               ))}

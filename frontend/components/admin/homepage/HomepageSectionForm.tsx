@@ -108,11 +108,11 @@ export function HomepageSectionForm({
   }
 
   return (
-    <form onSubmit={handleSubmit} className="border border-[#ddd4c8] bg-[#fffaf3] p-6">
+    <form onSubmit={handleSubmit} className="border border-[#ddd4c8] bg-[#fffaf3] p-4 sm:p-6">
       <p className="text-xs uppercase tracking-[0.18em] text-[#777777]">
         {section ? 'Edit section' : 'New section'}
       </p>
-      <div className="mt-6 grid gap-5 md:grid-cols-2">
+      <div className="mt-5 grid gap-4 md:grid-cols-2 md:gap-5">
         <label className="block">
           <span className="text-xs font-medium uppercase tracking-[0.14em]">
             Type
@@ -203,11 +203,11 @@ export function HomepageSectionForm({
         </label>
 
         <div className="md:col-span-2">
-          <div className="flex items-center justify-between gap-4">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <p className="text-xs font-medium uppercase tracking-[0.14em]">
               Section image
             </p>
-            <label className="cursor-pointer border border-[#111111] px-4 py-2 text-xs font-medium uppercase tracking-[0.1em] hover:bg-[#111111] hover:text-[#fffaf3]">
+            <label className="inline-flex h-10 cursor-pointer items-center justify-center border border-[#111111] px-4 text-xs font-medium uppercase tracking-[0.1em] hover:bg-[#111111] hover:text-[#fffaf3]">
               {uploadState === 'uploading' ? 'Uploading' : 'Upload image'}
               <input
                 type="file"
@@ -258,7 +258,7 @@ export function HomepageSectionForm({
         </label>
       </div>
 
-      <div className="mt-6 flex flex-wrap gap-3">
+      <div className="mt-6 grid gap-3 sm:flex sm:flex-wrap">
         <button
           type="submit"
           disabled={isSubmitting}

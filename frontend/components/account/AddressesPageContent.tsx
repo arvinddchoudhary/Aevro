@@ -160,13 +160,13 @@ export function AddressesPageContent() {
   }
 
   return (
-    <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_380px]">
+    <div className="grid gap-7 lg:grid-cols-[minmax(0,1fr)_360px]">
       <section>
         <div className="mb-6 border-b border-[#ddd4c8] pb-5">
           <p className="mb-3 text-xs uppercase tracking-[0.22em] text-[#777777]">
             Account
           </p>
-          <h1 className="text-3xl font-light md:text-4xl">Addresses</h1>
+          <h1 className="text-3xl font-light sm:text-4xl">Addresses</h1>
           <Link
             href="/account/profile"
             className="mt-4 inline-flex cursor-pointer text-sm underline underline-offset-4"
@@ -183,7 +183,7 @@ export function AddressesPageContent() {
 
         <div className="space-y-4">
           {addresses.map((address) => (
-            <article key={address.id} className="border border-[#ddd4c8] p-4">
+            <article key={address.id} className="border border-[#ddd4c8] p-4 sm:p-5">
               <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                 <div>
                   <div className="flex flex-wrap items-center gap-3">
@@ -235,7 +235,7 @@ export function AddressesPageContent() {
         </div>
       </section>
 
-      <aside className="h-fit border border-[#ddd4c8] p-5 lg:sticky lg:top-24">
+      <aside className="h-fit border border-[#ddd4c8] p-4 sm:p-5 lg:sticky lg:top-24">
         <p className="text-xs uppercase tracking-[0.2em] text-[#777777]">
           {editingAddress ? 'Edit address' : 'New address'}
         </p>

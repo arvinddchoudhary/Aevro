@@ -22,16 +22,16 @@ export function CartPageContent() {
   }
 
   return (
-    <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_380px]">
+    <div className="grid gap-7 lg:grid-cols-[minmax(0,1fr)_360px] xl:grid-cols-[minmax(0,1fr)_390px]">
       <section className="space-y-6">
         {items.map((item) => (
           <article
             key={item.itemKey}
-            className="grid gap-5 border-b border-[#ddd4c8] pb-6 sm:grid-cols-[190px_1fr]"
+            className="grid gap-4 border-b border-[#ddd4c8] pb-6 sm:grid-cols-[150px_1fr] md:grid-cols-[170px_1fr]"
           >
             <Link
               href={`/products/${item.slug}`}
-              className="aspect-[1086/1448] max-w-[190px] cursor-pointer overflow-hidden rounded-[4px] bg-[#eee8de]"
+              className="aspect-[1086/1448] w-full max-w-[150px] cursor-pointer overflow-hidden rounded-[4px] bg-[#eee8de] md:max-w-[170px]"
             >
               {item.imageUrl ? (
                 <img
@@ -53,7 +53,7 @@ export function CartPageContent() {
                 </p>
                 <Link
                   href={`/products/${item.slug}`}
-                  className="mt-2 block cursor-pointer text-xl font-light uppercase leading-tight underline-offset-4 hover:underline"
+                className="mt-2 block cursor-pointer text-lg font-light uppercase leading-tight underline-offset-4 hover:underline sm:text-xl"
                 >
                   {item.name}
                 </Link>
@@ -100,7 +100,7 @@ export function CartPageContent() {
         ))}
       </section>
 
-      <aside className="h-fit border border-[#ddd4c8] bg-[#fffaf3]/70 p-6 lg:sticky lg:top-24">
+      <aside className="h-fit border border-[#ddd4c8] bg-[#fffaf3]/70 p-5 sm:p-6 lg:sticky lg:top-24">
         <p className="text-sm font-medium uppercase tracking-[0.08em]">
           Order summary
         </p>

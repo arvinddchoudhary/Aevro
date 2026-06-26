@@ -78,10 +78,10 @@ export function AdminOrdersPageContent() {
         <p className="mb-3 text-xs uppercase tracking-[0.22em] text-[#777777]">
           Admin
         </p>
-        <h1 className="text-4xl font-light md:text-5xl">Orders</h1>
+        <h1 className="text-3xl font-light sm:text-4xl md:text-5xl">Orders</h1>
       </div>
 
-      <div className="mb-8 border border-[#ddd4c8] p-5">
+      <div className="mb-8 border border-[#ddd4c8] p-4 sm:p-5">
         <form onSubmit={submitSearch} className="grid gap-4 lg:grid-cols-[1fr_auto]">
           <input
             value={searchInput}
@@ -167,13 +167,13 @@ export function AdminOrdersPageContent() {
               <Link
                 key={order.id}
                 href={`/admin/orders/${order.id}`}
-                className="grid cursor-pointer gap-5 border border-[#ddd4c8] bg-[#fffaf3] p-5 transition hover:border-[#111111] lg:grid-cols-[1.2fr_1fr_auto]"
+            className="grid cursor-pointer gap-4 border border-[#ddd4c8] bg-[#fffaf3] p-4 transition hover:border-[#111111] sm:gap-5 sm:p-5 lg:grid-cols-[1.2fr_1fr_auto]"
               >
                 <div>
                   <p className="text-xs uppercase tracking-[0.18em] text-[#777777]">
                     {order.orderNumber}
                   </p>
-                  <p className="mt-3 text-lg">{order.customer.name}</p>
+                  <p className="mt-3 text-base sm:text-lg">{order.customer.name}</p>
                   <p className="mt-1 text-sm text-[#5f5a53]">{order.customer.email}</p>
                 </div>
                 <div className="flex flex-wrap items-start gap-2">

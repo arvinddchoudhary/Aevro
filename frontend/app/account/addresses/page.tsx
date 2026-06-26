@@ -2,7 +2,7 @@ import { AddressesPageContent } from '../../../components/account/AddressesPageC
 
 export default function AccountAddressesPage() {
   return (
-    <main className="aevro-container min-h-screen py-10">
+    <main className="aevro-container min-h-screen py-8 sm:py-10">
       <AddressesPageContent />
     </main>
   );

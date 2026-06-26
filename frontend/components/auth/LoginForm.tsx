@@ -35,12 +35,12 @@ export function LoginForm() {
 
   return (
     <div className="mx-auto w-full max-w-md">
-      <form onSubmit={handleSubmit} className="border border-[#ddd4c8] bg-[#fffaf3]/70 p-8">
+      <form onSubmit={handleSubmit} className="border border-[#ddd4c8] bg-[#fffaf3]/70 p-5 sm:p-8">
         <p className="text-xs uppercase tracking-[0.14em] text-[#77716a]">
           Customer login
         </p>
-        <h1 className="mt-4 text-4xl font-light uppercase">Welcome back.</h1>
-        <div className="mt-8 space-y-5">
+        <h1 className="mt-4 text-3xl font-light uppercase sm:text-4xl">Welcome back.</h1>
+        <div className="mt-6 space-y-5 sm:mt-8">
           <AuthField
             label="Email"
             name="email"

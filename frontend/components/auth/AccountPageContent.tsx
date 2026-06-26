@@ -44,12 +44,12 @@ export function AccountPageContent() {
   }
 
   return (
-    <div className="grid gap-10 lg:grid-cols-[minmax(0,1fr)_360px]">
-      <section className="border border-[#ddd4c8] p-6">
+    <div className="grid gap-7 lg:grid-cols-[minmax(0,1fr)_340px]">
+      <section className="border border-[#ddd4c8] p-5 sm:p-6">
         <p className="text-xs uppercase tracking-[0.22em] text-[#777777]">
           Account
         </p>
-        <h1 className="mt-4 text-4xl font-light md:text-5xl">{user.name}</h1>
+        <h1 className="mt-4 text-3xl font-light sm:text-4xl md:text-5xl">{user.name}</h1>
         <div className="mt-8 border-y border-[#ddd4c8]">
           {[
             ['Email', user.email],
@@ -58,7 +58,7 @@ export function AccountPageContent() {
           ].map(([label, value]) => (
             <div
               key={label}
-              className="grid grid-cols-[150px_1fr] border-b border-[#e7ded2] py-4 text-sm last:border-b-0"
+              className="grid gap-1 border-b border-[#e7ded2] py-4 text-sm last:border-b-0 sm:grid-cols-[150px_1fr] sm:gap-0"
             >
               <span className="text-[#777777]">{label}</span>
               <span>{value}</span>
@@ -67,7 +67,7 @@ export function AccountPageContent() {
         </div>
       </section>
 
-      <aside className="h-fit border border-[#ddd4c8] p-6">
+      <aside className="h-fit border border-[#ddd4c8] p-5 sm:p-6">
         <p className="text-xs uppercase tracking-[0.2em] text-[#777777]">
           Session
         </p>
