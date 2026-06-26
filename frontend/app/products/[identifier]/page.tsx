@@ -41,8 +41,8 @@ export default async function ProductDetailsPage({
 
   return (
     <main className="text-[#111111]">
-      <div className="aevro-container py-8 lg:py-12">
-        <div className="mb-8 flex flex-wrap items-center gap-2 text-sm text-[#2f2a25]">
+      <div className="aevro-container py-6 sm:py-8 lg:py-10">
+        <div className="mb-6 flex flex-wrap items-center gap-2 text-sm text-[#2f2a25]">
           <Link href="/" className="hover:text-[#111111]">Home</Link>
           <span>/</span>
           <Link href="/products" className="hover:text-[#111111]">Shop</Link>
@@ -55,14 +55,14 @@ export default async function ProductDetailsPage({
         </div>
         <ProductVariantSelection product={product} />
 
-        <section className="mt-12 grid gap-4 rounded-[6px] border border-[#eadfd2] bg-[#fffaf3]/80 px-6 py-5 shadow-[0_18px_45px_rgba(49,37,26,0.05)] sm:grid-cols-2 lg:grid-cols-4">
+        <section className="mt-8 grid gap-3 rounded-[6px] border border-[#eadfd2] bg-[#fffaf3]/80 px-4 py-4 shadow-[0_18px_45px_rgba(49,37,26,0.05)] sm:grid-cols-2 sm:px-5 lg:grid-cols-4">
           {[
             ['Free shipping', 'On all orders above ₹ 4999'],
             ['Easy returns', '14 days return policy'],
             ['Secure payments', '100% secure checkout'],
             ['Customer support', 'hello@aevro.com'],
           ].map(([title, detail]) => (
-            <div key={title} className="flex gap-4 py-3">
+            <div key={title} className="flex gap-3 py-2">
               <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-[#111111] text-xs">
                 +
               </span>
@@ -74,8 +74,8 @@ export default async function ProductDetailsPage({
           ))}
         </section>
 
-        <section className="mt-8 grid overflow-hidden rounded-[6px] border border-[#eadfd2] bg-[#fffaf3]/70 lg:grid-cols-2">
-          <div className="border-b border-[#eadfd2] p-8 lg:border-b-0 lg:border-r">
+        <section className="mt-6 grid overflow-hidden rounded-[6px] border border-[#eadfd2] bg-[#fffaf3]/70 lg:grid-cols-2">
+          <div className="border-b border-[#eadfd2] p-5 sm:p-6 lg:border-b-0 lg:border-r">
             <p className="text-xs font-semibold uppercase tracking-[0.1em]">Details</p>
             <p className="mt-5 max-w-md text-sm leading-7 text-[#2f2a25]">
               Tailored with precision, these trousers feature a refined drape,
@@ -89,7 +89,7 @@ export default async function ProductDetailsPage({
               <li>• Belt loops</li>
             </ul>
           </div>
-          <div className="p-8">
+          <div className="p-5 sm:p-6">
             <p className="text-xs font-semibold uppercase tracking-[0.1em]">
               Fabric & care
             </p>
@@ -106,7 +106,7 @@ export default async function ProductDetailsPage({
         </section>
 
         {relatedProducts.length > 0 && (
-          <section className="mt-12">
+          <section className="mt-10 sm:mt-12">
             <div className="mb-6 flex items-center justify-between">
               <p className="text-xs font-semibold uppercase tracking-[0.08em]">
                 You may also like
@@ -118,7 +118,7 @@ export default async function ProductDetailsPage({
                 View all
               </Link>
             </div>
-            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
+            <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4 xl:grid-cols-5">
               {relatedProducts.map((item) => (
                 <ProductCard key={item.id} product={item} compact />
               ))}

@@ -62,12 +62,12 @@ export function ProfilePageContent() {
   }
 
   return (
-    <div className="grid gap-10 lg:grid-cols-[minmax(0,1fr)_340px]">
-      <form onSubmit={submitProfile} className="border border-[#ddd4c8] p-6">
+    <div className="grid gap-7 lg:grid-cols-[minmax(0,1fr)_320px]">
+      <form onSubmit={submitProfile} className="border border-[#ddd4c8] p-5 sm:p-6">
         <p className="text-xs uppercase tracking-[0.22em] text-[#777777]">
           Profile
         </p>
-        <h1 className="mt-4 text-4xl font-light md:text-5xl">Your details</h1>
+        <h1 className="mt-4 text-3xl font-light sm:text-4xl md:text-5xl">Your details</h1>
         <div className="mt-8 grid gap-5">
           <label>
             <span className="mb-2 block text-xs uppercase tracking-[0.16em] text-[#777777]">
@@ -120,7 +120,7 @@ export function ProfilePageContent() {
         </button>
       </form>
 
-      <aside className="h-fit border border-[#ddd4c8] p-6">
+      <aside className="h-fit border border-[#ddd4c8] p-5 sm:p-6">
         <p className="text-xs uppercase tracking-[0.2em] text-[#777777]">
           Account
         </p>

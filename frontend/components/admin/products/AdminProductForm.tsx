@@ -448,22 +448,22 @@ export function AdminProductForm({ product }: AdminProductFormProps) {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_380px]">
-      <section className="space-y-8">
+    <form onSubmit={handleSubmit} className="grid gap-7 lg:grid-cols-[minmax(0,1fr)_340px] xl:grid-cols-[minmax(0,1fr)_380px]">
+      <section className="space-y-6 sm:space-y-8">
         <div className="border border-[#ddd4c8] bg-[#fffaf3] p-5 sm:p-7">
           <div className="mb-7 flex flex-col gap-3 border-b border-[#e7ded2] pb-5 sm:flex-row sm:items-end sm:justify-between">
             <div>
               <p className="text-xs uppercase tracking-[0.22em] text-[#777777]">
                 Product setup
               </p>
-              <h2 className="mt-2 text-2xl font-light">Core product details</h2>
+              <h2 className="mt-2 text-xl font-light sm:text-2xl">Core product details</h2>
             </div>
             <p className="text-sm text-[#666666]">
               Slug preview: {productSlug || 'product-slug'}
             </p>
           </div>
 
-          <div className="grid gap-5 sm:grid-cols-2">
+          <div className="grid gap-4 sm:grid-cols-2 sm:gap-5">
             <div className="sm:col-span-2">
               <TextInput label="Name" value={name} onChange={setName} />
             </div>
@@ -518,24 +518,24 @@ export function AdminProductForm({ product }: AdminProductFormProps) {
         </div>
 
         <div className="space-y-5">
-          <div className="flex items-end justify-between gap-4">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
             <div>
               <p className="text-xs uppercase tracking-[0.22em] text-[#777777]">
                 Variants
               </p>
-              <h2 className="mt-2 text-2xl font-light">Colors, sizes, and stock</h2>
+              <h2 className="mt-2 text-xl font-light sm:text-2xl">Colors, sizes, and stock</h2>
             </div>
             <button
               type="button"
               onClick={() => setVariants((current) => [...current, emptyVariant()])}
-              className="h-11 cursor-pointer border border-[#111111] px-5 text-sm font-medium uppercase tracking-[0.08em] hover:bg-[#111111] hover:text-[#fffaf3]"
+              className="h-11 w-full cursor-pointer border border-[#111111] px-5 text-sm font-medium uppercase tracking-[0.08em] hover:bg-[#111111] hover:text-[#fffaf3] sm:w-auto"
             >
               Add variant
             </button>
           </div>
 
           {variants.map((variant, index) => (
-            <div key={index} className="border border-[#ddd4c8] bg-[#fffaf3] p-5 sm:p-7">
+            <div key={index} className="border border-[#ddd4c8] bg-[#fffaf3] p-4 sm:p-7">
               <div className="mb-6 flex flex-col gap-3 border-b border-[#e7ded2] pb-5 sm:flex-row sm:items-center sm:justify-between">
                 <div className="flex items-center gap-4">
                   <span
@@ -564,7 +564,7 @@ export function AdminProductForm({ product }: AdminProductFormProps) {
                 )}
               </div>
 
-              <div className="grid gap-5 sm:grid-cols-3">
+              <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
                 <TextInput
                   label="Color name"
                   value={variant.colorName}
@@ -621,7 +621,7 @@ export function AdminProductForm({ product }: AdminProductFormProps) {
                 </div>
 
                 <label
-                  className={`flex min-h-36 cursor-pointer flex-col items-center justify-center border border-dashed px-5 py-8 text-center transition ${
+                  className={`flex min-h-32 cursor-pointer flex-col items-center justify-center border border-dashed px-4 py-7 text-center transition sm:min-h-36 sm:px-5 sm:py-8 ${
                     uploadingIndex === index
                       ? 'border-[#111111] bg-[#f5efe6]'
                       : 'border-[#c8bcae] hover:border-[#111111]'
@@ -651,7 +651,7 @@ export function AdminProductForm({ product }: AdminProductFormProps) {
                 )}
 
                 {variant.images.length > 0 && (
-                  <div className="mt-5 grid grid-cols-2 gap-4 sm:grid-cols-5">
+                  <div className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-4 xl:grid-cols-5">
                     {variant.images.map((image, imageIndex) => (
                       <div key={image.publicId ?? image.url} className="group">
                         <div className="aspect-square overflow-hidden bg-[#f5f5f5]">
@@ -685,8 +685,8 @@ export function AdminProductForm({ product }: AdminProductFormProps) {
         </div>
       </section>
 
-      <aside className="h-fit border border-[#ddd4c8] bg-[#fffaf3] p-5 sm:p-6 lg:sticky lg:top-24">
-          <p className="text-xs uppercase tracking-[0.2em] text-[#777777]">
+      <aside className="h-fit border border-[#ddd4c8] bg-[#fffaf3] p-4 sm:p-6 lg:sticky lg:top-24">
+        <p className="text-xs uppercase tracking-[0.2em] text-[#777777]">
           {isEditMode ? 'Update checklist' : 'Publish checklist'}
         </p>
         <div className="mt-5 space-y-3 border-b border-[#e7ded2] pb-5 text-sm text-[#5f5a53]">

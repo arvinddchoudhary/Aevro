@@ -238,16 +238,16 @@ export function CheckoutPageContent() {
     <>
       <form
         onSubmit={handleSubmit}
-        className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_410px]"
+        className="grid gap-7 lg:grid-cols-[minmax(0,1fr)_380px] xl:grid-cols-[minmax(0,1fr)_410px]"
       >
         <section className="overflow-hidden rounded-[8px] border border-[#ddd4c8] bg-[#fffaf3]/65 shadow-[0_18px_60px_rgba(17,17,17,0.035)]">
-          <div className="p-5 sm:p-7">
+          <div className="p-4 sm:p-6 lg:p-7">
             <div className="mb-5 flex items-center justify-between border-b border-[#ddd4c8] pb-4">
               <p className="text-xs font-medium uppercase tracking-[0.14em] text-[#514c45]">
                 1. Contact information
               </p>
             </div>
-            <div className="grid gap-4 sm:grid-cols-2">
+            <div className="grid gap-4 md:grid-cols-2">
               <CheckoutField
                 label="Full name"
                 name="fullName"
@@ -256,7 +256,7 @@ export function CheckoutPageContent() {
                 autoComplete="name"
                 onChange={updateValue}
               />
-              <div className="hidden border-b border-[#ddd4c8] sm:block" aria-hidden="true" />
+              <div className="hidden border-b border-[#ddd4c8] md:block" aria-hidden="true" />
               <CheckoutField
                 label="Email"
                 name="email"
@@ -278,14 +278,14 @@ export function CheckoutPageContent() {
             </div>
           </div>
 
-          <div className="border-t border-[#ddd4c8] p-5 sm:p-7">
+          <div className="border-t border-[#ddd4c8] p-4 sm:p-6 lg:p-7">
             <div className="mb-5 flex items-center justify-between border-b border-[#ddd4c8] pb-4">
               <p className="text-xs font-medium uppercase tracking-[0.14em] text-[#514c45]">
                 2. Shipping address
               </p>
             </div>
-            <div className="grid gap-4 sm:grid-cols-6">
-              <div className="sm:col-span-6">
+            <div className="grid gap-4 md:grid-cols-6">
+              <div className="md:col-span-6">
                 <CheckoutField
                   label="Address line"
                   name="addressLine"
@@ -295,7 +295,7 @@ export function CheckoutPageContent() {
                   onChange={updateValue}
                 />
               </div>
-              <div className="sm:col-span-2">
+              <div className="md:col-span-2">
                 <CheckoutField
                   label="City"
                   name="city"
@@ -305,7 +305,7 @@ export function CheckoutPageContent() {
                   onChange={updateValue}
                 />
               </div>
-              <div className="sm:col-span-2">
+              <div className="md:col-span-2">
                 <CheckoutField
                   label="State"
                   name="state"
@@ -315,7 +315,7 @@ export function CheckoutPageContent() {
                   onChange={updateValue}
                 />
               </div>
-              <div className="sm:col-span-2">
+              <div className="md:col-span-2">
                 <CheckoutField
                   label="Pincode"
                   name="postalCode"
@@ -326,7 +326,7 @@ export function CheckoutPageContent() {
                   onChange={updateValue}
                 />
               </div>
-              <div className="sm:col-span-2">
+              <div className="md:col-span-2">
                 <CheckoutField
                   label="Country"
                   name="country"
@@ -357,7 +357,7 @@ export function CheckoutPageContent() {
           )}
         </section>
 
-        <aside className="h-fit rounded-[8px] border border-[#ddd4c8] bg-[#fffaf3]/75 p-6 shadow-[0_18px_60px_rgba(17,17,17,0.035)] lg:sticky lg:top-24">
+        <aside className="h-fit rounded-[8px] border border-[#ddd4c8] bg-[#fffaf3]/75 p-4 shadow-[0_18px_60px_rgba(17,17,17,0.035)] sm:p-6 lg:sticky lg:top-24">
           <div className="flex items-center justify-between gap-4">
             <p className="text-sm font-medium uppercase tracking-[0.08em]">
               Order summary ({items.length})

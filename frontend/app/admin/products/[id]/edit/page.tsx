@@ -9,7 +9,7 @@ export default async function EditAdminProductPage({
   const { id } = await params;
 
   return (
-    <main className="aevro-container min-h-screen py-14">
+    <main className="aevro-container min-h-screen py-8 sm:py-14">
       <AdminRouteGuard>
         <AdminProductEditPageContent productId={id} />
       </AdminRouteGuard>

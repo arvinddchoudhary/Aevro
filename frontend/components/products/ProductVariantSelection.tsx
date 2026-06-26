@@ -147,8 +147,8 @@ export function ProductVariantSelection({ product }: ProductVariantSelectionProp
   }, [colorImages, selectedImageIndex]);
 
   return (
-    <div className="grid gap-10 lg:grid-cols-[minmax(0,650px)_minmax(420px,1fr)] lg:gap-12 xl:grid-cols-[minmax(0,680px)_minmax(440px,1fr)]">
-      <section className="grid max-w-[680px] gap-4 sm:grid-cols-[84px_minmax(0,560px)] xl:grid-cols-[88px_minmax(0,580px)]">
+    <div className="grid gap-8 lg:grid-cols-[minmax(0,560px)_minmax(360px,1fr)] lg:gap-10 xl:grid-cols-[minmax(0,620px)_minmax(400px,1fr)]">
+      <section className="mx-auto grid w-full max-w-[620px] gap-4 sm:grid-cols-[76px_minmax(0,520px)] xl:grid-cols-[82px_minmax(0,540px)]">
         <div className="order-2 grid grid-cols-4 gap-3 sm:order-1 sm:block sm:space-y-4">
           {(colorImages.length > 0 ? colorImages : [undefined]).map((image, index) => (
             <button
@@ -178,7 +178,8 @@ export function ProductVariantSelection({ product }: ProductVariantSelectionProp
             <ProductImageFrame
               image={selectedImage}
               productName={product.name}
-              className="aspect-[1086/1448] w-full max-w-[580px] rounded-[6px]"
+              className="aspect-[1086/1448] w-full max-w-[540px] rounded-[6px]"
+              imageClassName="object-contain"
             />
           </button>
 
@@ -236,14 +237,14 @@ export function ProductVariantSelection({ product }: ProductVariantSelectionProp
         </div>
       </section>
 
-      <section className="max-w-[560px] lg:sticky lg:top-24 lg:self-start">
+      <section className="max-w-[520px] lg:sticky lg:top-24 lg:self-start">
         <span className="mb-3 inline-flex rounded-full bg-[#efe8df] px-3 py-1 text-[0.68rem] font-semibold uppercase tracking-[0.08em] text-[#514c45]">
           Best seller
         </span>
-        <h1 className="max-w-2xl text-3xl font-light uppercase leading-[1.03] tracking-[0.01em] md:text-4xl">
+        <h1 className="max-w-2xl text-2xl font-light uppercase leading-[1.05] sm:text-3xl md:text-4xl">
           {product.name}
         </h1>
-        <p className="mt-4 text-xl font-semibold">{formatPrice(product.priceInPaise)}</p>
+        <p className="mt-4 text-lg font-semibold sm:text-xl">{formatPrice(product.priceInPaise)}</p>
         <p className="mt-1 text-sm text-[#514c45]">Inclusive of all taxes</p>
 
         {product.description && (
@@ -252,7 +253,7 @@ export function ProductVariantSelection({ product }: ProductVariantSelectionProp
           </p>
         )}
 
-        <div className="mt-6 border-y border-[#ddd4c8] py-5">
+        <div className="mt-5 border-y border-[#ddd4c8] py-4 sm:py-5">
           <div>
             <div className="mb-3 flex items-center justify-between gap-4">
               <p className="text-xs font-semibold uppercase tracking-[0.12em]">
@@ -281,7 +282,7 @@ export function ProductVariantSelection({ product }: ProductVariantSelectionProp
             </div>
           </div>
 
-          <div className="mt-5">
+          <div className="mt-4 sm:mt-5">
             <div className="mb-3 flex items-center justify-between gap-4">
               <p className="text-xs font-semibold uppercase tracking-[0.12em]">
                 Size: <span className="text-[#77716a]">{selectedSize || 'Select your size'}</span>
@@ -313,7 +314,7 @@ export function ProductVariantSelection({ product }: ProductVariantSelectionProp
           </div>
         </div>
 
-        <div className="mt-5 flex flex-col gap-3">
+        <div className="mt-4 flex flex-col gap-3 sm:mt-5">
           <AddToCartButton
             product={product}
             selection={{
@@ -337,7 +338,7 @@ export function ProductVariantSelection({ product }: ProductVariantSelectionProp
             </Link>
           )}
         </div>
-        <div className="mt-6 border-t border-[#ddd4c8]">
+        <div className="mt-5 border-t border-[#ddd4c8]">
           {['Details', 'Fabric & care', 'Shipping & returns'].map((item) => (
             <details key={item} className="group border-b border-[#ddd4c8] py-3">
               <summary className="flex list-none items-center justify-between text-xs font-semibold uppercase tracking-[0.1em]">

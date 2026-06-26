@@ -87,22 +87,22 @@ export function AdminOrderDetailPageContent({ orderId }: { orderId: string }) {
           <p className="mb-3 text-xs uppercase tracking-[0.22em] text-[#777777]">
             {order.orderNumber}
           </p>
-          <h1 className="text-4xl font-light md:text-5xl">Order detail</h1>
+          <h1 className="text-3xl font-light sm:text-4xl md:text-5xl">Order detail</h1>
           <p className="mt-4 text-sm text-[#5f5a53]">
             Created {new Date(order.createdAt).toLocaleString()}
           </p>
         </div>
         <Link
           href="/admin/orders"
-          className="inline-flex h-11 cursor-pointer items-center justify-center border border-[#ddd4c8] px-5 text-sm font-medium uppercase tracking-[0.08em] hover:border-[#111111]"
+          className="inline-flex h-11 w-full cursor-pointer items-center justify-center border border-[#ddd4c8] px-5 text-sm font-medium uppercase tracking-[0.08em] hover:border-[#111111] sm:w-auto"
         >
           Back to orders
         </Link>
       </div>
 
-      <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_360px]">
+      <div className="grid gap-7 lg:grid-cols-[minmax(0,1fr)_340px] xl:grid-cols-[minmax(0,1fr)_360px]">
         <section className="space-y-6">
-          <div className="border border-[#ddd4c8] p-5">
+          <div className="border border-[#ddd4c8] p-4 sm:p-5">
             <p className="mb-4 text-xs uppercase tracking-[0.2em] text-[#777777]">
               Items
             </p>
@@ -110,7 +110,7 @@ export function AdminOrderDetailPageContent({ orderId }: { orderId: string }) {
               {order.items.map((item) => (
                 <article
                   key={item.id}
-                  className="grid gap-4 border-b border-[#e7ded2] pb-5 last:border-b-0 md:grid-cols-[96px_1fr_auto]"
+                    className="grid gap-4 border-b border-[#e7ded2] pb-5 last:border-b-0 sm:grid-cols-[90px_1fr_auto]"
                 >
                   <div className="aspect-[3/4] overflow-hidden bg-[#f5f5f5]">
                     {item.product?.images[0] ? (
@@ -126,7 +126,7 @@ export function AdminOrderDetailPageContent({ orderId }: { orderId: string }) {
                     )}
                   </div>
                   <div>
-                    <p className="text-lg">{item.productName}</p>
+                    <p className="text-base sm:text-lg">{item.productName}</p>
                     <p className="mt-2 text-sm text-[#5f5a53]">
                       {[item.selectedColor, item.selectedSize].filter(Boolean).join(' / ') ||
                         'No variant selected'}
@@ -144,7 +144,7 @@ export function AdminOrderDetailPageContent({ orderId }: { orderId: string }) {
           </div>
 
           <div className="grid gap-6 md:grid-cols-2">
-            <div className="border border-[#ddd4c8] p-5">
+            <div className="border border-[#ddd4c8] p-4 sm:p-5">
               <p className="mb-4 text-xs uppercase tracking-[0.2em] text-[#777777]">
                 Customer
               </p>
@@ -152,7 +152,7 @@ export function AdminOrderDetailPageContent({ orderId }: { orderId: string }) {
               <p className="mt-2 text-sm text-[#5f5a53]">{order.customer.email}</p>
               <p className="mt-1 text-sm text-[#5f5a53]">{order.customer.phone}</p>
             </div>
-            <div className="border border-[#ddd4c8] p-5">
+            <div className="border border-[#ddd4c8] p-4 sm:p-5">
               <p className="mb-4 text-xs uppercase tracking-[0.2em] text-[#777777]">
                 Shipping
               </p>
@@ -167,7 +167,7 @@ export function AdminOrderDetailPageContent({ orderId }: { orderId: string }) {
           </div>
         </section>
 
-        <aside className="h-fit border border-[#ddd4c8] p-5 lg:sticky lg:top-24">
+        <aside className="h-fit border border-[#ddd4c8] p-4 sm:p-5 lg:sticky lg:top-24">
           <p className="text-xs uppercase tracking-[0.2em] text-[#777777]">
             Manage order
           </p>

@@ -36,12 +36,12 @@ export function RegisterForm() {
 
   return (
     <div className="mx-auto w-full max-w-md">
-      <form onSubmit={handleSubmit} className="border border-[#ddd4c8] bg-[#fffaf3]/70 p-8">
+      <form onSubmit={handleSubmit} className="border border-[#ddd4c8] bg-[#fffaf3]/70 p-5 sm:p-8">
         <p className="text-xs uppercase tracking-[0.14em] text-[#77716a]">
           Create account
         </p>
-        <h1 className="mt-4 text-4xl font-light uppercase">Start your AEVRO profile.</h1>
-        <div className="mt-8 space-y-5">
+        <h1 className="mt-4 text-3xl font-light uppercase sm:text-4xl">Start your AEVRO profile.</h1>
+        <div className="mt-6 space-y-5 sm:mt-8">
           <AuthField
             label="Name"
             name="name"

@@ -2,7 +2,7 @@ import { AdminHomepagePageContent } from '../../../components/admin/homepage/Adm
 
 export default function AdminHomepagePage() {
   return (
-    <main className="aevro-container min-h-screen py-14">
+    <main className="aevro-container min-h-screen py-8 sm:py-14">
       <AdminHomepagePageContent />
     </main>
   );
