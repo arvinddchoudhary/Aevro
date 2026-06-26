@@ -286,3 +286,10 @@ Open the admin CMS UI at:
 ```txt
 http://localhost:3000/admin/homepage
 ```
+## Deployment
+
+Production deployment notes are maintained in `docs/deployment.md`.
+
+Use Vercel for the frontend, Render for the backend, Neon for PostgreSQL,
+Cloudinary for media, and Razorpay for payments. Keep production secrets in the
+hosting dashboards only.
