@@ -176,3 +176,14 @@ Expected:
 - Razorpay test payment flow works.
 - Admin routes remain protected.
 - No real secrets committed to Git.
+
+## Security Hardening
+
+Before production launch, review the full checklist in:
+
+```text
+docs/security.md
+```
+
+At minimum, confirm CORS, cookies, rate limits, admin guards, upload validation,
+Razorpay verification, and production error responses are configured safely.
