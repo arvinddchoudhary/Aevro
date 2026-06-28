@@ -1,5 +1,6 @@
 import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
+import { NotificationsService } from '../notifications/notifications.service';
 import { PrismaService } from '../prisma/prisma.service';
 import {
   AdminOrderSort,
@@ -13,7 +14,10 @@ type AdminOrderWithDetails = Prisma.OrderGetPayload<{
 
 @Injectable()
 export class AdminOrdersService {
-  constructor(@Inject(PrismaService) private readonly prisma: PrismaService) {}
+  constructor(
+    @Inject(PrismaService) private readonly prisma: PrismaService,
+    private readonly notificationsService: NotificationsService,
+  ) {}
 
   async listOrders(query: ListAdminOrdersQueryDto) {
     const page = Number(query.page ?? 1);
@@ -60,7 +64,7 @@ export class AdminOrdersService {
   }
 
   async updateOrderStatus(id: string, dto: UpdateAdminOrderStatusDto) {
-    await this.ensureOrderExists(id);
+    const existingOrder = await this.ensureOrderExists(id);
 
     const order = await this.prisma.order.update({
       where: { id },
@@ -69,6 +73,10 @@ export class AdminOrdersService {
       },
       include: this.orderInclude(),
     });
+
+    void this.notificationsService
+      .handleOrderStatusTransition(order.id, existingOrder.status, order.status)
+      .catch(() => undefined);
 
     return this.serializeOrder(order);
   }
@@ -107,12 +115,14 @@ export class AdminOrdersService {
   private async ensureOrderExists(id: string) {
     const order = await this.prisma.order.findUnique({
       where: { id },
-      select: { id: true },
+      select: { id: true, status: true },
     });
 
     if (!order) {
       throw new NotFoundException('Order not found.');
     }
+
+    return order;
   }
 
   private orderInclude() {

@@ -15,12 +15,15 @@ import {
   login,
   logout,
   register,
+  resendEmailOtp,
+  verifyEmailOtp,
 } from './api/auth';
 import type {
   AuthUser,
   GoogleLoginPayload,
   LoginPayload,
   RegisterPayload,
+  RegisterResult,
 } from '../types/auth';
 
 type AuthStatus = 'loading' | 'authenticated' | 'unauthenticated';
@@ -28,9 +31,16 @@ type AuthStatus = 'loading' | 'authenticated' | 'unauthenticated';
 type AuthContextValue = {
   user: AuthUser | null;
   status: AuthStatus;
-  register: (payload: RegisterPayload) => Promise<AuthUser>;
+  register: (payload: RegisterPayload) => Promise<RegisterResult>;
   login: (payload: LoginPayload) => Promise<AuthUser>;
   googleLogin: (payload: GoogleLoginPayload) => Promise<AuthUser>;
+  verifyEmailOtp: (code: string) => Promise<AuthUser>;
+  resendEmailOtp: () => Promise<{
+    alreadyVerified: boolean;
+    sent: boolean;
+    expiresInMinutes: number;
+    error?: string | null;
+  }>;
   logout: () => Promise<void>;
   reloadUser: () => Promise<AuthUser | null>;
 };
@@ -59,11 +69,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       user,
       status,
       register: async (payload) => {
-        const nextUser = await register(payload);
-        setUser(nextUser);
+        const result = await register(payload);
+        setUser(result.user);
         setStatus('authenticated');
 
-        return nextUser;
+        return result;
       },
       login: async (payload) => {
         const nextUser = await login(payload);
@@ -79,6 +89,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
         return nextUser;
       },
+      verifyEmailOtp: async (code) => {
+        const nextUser = await verifyEmailOtp(code);
+        setUser(nextUser);
+        setStatus('authenticated');
+
+        return nextUser;
+      },
+      resendEmailOtp,
       logout: async () => {
         await logout();
         setUser(null);

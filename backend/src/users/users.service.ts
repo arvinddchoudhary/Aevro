@@ -311,6 +311,7 @@ export class UsersService {
     dto: CreateAddressDto | UpdateAddressDto,
   ) {
     return {
+      label: dto.label?.trim() || 'Home',
       fullName: dto.fullName.trim(),
       phone: dto.phone.trim(),
       addressLine1: dto.addressLine1.trim(),
@@ -325,6 +326,7 @@ export class UsersService {
   private serializeAddress(address: UserAddress) {
     return {
       id: address.id,
+      label: address.label,
       fullName: address.fullName,
       phone: address.phone,
       addressLine1: address.addressLine1,

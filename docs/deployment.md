@@ -7,6 +7,7 @@ AEVRO is deployed as two separate services:
 - Database: Neon PostgreSQL
 - Images: Cloudinary
 - Payments: Razorpay
+- Email: Brevo transactional email
 
 Do not commit real secrets. Configure production values in the hosting dashboards.
 
@@ -67,6 +68,18 @@ CLOUDINARY_API_SECRET=your-api-secret
 RAZORPAY_KEY_ID=rzp_live_or_test_key
 RAZORPAY_KEY_SECRET=your-razorpay-secret
 RAZORPAY_WEBHOOK_SECRET=your-razorpay-webhook-secret
+BREVO_API_KEY=your-brevo-transactional-api-key
+BREVO_SENDER_EMAIL=orders@aevro.com
+BREVO_SENDER_NAME=AEVRO
+BREVO_REPLY_TO_EMAIL=support@aevro.com
+BREVO_REPLY_TO_NAME=AEVRO Support
+BREVO_TEMPLATE_ORDER_CONFIRMED_CUSTOMER=1
+BREVO_TEMPLATE_ORDER_CONFIRMED_ADMIN=2
+BREVO_TEMPLATE_ORDER_SHIPPED=3
+BREVO_TEMPLATE_ORDER_DELIVERED=4
+BREVO_TEMPLATE_PAYMENT_FAILED=5
+AEVRO_ADMIN_EMAIL=orders@aevro.com
+AEVRO_SUPPORT_EMAIL=support@aevro.com
 NODE_ENV=production
 PORT=10000
 ```
@@ -124,6 +137,48 @@ https://your-render-api.onrender.com/api/v1/webhooks/razorpay
 
 Subscribe to `payment.captured`, `payment.failed`, and `order.paid`.
 
+## Brevo Transactional Email
+
+Add Brevo credentials only to the backend Render service:
+
+```bash
+BREVO_API_KEY=
+BREVO_SENDER_EMAIL=orders@aevro.com
+BREVO_SENDER_NAME=AEVRO
+BREVO_REPLY_TO_EMAIL=support@aevro.com
+BREVO_REPLY_TO_NAME=AEVRO Support
+BREVO_TEMPLATE_ORDER_CONFIRMED_CUSTOMER=
+BREVO_TEMPLATE_ORDER_CONFIRMED_ADMIN=
+BREVO_TEMPLATE_ORDER_SHIPPED=
+BREVO_TEMPLATE_ORDER_DELIVERED=
+BREVO_TEMPLATE_PAYMENT_FAILED=
+AEVRO_ADMIN_EMAIL=orders@aevro.com
+AEVRO_SUPPORT_EMAIL=support@aevro.com
+```
+
+Never expose `BREVO_API_KEY` to Vercel or frontend code.
+
+Recommended production sender addresses:
+
+```txt
+orders@aevro.com
+support@aevro.com
+returns@aevro.com
+no-reply@aevro.com
+```
+
+Before going live, authenticate the sending domain in Brevo and configure DNS
+records for DKIM, DMARC, and SPF.
+
+Configure Brevo transactional webhook URL after Render deployment:
+
+```txt
+https://your-render-api.onrender.com/api/v1/webhooks/brevo
+```
+
+Subscribe to `sent`, `delivered`, `soft_bounce`, `hard_bounce`, `blocked`,
+`invalid`, and `error`.
+
 ## Google Login
 
 Use the same Google OAuth web client id in:
@@ -177,6 +232,9 @@ Expected:
 - Cloudinary credentials added only to backend.
 - Razorpay test or live keys and webhook secret added only to backend.
 - Razorpay webhook points to `/api/v1/webhooks/razorpay`.
+- Brevo API key and template IDs added only to backend.
+- Brevo webhook points to `/api/v1/webhooks/brevo`.
+- Brevo sender domain has DKIM, DMARC, and SPF configured.
 - Google OAuth origins configured for localhost and deployed frontend.
 - `FRONTEND_URL` matches deployed frontend URL exactly.
 - CORS credentials enabled.

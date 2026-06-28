@@ -16,6 +16,7 @@ import { EmptyState } from '../ui/EmptyState';
 import { ErrorState } from '../ui/ErrorState';
 
 const emptyAddress: AddressPayload = {
+  label: 'Home',
   fullName: '',
   phone: '',
   addressLine1: '',
@@ -28,6 +29,7 @@ const emptyAddress: AddressPayload = {
 
 function toPayload(address: UserAddress): AddressPayload {
   return {
+    label: address.label,
     fullName: address.fullName,
     phone: address.phone,
     addressLine1: address.addressLine1,
@@ -186,6 +188,9 @@ export function AddressesPageContent() {
             <article key={address.id} className="border border-[#ddd4c8] p-4 sm:p-5">
               <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                 <div>
+                  <p className="mb-2 text-xs font-medium uppercase tracking-[0.16em] text-[#777777]">
+                    {address.label}
+                  </p>
                   <div className="flex flex-wrap items-center gap-3">
                     <p className="text-lg">{address.fullName}</p>
                     {address.isDefault && (
@@ -243,6 +248,7 @@ export function AddressesPageContent() {
           {(
             [
               ['fullName', 'Full name'],
+              ['label', 'Address name'],
               ['phone', 'Phone'],
               ['addressLine1', 'Address line 1'],
               ['addressLine2', 'Address line 2'],

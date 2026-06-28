@@ -20,15 +20,18 @@ export function AuthNav() {
 
   if (status === 'loading') {
     return (
-      <span className="text-xs uppercase tracking-[0.16em] text-[#777777]">
+      <Link
+        href="/account"
+        className="cursor-pointer text-xs uppercase tracking-[0.16em] text-[#777777] underline-offset-8 hover:text-[#111111] hover:underline"
+      >
         Account
-      </span>
+      </Link>
     );
   }
 
   if (!user) {
     return (
-      <Link href="/login" className="underline-offset-8 hover:underline">
+      <Link href="/login" className="cursor-pointer underline-offset-8 hover:underline">
         Account
       </Link>
     );
@@ -36,14 +39,14 @@ export function AuthNav() {
 
   return (
     <>
-      <Link href="/account" className="underline-offset-8 hover:underline">
+      <Link href="/account" className="cursor-pointer underline-offset-8 hover:underline">
         Account
       </Link>
       <button
         type="button"
         disabled={isLoggingOut}
         onClick={handleLogout}
-        className="hidden underline-offset-8 hover:underline disabled:text-[#777777] sm:inline"
+        className="hidden cursor-pointer underline-offset-8 hover:underline disabled:cursor-not-allowed disabled:text-[#777777] sm:inline"
       >
         {isLoggingOut ? 'Logging out' : 'Logout'}
       </button>

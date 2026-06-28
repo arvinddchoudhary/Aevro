@@ -18,6 +18,7 @@ import { AuthService } from './auth.service';
 import { GoogleLoginDto } from './dto/google-login.dto';
 import { LoginDto } from './dto/login.dto';
 import { RegisterDto } from './dto/register.dto';
+import { VerifyEmailOtpDto } from './dto/verify-email-otp.dto';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { AuthenticatedRequest } from './types/authenticated-request';
 
@@ -43,6 +44,7 @@ export class AuthController {
       success: true,
       data: {
         user: result.user,
+        emailVerification: result.emailVerification,
       },
     };
   }
@@ -129,6 +131,38 @@ export class AuthController {
       data: {
         user,
       },
+    };
+  }
+
+  @Post('verify-email-otp')
+  @UseGuards(JwtAuthGuard)
+  async verifyEmailOtp(
+    @Req() request: AuthenticatedRequest,
+    @Body() dto: VerifyEmailOtpDto,
+  ) {
+    const user = await this.authService.verifyEmailOtp(
+      request.user?.id ?? '',
+      dto.code,
+    );
+
+    return {
+      success: true,
+      data: {
+        user,
+      },
+    };
+  }
+
+  @Post('resend-email-otp')
+  @UseGuards(JwtAuthGuard)
+  async resendEmailOtp(@Req() request: AuthenticatedRequest) {
+    const result = await this.authService.resendEmailVerificationOtp(
+      request.user?.id ?? '',
+    );
+
+    return {
+      success: true,
+      data: result,
     };
   }
 

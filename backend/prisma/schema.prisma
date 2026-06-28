@@ -51,6 +51,29 @@ enum WebhookEventStatus {
   IGNORED
 }
 
+enum EmailNotificationStatus {
+  PENDING
+  SENT
+  DELIVERED
+  BOUNCED
+  FAILED
+}
+
+enum EmailEventType {
+  ORDER_CONFIRMED_CUSTOMER
+  ORDER_CONFIRMED_ADMIN
+  ORDER_SHIPPED
+  ORDER_DELIVERED
+  PAYMENT_FAILED
+  EMAIL_VERIFICATION_OTP
+  REFUND_INITIATED
+  REFUND_COMPLETED
+  RETURN_REQUEST_RECEIVED
+  LOW_STOCK_ALERT
+  PASSWORD_RESET
+  WELCOME
+}
+
 enum AuthProvider {
   EMAIL
   GOOGLE
@@ -75,8 +98,10 @@ model User {
   authAccounts    AuthAccount[]
   refreshSessions RefreshSession[]
   addresses       UserAddress[]
+  emailVerificationOtps EmailVerificationOtp[]
   cartItems       CartItem[]
   orders          Order[]
+  emailNotifications EmailNotification[]
   createdAt       DateTime         @default(now())
   updatedAt       DateTime         @updatedAt
 
@@ -88,6 +113,7 @@ model UserAddress {
   id           String   @id @default(cuid())
   userId       String
   user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  label        String   @default("Home")
   fullName     String
   phone        String
   addressLine1 String
@@ -103,6 +129,21 @@ model UserAddress {
   @@index([userId])
   @@index([userId, isDefault])
   @@map("user_addresses")
+}
+
+model EmailVerificationOtp {
+  id         String    @id @default(cuid())
+  userId     String
+  user       User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  codeHash   String
+  expiresAt  DateTime
+  consumedAt DateTime?
+  attempts   Int       @default(0)
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+
+  @@index([userId, expiresAt])
+  @@map("email_verification_otps")
 }
 
 model AuthAccount {
@@ -248,6 +289,7 @@ model Order {
   idempotencyKey  String?     @unique
   items           OrderItem[]
   payment         Payment?
+  emailNotifications EmailNotification[]
   createdAt       DateTime    @default(now())
   updatedAt       DateTime    @updatedAt
 
@@ -339,6 +381,35 @@ model WebhookEvent {
   @@index([provider, eventType])
   @@index([status])
   @@map("webhook_events")
+}
+
+model EmailNotification {
+  id              String                  @id @default(cuid())
+  orderId         String?
+  order           Order?                  @relation(fields: [orderId], references: [id], onDelete: SetNull)
+  userId          String?
+  user            User?                   @relation(fields: [userId], references: [id], onDelete: SetNull)
+  eventType       EmailEventType
+  recipientEmail  String
+  recipientName   String?
+  subject         String
+  status          EmailNotificationStatus @default(PENDING)
+  brevoMessageId  String?
+  idempotencyKey  String                  @unique
+  errorMessage    String?
+  sentAt          DateTime?
+  deliveredAt     DateTime?
+  failedAt        DateTime?
+  createdAt       DateTime                @default(now())
+  updatedAt       DateTime                @updatedAt
+
+  @@index([orderId])
+  @@index([userId])
+  @@index([eventType])
+  @@index([status])
+  @@index([brevoMessageId])
+  @@index([recipientEmail])
+  @@map("email_notifications")
 }
 
 model HomepageSection {
