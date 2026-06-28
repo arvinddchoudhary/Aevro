@@ -144,6 +144,19 @@ COOKIE_DOMAIN=
 CLOUDINARY_CLOUD_NAME=your_cloudinary_cloud_name
 CLOUDINARY_API_KEY=your_cloudinary_api_key
 CLOUDINARY_API_SECRET=your_cloudinary_api_secret
+BREVO_API_KEY=your_brevo_transactional_api_key
+BREVO_SENDER_EMAIL=orders@aevro.com
+BREVO_SENDER_NAME=AEVRO
+BREVO_REPLY_TO_EMAIL=support@aevro.com
+BREVO_REPLY_TO_NAME=AEVRO Support
+BREVO_TEMPLATE_ORDER_CONFIRMED_CUSTOMER=1
+BREVO_TEMPLATE_ORDER_CONFIRMED_ADMIN=2
+BREVO_TEMPLATE_ORDER_SHIPPED=3
+BREVO_TEMPLATE_ORDER_DELIVERED=4
+BREVO_TEMPLATE_PAYMENT_FAILED=5
+BREVO_TEMPLATE_EMAIL_VERIFICATION_OTP=6
+AEVRO_ADMIN_EMAIL=orders@aevro.com
+AEVRO_SUPPORT_EMAIL=support@aevro.com
 ```
 
 ## Neon + Prisma Setup
@@ -173,6 +186,9 @@ backend/prisma/migrations/000004_product_variants_cloudinary/migration.sql
 backend/prisma/migrations/000005_inventory_variant_order_items/migration.sql
 backend/prisma/migrations/000006_user_profile_addresses/migration.sql
 backend/prisma/migrations/000007_homepage_cms/migration.sql
+backend/prisma/migrations/000008_razorpay_reliability_hardening/migration.sql
+backend/prisma/migrations/000009_brevo_email_notifications/migration.sql
+backend/prisma/migrations/000010_email_otp_address_label/migration.sql
 ```
 
 For deployed environments, use:
@@ -219,6 +235,143 @@ Production webhook URL:
 ```txt
 https://your-render-api.onrender.com/api/v1/webhooks/razorpay
 ```
+
+## Brevo Transactional Email Setup
+
+1. Create or log in to a Brevo account.
+2. Enable transactional email.
+3. Verify the sender domain before production.
+4. Add DKIM, DMARC, and SPF records from Brevo to your DNS.
+5. Create transactional templates and copy their numeric template IDs into
+   `backend/.env`.
+6. Add the backend-only `BREVO_API_KEY` to Render and local `backend/.env`.
+7. Restart the backend after changing `.env`.
+
+Recommended sender addresses:
+
+```txt
+orders@aevro.com
+support@aevro.com
+returns@aevro.com
+no-reply@aevro.com
+```
+
+Recommended template variables:
+
+- `customerName`
+- `orderNumber`
+- `otpCode`
+- `verificationCode`
+- `expiresInMinutes`
+- `orderId`
+- `paymentStatus`
+- `paymentStatusText`
+- `orderDate`
+- `orderDateText`
+- `itemsText`
+- `orderTotal`
+- `totalPaid`
+- `shippingAddressText`
+- `estimatedDelivery`
+- `orderUrl`
+- `supportEmail`
+- `customerEmail`
+- `customerPhone`
+- `customerPhoneText`
+- `paymentMethod`
+- `adminOrderUrl`
+
+Do not print `{{params.items}}` or `{{params.shippingAddress}}` directly in a
+Brevo text block. Those are structured values for future HTML templates. Use
+`{{params.itemsText}}` and `{{params.shippingAddressText}}` for the current
+templates.
+
+Customer order confirmation template:
+
+```txt
+Hi {{params.customerName}},
+
+Thank you for shopping with AEVRO.
+
+Your order {{params.orderNumber}} has been confirmed.
+
+Order total: {{params.orderTotal}}
+Payment status: {{params.paymentStatusText}}
+
+Items:
+{{params.itemsText}}
+
+Shipping address:
+{{params.shippingAddressText}}
+
+Estimated delivery:
+{{params.estimatedDelivery}}
+
+View your order:
+{{params.orderUrl}}
+
+If you need help, contact us at {{params.supportEmail}}.
+
+AEVRO
+```
+
+Admin order confirmation template:
+
+```txt
+New AEVRO order received.
+
+Order: {{params.orderNumber}}
+Customer: {{params.customerName}}
+Email: {{params.customerEmail}}
+Phone: {{params.customerPhoneText}}
+
+Order total: {{params.orderTotal}}
+Payment status: {{params.paymentStatusText}}
+
+Items:
+{{params.itemsText}}
+
+Shipping address:
+{{params.shippingAddressText}}
+
+Order URL:
+{{params.adminOrderUrl}}
+
+AEVRO Admin
+```
+
+Email verification OTP template:
+
+```txt
+Hi {{params.customerName}},
+
+Your AEVRO verification code is:
+
+{{params.otpCode}}
+
+This code expires in {{params.expiresInMinutes}} minutes.
+
+If you did not create an AEVRO account, you can ignore this email.
+
+Need help? Contact us at {{params.supportEmail}}.
+
+AEVRO
+```
+
+Local Brevo webhook URL:
+
+```txt
+http://localhost:8000/api/v1/webhooks/brevo
+```
+
+Production Brevo webhook URL:
+
+```txt
+https://your-render-api.onrender.com/api/v1/webhooks/brevo
+```
+
+Subscribe the Brevo transactional webhook to delivery events such as `sent`,
+`delivered`, `soft_bounce`, `hard_bounce`, `blocked`, `invalid`, and `error`.
 
 Subscribe the webhook to:
 

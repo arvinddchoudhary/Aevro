@@ -6,6 +6,7 @@ import { CategoriesModule } from './categories/categories.module';
 import { validateEnvironment } from './config/env.validation';
 import { HealthModule } from './health/health.module';
 import { HomepageModule } from './homepage/homepage.module';
+import { NotificationsModule } from './notifications/notifications.module';
 import { OrdersModule } from './orders/orders.module';
 import { PaymentsModule } from './payments/payments.module';
 import { ProductsModule } from './products/products.module';
@@ -23,6 +24,7 @@ import { UsersModule } from './users/users.module';
     UsersModule,
     UsersApiModule,
     AuthModule,
+    NotificationsModule,
     AdminModule,
     CategoriesModule,
     ProductsModule,

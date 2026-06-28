@@ -9,11 +9,23 @@ export type AuthUser = {
   updatedAt: string;
 };
 
+export type EmailVerificationDelivery = {
+  sent: boolean;
+  expiresInMinutes: number;
+  error?: string | null;
+};
+
+export type RegisterResult = {
+  user: AuthUser;
+  emailVerification?: EmailVerificationDelivery;
+};
+
 export type AuthResponse =
   | {
       success: true;
       data: {
         user: AuthUser;
+        emailVerification?: EmailVerificationDelivery;
       };
     }
   | {

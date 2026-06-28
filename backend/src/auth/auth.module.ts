@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { PrismaModule } from '../prisma/prisma.module';
+import { NotificationsModule } from '../notifications/notifications.module';
 import { UsersModule } from '../users/users.module';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
@@ -9,7 +10,7 @@ import { OptionalJwtAuthGuard } from './guards/optional-jwt-auth.guard';
 import { RolesGuard } from './guards/roles.guard';
 
 @Module({
-  imports: [ConfigModule, PrismaModule, UsersModule],
+  imports: [ConfigModule, PrismaModule, UsersModule, NotificationsModule],
   controllers: [AuthController],
   providers: [AuthService, JwtAuthGuard, OptionalJwtAuthGuard, RolesGuard],
   exports: [AuthService, JwtAuthGuard, OptionalJwtAuthGuard, RolesGuard],

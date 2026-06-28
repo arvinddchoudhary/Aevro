@@ -10,6 +10,8 @@ GET /api/v1/health/database
 POST /api/v1/auth/register
 POST /api/v1/auth/login
 POST /api/v1/auth/google
+POST /api/v1/auth/verify-email-otp
+POST /api/v1/auth/resend-email-otp
 POST /api/v1/auth/refresh
 POST /api/v1/auth/logout
 GET /api/v1/auth/me
@@ -49,6 +51,7 @@ GET /api/v1/orders/me/:id
 POST /api/v1/payments/razorpay/order
 POST /api/v1/payments/razorpay/verify
 POST /api/v1/webhooks/razorpay
+POST /api/v1/webhooks/brevo
 ```
 
 `GET /api/v1/health/database` verifies Prisma can connect to PostgreSQL.
@@ -105,6 +108,30 @@ POST /api/v1/auth/google
 
 The backend verifies this ID token against `GOOGLE_CLIENT_ID`.
 
+### Verify Email OTP
+
+```txt
+POST /api/v1/auth/verify-email-otp
+```
+
+Requires the `aevro_access_token` httpOnly cookie. The backend verifies the
+latest active 6-digit OTP and marks the user's email as verified.
+
+```json
+{
+  "code": "123456"
+}
+```
+
+### Resend Email OTP
+
+```txt
+POST /api/v1/auth/resend-email-otp
+```
+
+Requires the `aevro_access_token` httpOnly cookie. Creates a new 10-minute OTP
+and sends it to the current user's email address.
+
 ### Refresh
 
 ```txt
@@ -149,6 +176,8 @@ The frontend uses:
 - `POST /api/v1/auth/register`
 - `POST /api/v1/auth/login`
 - `POST /api/v1/auth/google`
+- `POST /api/v1/auth/verify-email-otp`
+- `POST /api/v1/auth/resend-email-otp`
 - `POST /api/v1/auth/refresh`
 - `POST /api/v1/auth/logout`
 - `GET /api/v1/auth/me`
@@ -183,6 +212,7 @@ Address body:
 
 ```json
 {
+  "label": "Home",
   "fullName": "Customer Name",
   "phone": "+91 9999999999",
   "addressLine1": "Street address",
@@ -197,6 +227,8 @@ Address body:
 Users can only read and mutate their own saved addresses. Setting one address
 as default clears the previous default address for the same user. Checkout may
 prefill customer and shipping details from the default saved address.
+Address labels are customer-facing names such as `Home`, `Office`, or
+`Parents Home`.
 
 ## Phase 14 Admin Foundation
 
@@ -938,6 +970,77 @@ Run it with:
 cd backend
 npm run prisma:deploy
 ```
+
+## Phase 26 Brevo Email Notification API
+
+Transactional emails are sent from the backend only. The frontend never calls
+Brevo and never receives `BREVO_API_KEY`.
+
+Email notification rows are stored in `email_notifications` and keyed by a
+unique `idempotencyKey` so Razorpay verify plus Razorpay webhook retries do not
+send duplicate emails.
+
+Triggered email events:
+
+```txt
+ORDER_CONFIRMED_CUSTOMER
+ORDER_CONFIRMED_ADMIN
+ORDER_SHIPPED
+ORDER_DELIVERED
+PAYMENT_FAILED
+EMAIL_VERIFICATION_OTP
+```
+
+Reserved event foundations:
+
+```txt
+REFUND_INITIATED
+REFUND_COMPLETED
+RETURN_REQUEST_RECEIVED
+LOW_STOCK_ALERT
+PASSWORD_RESET
+WELCOME
+```
+
+Order confirmation emails are created only after backend payment verification
+marks the local payment `PAID` and the order `CONFIRMED`.
+
+### Brevo Webhook
+
+```txt
+POST /api/v1/webhooks/brevo
+```
+
+Configure this URL in Brevo transactional webhooks:
+
+```txt
+https://your-render-api.onrender.com/api/v1/webhooks/brevo
+```
+
+Supported Brevo events:
+
+```txt
+sent
+delivered
+opened
+clicked
+soft_bounce
+hard_bounce
+invalid
+blocked
+error
+unsubscribed
+```
+
+Status mapping:
+
+- `sent` -> `SENT`
+- `delivered` -> `DELIVERED`
+- `soft_bounce` / `hard_bounce` -> `BOUNCED`
+- `error` / `blocked` / `invalid` -> `FAILED`
+
+Open, click, and unsubscribe events are accepted but do not change the current
+delivery status in this phase.
 
 ## Planned API Direction
 

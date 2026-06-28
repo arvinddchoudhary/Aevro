@@ -1,4 +1,10 @@
-import { IsOptional, IsString, Matches, MinLength } from 'class-validator';
+import {
+  IsOptional,
+  IsString,
+  Matches,
+  MaxLength,
+  MinLength,
+} from 'class-validator';
 
 export class UpdateProfileDto {
   @IsString()
@@ -13,6 +19,12 @@ export class UpdateProfileDto {
 }
 
 export class CreateAddressDto {
+  @IsString()
+  @MinLength(2)
+  @MaxLength(40)
+  @IsOptional()
+  label?: string;
+
   @IsString()
   @MinLength(2)
   fullName!: string;

@@ -86,6 +86,62 @@ class EnvironmentVariables {
   @IsString()
   @IsOptional()
   CLOUDINARY_API_SECRET?: string;
+
+  @IsString()
+  @IsOptional()
+  BREVO_API_KEY?: string;
+
+  @IsString()
+  @IsOptional()
+  BREVO_SENDER_EMAIL?: string;
+
+  @IsString()
+  @IsOptional()
+  BREVO_SENDER_NAME?: string;
+
+  @IsString()
+  @IsOptional()
+  BREVO_REPLY_TO_EMAIL?: string;
+
+  @IsString()
+  @IsOptional()
+  BREVO_REPLY_TO_NAME?: string;
+
+  @IsString()
+  @IsOptional()
+  BREVO_TEMPLATE_ORDER_CONFIRMED_CUSTOMER?: string;
+
+  @IsString()
+  @IsOptional()
+  BREVO_TEMPLATE_ORDER_CONFIRMED_ADMIN?: string;
+
+  @IsString()
+  @IsOptional()
+  BREVO_TEMPLATE_ORDER_SHIPPED?: string;
+
+  @IsString()
+  @IsOptional()
+  BREVO_TEMPLATE_ORDER_DELIVERED?: string;
+
+  @IsString()
+  @IsOptional()
+  BREVO_TEMPLATE_PAYMENT_FAILED?: string;
+
+  @IsString()
+  @IsOptional()
+  BREVO_TEMPLATE_EMAIL_VERIFICATION_OTP?: string;
+
+  @IsString()
+  @IsOptional()
+  AEVRO_ADMIN_EMAIL?: string;
+
+  @IsString()
+  @IsOptional()
+  ADMIN_ORDER_NOTIFICATION_EMAIL?: string;
+
+  @IsString()
+  @IsOptional()
+  AEVRO_SUPPORT_EMAIL?: string;
 }
 
 export function validateEnvironment(config: Record<string, unknown>) {

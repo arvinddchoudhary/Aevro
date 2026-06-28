@@ -9,6 +9,7 @@ export type UpdateProfilePayload = {
 
 export type UserAddress = {
   id: string;
+  label: string;
   fullName: string;
   phone: string;
   addressLine1: string;
@@ -23,6 +24,7 @@ export type UserAddress = {
 };
 
 export type AddressPayload = {
+  label?: string;
   fullName: string;
   phone: string;
   addressLine1: string;

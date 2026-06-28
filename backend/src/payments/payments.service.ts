@@ -2,6 +2,7 @@ import {
   BadRequestException,
   Inject,
   Injectable,
+  Logger,
   NotFoundException,
   ServiceUnavailableException,
 } from '@nestjs/common';
@@ -16,6 +17,7 @@ import {
   WebhookEventStatus,
 } from '@prisma/client';
 import { createHash, createHmac, timingSafeEqual } from 'crypto';
+import { NotificationsService } from '../notifications/notifications.service';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateRazorpayOrderDto } from './dto/create-razorpay-order.dto';
 import { VerifyRazorpayPaymentDto } from './dto/verify-razorpay-payment.dto';
@@ -79,6 +81,7 @@ type PaymentForInventory = Prisma.PaymentGetPayload<{
 
 @Injectable()
 export class PaymentsService {
+  private readonly logger = new Logger(PaymentsService.name);
   private readonly razorpayKeyId: string;
   private readonly razorpayKeySecret: string;
   private readonly razorpayWebhookSecret: string;
@@ -86,6 +89,8 @@ export class PaymentsService {
   constructor(
     @Inject(PrismaService) private readonly prisma: PrismaService,
     @Inject(ConfigService) configService: ConfigService,
+    @Inject(NotificationsService)
+    private readonly notificationsService: NotificationsService,
   ) {
     this.razorpayKeyId = configService.get<string>('RAZORPAY_KEY_ID') ?? '';
     this.razorpayKeySecret =
@@ -279,6 +284,7 @@ export class PaymentsService {
       providerPaymentId: dto.razorpayPaymentId,
       providerSignature: dto.razorpaySignature,
     });
+    this.queueOrderPaidEmails(updatedPayment.orderId);
 
     return this.serializePayment(updatedPayment);
   }
@@ -445,9 +451,10 @@ export class PaymentsService {
       rawStatus: razorpayPayment.status,
     });
 
-    await this.markPaymentSuccessful(payment.id, {
+    const updatedPayment = await this.markPaymentSuccessful(payment.id, {
       providerPaymentId: razorpayPayment.id,
     });
+    this.queueOrderPaidEmails(updatedPayment.orderId);
 
     return {
       processed: true,
@@ -812,7 +819,16 @@ export class PaymentsService {
     providerPaymentId?: string,
     providerSignature?: string,
   ) {
-    await this.prisma.payment.updateMany({
+    const payment = await this.prisma.payment.findUnique({
+      where: {
+        id: paymentId,
+      },
+      select: {
+        orderId: true,
+      },
+    });
+
+    const result = await this.prisma.payment.updateMany({
       where: {
         id: paymentId,
         status: {
@@ -824,6 +840,26 @@ export class PaymentsService {
         providerPaymentId,
         providerSignature,
       },
+    });
+
+    if (result.count > 0 && payment?.orderId) {
+      this.queuePaymentFailedEmail(payment.orderId);
+    }
+  }
+
+  private queueOrderPaidEmails(orderId: string) {
+    void this.notificationsService.handleOrderPaid(orderId).catch((error) => {
+      this.logger.error(
+        error instanceof Error ? error.message : 'Order email notification failed.',
+      );
+    });
+  }
+
+  private queuePaymentFailedEmail(orderId: string) {
+    void this.notificationsService.handlePaymentFailed(orderId).catch((error) => {
+      this.logger.error(
+        error instanceof Error ? error.message : 'Payment failed email notification failed.',
+      );
     });
   }
 

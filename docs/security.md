@@ -115,6 +115,19 @@ Razorpay security expectations:
 - Retried verification must not double-update payment/order status.
 - Retried verification must not double-deduct inventory.
 
+### Transactional Email
+
+Brevo security expectations:
+
+- `BREVO_API_KEY` stays backend-only.
+- Frontend never calls Brevo directly.
+- Order confirmation emails are sent only after backend payment verification.
+- Email notification rows use unique idempotency keys to prevent duplicates.
+- Razorpay verify and Razorpay webhook retries must not send duplicate emails.
+- Brevo webhook updates delivery/bounce/failure status only.
+- Email failures are recorded but must not fail payment success responses.
+- Sender domains should be authenticated with DKIM, DMARC, and SPF.
+
 ### Error Responses
 
 Production error responses should not expose:
@@ -125,6 +138,7 @@ Production error responses should not expose:
 - JWT secrets
 - Cloudinary secrets
 - Razorpay secrets
+- Brevo secrets
 - raw provider exceptions
 
 Logs can contain operational details, but client responses should stay clean.
@@ -160,6 +174,17 @@ CLOUDINARY_API_SECRET
 RAZORPAY_KEY_ID
 RAZORPAY_KEY_SECRET
 RAZORPAY_WEBHOOK_SECRET
+BREVO_API_KEY
+BREVO_SENDER_EMAIL
+BREVO_SENDER_NAME
+BREVO_REPLY_TO_EMAIL
+BREVO_TEMPLATE_ORDER_CONFIRMED_CUSTOMER
+BREVO_TEMPLATE_ORDER_CONFIRMED_ADMIN
+BREVO_TEMPLATE_ORDER_SHIPPED
+BREVO_TEMPLATE_ORDER_DELIVERED
+BREVO_TEMPLATE_PAYMENT_FAILED
+AEVRO_ADMIN_EMAIL
+AEVRO_SUPPORT_EMAIL
 NODE_ENV
 PORT
 ```
@@ -187,5 +212,8 @@ Before switching to live traffic:
 - Failed Razorpay verification does not mark payment successful.
 - Repeated successful Razorpay verification does not double-deduct stock.
 - Duplicate Razorpay webhook delivery is stored and ignored safely.
+- Order-confirmation email rows are created after successful payment.
+- Repeated payment verification/webhook does not create duplicate email rows.
+- Brevo webhook updates email delivery status.
 - Checkout shows safe error messages for insufficient stock.
 - No real secrets are committed to Git.

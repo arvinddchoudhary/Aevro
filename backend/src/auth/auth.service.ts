@@ -1,6 +1,8 @@
 import {
+  BadRequestException,
   Inject,
   Injectable,
+  Logger,
   ServiceUnavailableException,
   UnauthorizedException,
 } from '@nestjs/common';
@@ -10,9 +12,11 @@ import { OAuth2Client } from 'google-auth-library';
 import {
   createHmac,
   randomBytes,
+  randomInt,
   scrypt as scryptCallback,
   timingSafeEqual,
 } from 'crypto';
+import { NotificationsService } from '../notifications/notifications.service';
 import { promisify } from 'util';
 import { PrismaService } from '../prisma/prisma.service';
 import { UsersService } from '../users/users.service';
@@ -36,6 +40,7 @@ type JwtPayload = {
 
 @Injectable()
 export class AuthService {
+  private readonly logger = new Logger(AuthService.name);
   private readonly googleClient = new OAuth2Client();
   private readonly accessSecret: string;
   private readonly refreshSecret: string;
@@ -46,6 +51,8 @@ export class AuthService {
   constructor(
     @Inject(PrismaService) private readonly prisma: PrismaService,
     @Inject(UsersService) private readonly usersService: UsersService,
+    @Inject(NotificationsService)
+    private readonly notificationsService: NotificationsService,
     @Inject(ConfigService) configService: ConfigService,
   ) {
     this.accessSecret = configService.get<string>('JWT_ACCESS_SECRET') ?? '';
@@ -67,7 +74,37 @@ export class AuthService {
       passwordHash,
     });
 
-    return this.createAuthResult(user, context);
+    const result = await this.createAuthResult(user, context);
+    let emailVerification = {
+      sent: true,
+      expiresInMinutes: 0,
+      error: null as string | null,
+    };
+
+    try {
+      const expiresInMinutes = await this.createAndSendEmailVerificationOtp(user);
+      emailVerification = {
+        sent: true,
+        expiresInMinutes,
+        error: null,
+      };
+    } catch (error) {
+      const message = this.errorMessage(error);
+      this.logger.warn(
+        `Email verification OTP send failed | userId=${user.id} | email=${user.email} | error=${message}`,
+      );
+      emailVerification = {
+        sent: false,
+        expiresInMinutes: 0,
+        error:
+          'Account created, but the verification email could not be sent. Please use resend code.',
+      };
+    }
+
+    return {
+      ...result,
+      emailVerification,
+    };
   }
 
   async login(dto: LoginDto, context: SessionContext) {
@@ -175,6 +212,99 @@ export class AuthService {
     if (!user) {
       throw new UnauthorizedException('User not found.');
     }
+
+    return this.usersService.serializeUser(user);
+  }
+
+  async resendEmailVerificationOtp(userId: string) {
+    this.assertJwtConfigured();
+
+    const user = await this.usersService.findById(userId);
+
+    if (!user) {
+      throw new UnauthorizedException('User not found.');
+    }
+
+    if (user.emailVerified) {
+      return {
+        alreadyVerified: true,
+        sent: false,
+        expiresInMinutes: 0,
+      };
+    }
+
+    const expiresInMinutes = await this.createAndSendEmailVerificationOtp(user);
+
+    return {
+      alreadyVerified: false,
+      sent: true,
+      expiresInMinutes,
+    };
+  }
+
+  async verifyEmailOtp(userId: string, code: string) {
+    this.assertJwtConfigured();
+
+    const trimmedCode = code.trim();
+
+    if (!/^\d{6}$/.test(trimmedCode)) {
+      throw new BadRequestException('Enter the 6-digit OTP.');
+    }
+
+    const otp = await this.prisma.emailVerificationOtp.findFirst({
+      where: {
+        userId,
+        consumedAt: null,
+      },
+      orderBy: {
+        createdAt: 'desc',
+      },
+    });
+
+    if (!otp || otp.expiresAt <= new Date()) {
+      throw new BadRequestException('OTP expired. Please request a new code.');
+    }
+
+    if (otp.attempts >= 5) {
+      throw new BadRequestException(
+        'Too many attempts. Please request a new code.',
+      );
+    }
+
+    if (!this.safeCompare(this.hashEmailOtp(trimmedCode), otp.codeHash)) {
+      await this.prisma.emailVerificationOtp.update({
+        where: {
+          id: otp.id,
+        },
+        data: {
+          attempts: {
+            increment: 1,
+          },
+        },
+      });
+
+      throw new BadRequestException('Invalid OTP code.');
+    }
+
+    const user = await this.prisma.$transaction(async (tx) => {
+      await tx.emailVerificationOtp.update({
+        where: {
+          id: otp.id,
+        },
+        data: {
+          consumedAt: new Date(),
+        },
+      });
+
+      return tx.user.update({
+        where: {
+          id: userId,
+        },
+        data: {
+          emailVerified: true,
+        },
+      });
+    });
 
     return this.usersService.serializeUser(user);
   }
@@ -289,6 +419,49 @@ export class AuthService {
       .digest('hex');
   }
 
+  private async createAndSendEmailVerificationOtp(user: User) {
+    const code = randomInt(100000, 1000000).toString();
+    const expiresInMinutes = 10;
+    const expiresAt = new Date(Date.now() + expiresInMinutes * 60 * 1000);
+
+    await this.prisma.$transaction([
+      this.prisma.emailVerificationOtp.updateMany({
+        where: {
+          userId: user.id,
+          consumedAt: null,
+        },
+        data: {
+          consumedAt: new Date(),
+        },
+      }),
+      this.prisma.emailVerificationOtp.create({
+        data: {
+          userId: user.id,
+          codeHash: this.hashEmailOtp(code),
+          expiresAt,
+        },
+      }),
+    ]);
+
+    await this.notificationsService.sendEmailVerificationOtp({
+      user: {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+      },
+      code,
+      expiresInMinutes,
+    });
+
+    return expiresInMinutes;
+  }
+
+  private hashEmailOtp(code: string) {
+    return createHmac('sha256', this.refreshSecret || this.accessSecret)
+      .update(code)
+      .digest('hex');
+  }
+
   private async hashPassword(password: string) {
     const salt = randomBytes(16).toString('base64url');
     const derivedKey = (await scrypt(password, salt, 64)) as Buffer;
@@ -343,5 +516,9 @@ export class AuthService {
     if (!this.accessSecret || !this.refreshSecret) {
       throw new ServiceUnavailableException('Authentication is not configured.');
     }
+  }
+
+  private errorMessage(error: unknown) {
+    return error instanceof Error ? error.message : 'Unknown error';
   }
 }

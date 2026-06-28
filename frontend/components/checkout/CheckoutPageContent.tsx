@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { FormEvent, useEffect, useState } from 'react';
+import { FormEvent, useCallback, useEffect, useState } from 'react';
 import {
   CheckoutFormErrors,
   CheckoutFormValues,
@@ -15,11 +15,12 @@ import {
   createRazorpayOrder,
   verifyRazorpayPayment,
 } from '../../lib/api/payments';
-import { getUserAddresses } from '../../lib/api/users';
+import { createUserAddress, getUserAddresses } from '../../lib/api/users';
 import { useAuth } from '../../lib/auth';
 import { formatPrice } from '../../lib/format';
 import { loadRazorpayScript, openRazorpayCheckout } from '../../lib/razorpay';
 import { useCart } from '../../lib/cart';
+import type { UserAddress } from '../../types/user';
 import { EmptyState } from '../ui/EmptyState';
 
 const initialValues: CheckoutFormValues = {
@@ -77,6 +78,10 @@ export function CheckoutPageContent() {
   const [values, setValues] = useState(initialValues);
   const [errors, setErrors] = useState<CheckoutFormErrors>({});
   const [formError, setFormError] = useState<string | null>(null);
+  const [savedAddresses, setSavedAddresses] = useState<UserAddress[]>([]);
+  const [selectedAddressId, setSelectedAddressId] = useState('new');
+  const [saveAddress, setSaveAddress] = useState(false);
+  const [addressLabel, setAddressLabel] = useState('Home');
   const [pendingOrderId, setPendingOrderId] = useState<string | null>(null);
   const [paymentIdempotencyKey, setPaymentIdempotencyKey] = useState(
     createPaymentIdempotencyKey,
@@ -90,6 +95,24 @@ export function CheckoutPageContent() {
     (item) => item.stock > 0 && item.stock <= 5,
   );
 
+  const applyAddress = useCallback((address: UserAddress) => {
+    setValues((currentValues) => ({
+      ...currentValues,
+      fullName: address.fullName,
+      email: currentValues.email || user?.email || '',
+      phone: address.phone,
+      addressLine: [address.addressLine1, address.addressLine2]
+        .filter(Boolean)
+        .join(', '),
+      city: address.city,
+      state: address.state,
+      postalCode: address.postalCode,
+      country: address.country,
+    }));
+    setAddressLabel(address.label || 'Home');
+    setSaveAddress(false);
+  }, [user?.email]);
+
   useEffect(() => {
     async function loadDefaultAddress() {
       if (status !== 'authenticated' || !user) {
@@ -98,6 +121,7 @@ export function CheckoutPageContent() {
 
       try {
         const addresses = await getUserAddresses();
+        setSavedAddresses(addresses);
         const defaultAddress = addresses.find((address) => address.isDefault);
 
         if (!defaultAddress) {
@@ -110,22 +134,8 @@ export function CheckoutPageContent() {
           return;
         }
 
-        setValues((currentValues) => ({
-          ...currentValues,
-          fullName: currentValues.fullName || defaultAddress.fullName,
-          email: currentValues.email || user.email,
-          phone: currentValues.phone || defaultAddress.phone,
-          addressLine: currentValues.addressLine || [
-            defaultAddress.addressLine1,
-            defaultAddress.addressLine2,
-          ]
-            .filter(Boolean)
-            .join(', '),
-          city: currentValues.city || defaultAddress.city,
-          state: currentValues.state || defaultAddress.state,
-          postalCode: currentValues.postalCode || defaultAddress.postalCode,
-          country: currentValues.country || defaultAddress.country,
-        }));
+        setSelectedAddressId(defaultAddress.id);
+        applyAddress(defaultAddress);
       } catch {
         setValues((currentValues) => ({
           ...currentValues,
@@ -137,14 +147,34 @@ export function CheckoutPageContent() {
     }
 
     void loadDefaultAddress();
-  }, [status, user]);
+  }, [applyAddress, status, user]);
 
   const updateValue = (name: keyof CheckoutFormValues, value: string) => {
     setValues((currentValues) => ({ ...currentValues, [name]: value }));
+    if (['fullName', 'phone', 'addressLine', 'city', 'state', 'postalCode', 'country'].includes(name)) {
+      setSelectedAddressId('new');
+    }
     setErrors((currentErrors) => ({ ...currentErrors, [name]: undefined }));
     setFormError(null);
     setPendingOrderId(null);
     setPaymentIdempotencyKey(createPaymentIdempotencyKey());
+  };
+
+  const handleAddressSelection = (addressId: string) => {
+    setSelectedAddressId(addressId);
+    setFormError(null);
+    setPendingOrderId(null);
+    setPaymentIdempotencyKey(createPaymentIdempotencyKey());
+
+    if (addressId === 'new') {
+      setSaveAddress(savedAddresses.length === 0);
+      return;
+    }
+
+    const selectedAddress = savedAddresses.find((address) => address.id === addressId);
+    if (selectedAddress) {
+      applyAddress(selectedAddress);
+    }
   };
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
@@ -165,6 +195,20 @@ export function CheckoutPageContent() {
 
     try {
       setIsSubmitting(true);
+      if (status === 'authenticated' && selectedAddressId === 'new' && saveAddress) {
+        await createUserAddress({
+          label: addressLabel.trim() || 'Home',
+          fullName: values.fullName,
+          phone: values.phone,
+          addressLine1: values.addressLine,
+          city: values.city,
+          state: values.state,
+          postalCode: values.postalCode,
+          country: values.country,
+        });
+        setSaveAddress(false);
+      }
+
       setSubmitLabel(pendingOrderId ? 'Opening Razorpay' : 'Creating order');
       const order = pendingOrderId
         ? null
@@ -299,6 +343,79 @@ export function CheckoutPageContent() {
                 2. Shipping address
               </p>
             </div>
+            {status === 'authenticated' && (
+              <div className="mb-5 rounded-[6px] border border-[#e7ded2] bg-[#fffaf3]/60 p-4">
+                <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                  <div>
+                    <p className="text-xs font-medium uppercase tracking-[0.14em] text-[#514c45]">
+                      Saved addresses
+                    </p>
+                    <p className="mt-1 text-xs leading-5 text-[#777777]">
+                      Choose a saved address or add a new one for this order.
+                    </p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => handleAddressSelection('new')}
+                    className="h-9 cursor-pointer rounded-[4px] border border-[#111111] px-4 text-xs font-medium uppercase tracking-[0.1em] hover:bg-[#111111] hover:text-[#fffaf3]"
+                  >
+                    Add new
+                  </button>
+                </div>
+
+                {savedAddresses.length > 0 ? (
+                  <label className="mt-4 block">
+                    <span className="mb-2 block text-xs uppercase tracking-[0.16em] text-[#777777]">
+                      Select address
+                    </span>
+                    <select
+                      value={selectedAddressId}
+                      onChange={(event) => handleAddressSelection(event.target.value)}
+                      className="h-10 w-full cursor-pointer rounded-[4px] border border-[#ddd4c8] bg-[#fffaf3] px-4 text-sm outline-none focus:border-[#111111]"
+                    >
+                      <option value="new">New address</option>
+                      {savedAddresses.map((address) => (
+                        <option key={address.id} value={address.id}>
+                          {address.label} - {address.fullName}, {address.city}
+                          {address.isDefault ? ' (Default)' : ''}
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+                ) : (
+                  <p className="mt-4 text-xs leading-5 text-[#777777]">
+                    No saved addresses yet. You can save this one for next time.
+                  </p>
+                )}
+
+                {selectedAddressId === 'new' && (
+                  <div className="mt-4 grid gap-3 border-t border-[#e7ded2] pt-4">
+                    <label className="flex cursor-pointer items-center gap-3 text-sm text-[#514c45]">
+                      <input
+                        type="checkbox"
+                        checked={saveAddress}
+                        onChange={(event) => setSaveAddress(event.target.checked)}
+                        className="h-4 w-4 cursor-pointer accent-[#111111]"
+                      />
+                      Save this address for future orders
+                    </label>
+                    {saveAddress && (
+                      <label className="block">
+                        <span className="mb-2 block text-xs uppercase tracking-[0.16em] text-[#777777]">
+                          Address name
+                        </span>
+                        <input
+                          value={addressLabel}
+                          onChange={(event) => setAddressLabel(event.target.value)}
+                          placeholder="Home, Office, Parents"
+                          className="h-10 w-full rounded-[4px] border border-[#ddd4c8] bg-[#fffaf3] px-4 text-sm outline-none focus:border-[#111111]"
+                        />
+                      </label>
+                    )}
+                  </div>
+                )}
+              </div>
+            )}
             <div className="grid gap-4 md:grid-cols-6">
               <div className="md:col-span-6">
                 <CheckoutField
