@@ -6,7 +6,7 @@ export function Header() {
   const navigationLinks = [
     ['Home', '/'],
     ['Shop', '/products'],
-    ['Collections', '/products?sort=newest'],
+    // ['Collections', '/products?sort=newest'],
     ['About', '/about'],
     ['Lookbook', '/lookbook'],
   ];

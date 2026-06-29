@@ -60,15 +60,25 @@ export default function AboutPage() {
                 <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[#4d473f]">
                   Our story
                 </p>
-                <h1 className="mt-6 font-serif text-[3.35rem] font-light uppercase leading-[0.98] tracking-normal text-[#111111] sm:text-[4.8rem] lg:text-[4.7rem]">
+                <h1 className="mt-6 font-serif text-[3.35rem] font-light uppercase leading-[0.98] tracking-normal text-[#111111] sm:text-[4.8rem] lg:text-[3.7rem]">
                   Built on simplicity. Driven by purpose.
                 </h1>
-                <p className="mt-8 max-w-[390px] text-sm leading-7 text-[#3f3932]">
-                  AEVRO was created for those who value clarity in design and
-                  intention in every detail. We craft timeless trousers and
-                  modern essentials that elevate the way you live and dress,
-                  every single day.
-                </p>
+                <div className="mt-8 max-w-[390px] space-y-3   text-sm leading-7 text-[#3f3932]">
+                      <p>
+                        AEVRO was created with a simple idea: everyday clothing should feel thoughtfully
+                        designed.
+                        We begin with one product the pleated trouser. A timeless silhouette built
+                        with structure, ease, and versatility for work, travel, and everyday life.
+                    </p>
+                    <p>
+                        Instead of chasing trends, we focus on refined proportions, lasting design,
+                        and careful construction.
+                      </p>
+
+                      <p>This is only the beginning, 
+                        <br />
+                        Welcome to AEVRO.</p>
+              </div>
               </div>
             </div>
           </div>
@@ -110,10 +120,10 @@ export default function AboutPage() {
                 Expert tailoring. Premium fabrics. Timeless design.
               </h2>
               <p className="mt-7 text-sm leading-7 text-[#514c45]">
-                Every AEVRO piece is a result of thoughtful design and precision
-                craftsmanship. We work with carefully selected fabrics and
-                trusted makers to deliver trousers and essentials that look
-                sharp, feel exceptional, and last for years.
+                Every AEVRO garment begins with careful material selection and precise pattern development.
+                Our signature pleated trousers are designed with clean construction, balanced proportions, 
+                and attention to finishing details. From stitching to pressing, every stage is approached with 
+                consistency and care.
               </p>
               <Link
                 href="/products"
@@ -136,10 +146,12 @@ export default function AboutPage() {
                 Better choices. Greater impact.
               </h2>
               <p className="mt-7 text-sm leading-7 text-[#514c45]">
-                We are committed to building a more responsible brand. From
-                sourcing sustainable materials to ethical production and mindful
-                packaging, we continue to make choices that are better for
-                people and the planet.
+                We believe responsible fashion starts with thoughtful design.
+                AEVRO focuses on timeless garments instead of large seasonal collections, 
+                creating pieces made to last beyond trends.
+                Through considered production, durable materials, and long-term wear, 
+                we aim to reduce waste. As we grow, we will continue improving our 
+                sourcing, packaging, and manufacturing practices.
               </p>
               <Link
                 href="/lookbook"

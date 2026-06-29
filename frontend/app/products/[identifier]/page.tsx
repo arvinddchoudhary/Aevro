@@ -55,25 +55,6 @@ export default async function ProductDetailsPage({
         </div>
         <ProductVariantSelection product={product} />
 
-        <section className="mt-8 grid gap-3 rounded-[6px] border border-[#eadfd2] bg-[#fffaf3]/80 px-4 py-4 shadow-[0_18px_45px_rgba(49,37,26,0.05)] sm:grid-cols-2 sm:px-5 lg:grid-cols-4">
-          {[
-            ['Free shipping', 'On all orders above ₹ 4999'],
-            ['Easy returns', '14 days return policy'],
-            ['Secure payments', '100% secure checkout'],
-            ['Customer support', 'hello@aevro.com'],
-          ].map(([title, detail]) => (
-            <div key={title} className="flex gap-3 py-2">
-              <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-[#111111] text-xs">
-                +
-              </span>
-              <div>
-                <p className="text-sm font-semibold">{title}</p>
-                <p className="mt-1 text-sm text-[#514c45]">{detail}</p>
-              </div>
-            </div>
-          ))}
-        </section>
-
         <section className="mt-6 grid overflow-hidden rounded-[6px] border border-[#eadfd2] bg-[#fffaf3]/70 lg:grid-cols-2">
           <div className="border-b border-[#eadfd2] p-5 sm:p-6 lg:border-b-0 lg:border-r">
             <p className="text-xs font-semibold uppercase tracking-[0.1em]">Details</p>
