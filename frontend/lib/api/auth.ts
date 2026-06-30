@@ -2,9 +2,11 @@ import type {
   AuthResponse,
   AuthUser,
   GoogleLoginPayload,
+  LoginOtpPayload,
   LoginPayload,
   RegisterPayload,
   RegisterResult,
+  VerifyLoginOtpPayload,
 } from '../../types/auth';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8000/api/v1';
@@ -117,6 +119,30 @@ export function login(payload: LoginPayload) {
     method: 'POST',
     body: JSON.stringify(payload),
   });
+}
+
+export function sendLoginOtp(payload: LoginOtpPayload) {
+  return requestAuthAction<{
+    email: string;
+    sent: boolean;
+    expiresInMinutes: number;
+    resendCount?: number;
+  }>('/auth/login/send-otp', {
+    method: 'POST',
+    body: JSON.stringify(payload),
+  });
+}
+
+export async function verifyLoginOtp(payload: VerifyLoginOtpPayload) {
+  const data = await requestAuthAction<{ user: AuthUser }>(
+    '/auth/login/verify-otp',
+    {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    },
+  );
+
+  return data.user;
 }
 
 export function googleLogin(payload: GoogleLoginPayload) {

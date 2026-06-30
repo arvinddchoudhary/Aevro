@@ -46,6 +46,15 @@ export type LoginPayload = {
   password: string;
 };
 
+export type LoginOtpPayload = {
+  email: string;
+};
+
+export type VerifyLoginOtpPayload = {
+  email: string;
+  code: string;
+};
+
 export type GoogleLoginPayload = {
   idToken: string;
 };

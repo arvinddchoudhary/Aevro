@@ -57,6 +57,8 @@ Apply stricter rate limits to sensitive routes:
 
 - `POST /api/v1/auth/register`
 - `POST /api/v1/auth/login`
+- `POST /api/v1/auth/login/send-otp`
+- `POST /api/v1/auth/login/verify-otp`
 - `POST /api/v1/auth/google`
 - `POST /api/v1/auth/refresh`
 - `POST /api/v1/auth/logout`

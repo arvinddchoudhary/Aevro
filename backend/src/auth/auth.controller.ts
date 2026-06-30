@@ -17,6 +17,7 @@ import {
 import { AuthService } from './auth.service';
 import { GoogleLoginDto } from './dto/google-login.dto';
 import { LoginDto } from './dto/login.dto';
+import { SendLoginOtpDto, VerifyLoginOtpDto } from './dto/login-otp.dto';
 import { RegisterDto } from './dto/register.dto';
 import { ResendEmailOtpDto } from './dto/resend-email-otp.dto';
 import { VerifyEmailOtpDto } from './dto/verify-email-otp.dto';
@@ -55,6 +56,37 @@ export class AuthController {
     @Res({ passthrough: true }) reply: FastifyReply,
   ) {
     const result = await this.authService.login(dto, this.getSessionContext(request));
+    this.setAuthCookies(reply, result);
+
+    return {
+      success: true,
+      data: {
+        user: result.user,
+      },
+    };
+  }
+
+  @Post('login/send-otp')
+  async sendLoginOtp(@Body() dto: SendLoginOtpDto) {
+    const result = await this.authService.sendLoginOtp(dto.email);
+
+    return {
+      success: true,
+      data: result,
+    };
+  }
+
+  @Post('login/verify-otp')
+  async verifyLoginOtp(
+    @Body() dto: VerifyLoginOtpDto,
+    @Req() request: AuthenticatedRequest,
+    @Res({ passthrough: true }) reply: FastifyReply,
+  ) {
+    const result = await this.authService.verifyLoginOtp(
+      dto.email,
+      dto.code,
+      this.getSessionContext(request),
+    );
     this.setAuthCookies(reply, result);
 
     return {

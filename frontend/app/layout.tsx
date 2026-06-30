@@ -1,6 +1,5 @@
 import type { Metadata } from 'next';
-import { Footer } from '../components/layout/Footer';
-import { Header } from '../components/layout/Header';
+import { SiteChrome } from '../components/layout/SiteChrome';
 import { AuthProvider } from '../lib/auth';
 import { CartProvider } from '../lib/cart';
 import './globals.css';
@@ -20,9 +19,7 @@ export default function RootLayout({
       <body className="aevro-shell">
         <AuthProvider>
           <CartProvider>
-            <Header />
-            {children}
-            <Footer />
+            <SiteChrome>{children}</SiteChrome>
           </CartProvider>
         </AuthProvider>
       </body>

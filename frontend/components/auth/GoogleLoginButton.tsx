@@ -44,8 +44,11 @@ export function GoogleLoginButton({
       type="button"
       disabled={isLoading}
       onClick={handleGoogleLogin}
-      className="h-12 w-full border border-[#ddd4c8] text-sm font-medium uppercase tracking-[0.08em] hover:border-[#111111] disabled:cursor-not-allowed disabled:text-[#777777]"
+      className="flex h-14 w-full items-center justify-center gap-3 border border-[#cfc7bc] bg-transparent text-xs font-semibold uppercase tracking-[0.16em] transition hover:border-[#111111] hover:bg-[#fffaf3] disabled:cursor-not-allowed disabled:text-[#777777]"
     >
+      <span className="text-lg font-bold normal-case tracking-normal text-[#4285f4]">
+        G
+      </span>
       {isLoading ? 'Opening Google' : 'Continue with Google'}
     </button>
   );
