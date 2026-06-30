@@ -99,6 +99,7 @@ model User {
   refreshSessions       RefreshSession[]
   addresses             UserAddress[]
   emailVerificationOtps EmailVerificationOtp[]
+  loginOtps             LoginOtp[]
   cartItems             CartItem[]
   orders                Order[]
   emailNotifications    EmailNotification[]
@@ -161,6 +162,24 @@ model PendingRegistration {
 
   @@index([otpExpiresAt])
   @@map("pending_registrations")
+}
+
+model LoginOtp {
+  id           String    @id @default(cuid())
+  userId       String
+  user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  codeHash     String
+  expiresAt    DateTime
+  consumedAt   DateTime?
+  attemptCount Int       @default(0)
+  resendCount  Int       @default(0)
+  lastSentAt   DateTime
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  @@index([userId, expiresAt])
+  @@index([expiresAt])
+  @@map("login_otps")
 }
 
 model AuthAccount {

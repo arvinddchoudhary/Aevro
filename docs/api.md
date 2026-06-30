@@ -9,6 +9,8 @@ GET /api/v1/health
 GET /api/v1/health/database
 POST /api/v1/auth/register
 POST /api/v1/auth/login
+POST /api/v1/auth/login/send-otp
+POST /api/v1/auth/login/verify-otp
 POST /api/v1/auth/google
 POST /api/v1/auth/verify-email-otp
 POST /api/v1/auth/resend-email-otp
@@ -58,8 +60,8 @@ POST /api/v1/webhooks/brevo
 
 ## Phase 11 Auth API
 
-Auth supports email/password and Google login. Both methods issue the same
-backend-managed session cookies:
+Auth supports email/password login, email OTP login, and Google login. Successful
+login methods issue the same backend-managed session cookies:
 
 - `aevro_access_token`: short-lived JWT access token
 - `aevro_refresh_token`: long-lived opaque refresh token
@@ -110,6 +112,42 @@ POST /api/v1/auth/login
 }
 ```
 
+Password login requires an existing email/password account. It sets auth cookies
+after the password is verified.
+
+### Send Login OTP
+
+```txt
+POST /api/v1/auth/login/send-otp
+```
+
+```json
+{
+  "email": "customer@example.com"
+}
+```
+
+Requires an existing `User` with this email. Google-only users can use OTP login
+because ownership is verified through the account email. The backend stores only
+a hashed OTP, sends the 6-digit code through Brevo, and does not set auth cookies.
+
+### Verify Login OTP
+
+```txt
+POST /api/v1/auth/login/verify-otp
+```
+
+```json
+{
+  "email": "customer@example.com",
+  "code": "123456"
+}
+```
+
+Verifies the latest active login OTP for the existing user. If valid and not
+expired, the backend consumes the OTP, creates normal auth session cookies, and
+returns the current user. Login OTP never creates a new user.
+
 ### Google Login
 
 ```txt
@@ -123,6 +161,8 @@ POST /api/v1/auth/google
 ```
 
 The backend verifies this ID token against `GOOGLE_CLIENT_ID`.
+Google login does not require OTP. Google-authenticated users are treated as
+verified after the backend verifies the Google ID token.
 
 ### Verify Email OTP
 
@@ -200,6 +240,8 @@ The frontend uses:
 
 - `POST /api/v1/auth/register`
 - `POST /api/v1/auth/login`
+- `POST /api/v1/auth/login/send-otp`
+- `POST /api/v1/auth/login/verify-otp`
 - `POST /api/v1/auth/google`
 - `POST /api/v1/auth/verify-email-otp`
 - `POST /api/v1/auth/resend-email-otp`
