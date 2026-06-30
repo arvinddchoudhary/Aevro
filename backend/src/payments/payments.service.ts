@@ -1,5 +1,6 @@
 import {
   BadRequestException,
+  ForbiddenException,
   Inject,
   Injectable,
   Logger,
@@ -65,13 +66,14 @@ type RazorpayWebhookPayload = {
 
 type PaymentWithOrder = Prisma.PaymentGetPayload<{
   include: {
-    order: {
-      select: {
-        id: true;
-        orderNumber: true;
-        status: true;
-      };
-    };
+        order: {
+          select: {
+            id: true;
+            orderNumber: true;
+            userId: true;
+            status: true;
+          };
+        };
   };
 }>;
 
@@ -99,7 +101,11 @@ export class PaymentsService {
       configService.get<string>('RAZORPAY_WEBHOOK_SECRET') ?? '';
   }
 
-  async createRazorpayOrder(dto: CreateRazorpayOrderDto) {
+  async createRazorpayOrder(
+    dto: CreateRazorpayOrderDto,
+    userId: string,
+    isAdmin = false,
+  ) {
     this.assertRazorpayConfigured();
 
     const order = await this.prisma.order.findUnique({
@@ -133,6 +139,8 @@ export class PaymentsService {
     if (!order) {
       throw new NotFoundException('Order not found.');
     }
+
+    this.assertOrderAccess(order.userId, userId, isAdmin);
 
     if (order.idempotencyKey && order.idempotencyKey !== dto.idempotencyKey) {
       throw new BadRequestException('Order idempotency key mismatch.');
@@ -221,7 +229,11 @@ export class PaymentsService {
     };
   }
 
-  async verifyRazorpayPayment(dto: VerifyRazorpayPaymentDto) {
+  async verifyRazorpayPayment(
+    dto: VerifyRazorpayPaymentDto,
+    userId: string,
+    isAdmin = false,
+  ) {
     this.assertRazorpayConfigured();
 
     const payment = await this.prisma.payment.findFirst({
@@ -234,6 +246,7 @@ export class PaymentsService {
           select: {
             id: true,
             orderNumber: true,
+            userId: true,
             status: true,
           },
         },
@@ -243,6 +256,8 @@ export class PaymentsService {
     if (!payment) {
       throw new NotFoundException('Payment record not found.');
     }
+
+    this.assertOrderAccess(payment.order.userId, userId, isAdmin);
 
     if (payment.status === PaymentStatus.PAID) {
       return this.serializePayment(payment);
@@ -399,6 +414,7 @@ export class PaymentsService {
           select: {
             id: true,
             orderNumber: true,
+            userId: true,
             status: true,
           },
         },
@@ -650,6 +666,7 @@ export class PaymentsService {
           select: {
             id: true,
             orderNumber: true,
+            userId: true,
             status: true,
           },
         },
@@ -769,6 +786,16 @@ export class PaymentsService {
   private assertProviderPaymentCaptured(razorpayPayment: RazorpayPaymentResponse) {
     if (razorpayPayment.status !== 'captured') {
       throw new BadRequestException('Razorpay payment is not captured.');
+    }
+  }
+
+  private assertOrderAccess(orderUserId: string | null, userId: string, isAdmin: boolean) {
+    if (isAdmin) {
+      return;
+    }
+
+    if (!userId || orderUserId !== userId) {
+      throw new ForbiddenException('You do not have access to this order.');
     }
   }
 

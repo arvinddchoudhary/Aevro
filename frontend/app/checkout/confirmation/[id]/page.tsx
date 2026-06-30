@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { cookies } from 'next/headers';
 import { notFound } from 'next/navigation';
 import { RazorpayPaymentPanel } from '../../../../components/payments/RazorpayPaymentPanel';
 import { ErrorState } from '../../../../components/ui/ErrorState';
@@ -13,7 +14,8 @@ export default async function OrderConfirmationPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const result = await getOrder(id);
+  const cookieHeader = (await cookies()).toString();
+  const result = await getOrder(id, cookieHeader);
 
   if (!result.success) {
     if (result.statusCode === 404) {

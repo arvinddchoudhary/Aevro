@@ -81,6 +81,22 @@ POST /api/v1/auth/register
 }
 ```
 
+Creates or updates a pending registration and sends a 6-digit OTP by Brevo.
+This endpoint does not create a `User` row and does not set auth cookies.
+
+Response data:
+
+```json
+{
+  "email": "customer@example.com",
+  "emailVerification": {
+    "sent": true,
+    "expiresInMinutes": 10,
+    "error": null
+  }
+}
+```
+
 ### Login
 
 ```txt
@@ -114,11 +130,14 @@ The backend verifies this ID token against `GOOGLE_CLIENT_ID`.
 POST /api/v1/auth/verify-email-otp
 ```
 
-Requires the `aevro_access_token` httpOnly cookie. The backend verifies the
-latest active 6-digit OTP and marks the user's email as verified.
+Verifies a pending registration OTP. This endpoint does not require an existing
+auth cookie. If the OTP is valid and not expired, the backend creates the `User`
+row, marks `emailVerified: true`, deletes the pending registration, and sets the
+normal auth cookies.
 
 ```json
 {
+  "email": "customer@example.com",
   "code": "123456"
 }
 ```
@@ -129,8 +148,14 @@ latest active 6-digit OTP and marks the user's email as verified.
 POST /api/v1/auth/resend-email-otp
 ```
 
-Requires the `aevro_access_token` httpOnly cookie. Creates a new 10-minute OTP
-and sends it to the current user's email address.
+Resends an OTP for a pending registration. This endpoint does not require an
+auth cookie and uses cooldown/rate protection.
+
+```json
+{
+  "email": "customer@example.com"
+}
+```
 
 ### Refresh
 
@@ -184,6 +209,10 @@ The frontend uses:
 
 All auth requests use `credentials: include` so browser cookies are sent. JWT
 tokens are not stored in frontend storage.
+
+Register is a two-step flow: `POST /auth/register` sends an OTP but does not log
+the user in, then `POST /auth/verify-email-otp` creates the account and starts
+the session.
 
 ## Phase 20 User Profile And Addresses
 
@@ -479,7 +508,8 @@ orders where `order.userId` matches the authenticated user. Responses include
 order items, product data, payment status, totals, statuses, and timestamps.
 
 Logged-in checkout requests include cookies, so new orders are linked to the
-current user. Guest checkout continues to work without an account.
+current user. Guest checkout is not supported; checkout must ask unauthenticated
+customers to login or create an account before placing an order.
 
 ## Public Category Endpoints
 
@@ -749,6 +779,10 @@ product IDs with quantities. The backend fetches product prices from PostgreSQL
 and calculates totals itself. Frontend subtotal, total, and payment status must
 not be trusted.
 
+Order creation requires the `aevro_access_token` httpOnly cookie. The order owner
+is always taken from the authenticated user, not from the submitted customer
+email. Customer details remain shipping/contact fields only.
+
 ### Create Order
 
 ```txt
@@ -838,10 +872,13 @@ Response shape:
 GET /api/v1/orders/:id
 ```
 
+Requires auth. Customers can only access their own orders. Admin users can access
+orders through this route and the admin order routes.
+
 Example:
 
 ```bash
-curl "http://localhost:8000/api/v1/orders/order_id"
+curl --cookie "aevro_access_token=..." "http://localhost:8000/api/v1/orders/order_id"
 ```
 
 ## Phase 10 Razorpay Payment API
@@ -850,6 +887,11 @@ Razorpay secret keys are backend-only. The frontend never sends payment amounts
 or secret keys. It asks the backend to create a Razorpay order for an existing
 AEVRO order, then sends Razorpay's payment response back for backend signature
 verification.
+
+Customer-facing Razorpay order creation and verification require auth. The
+authenticated user must own the order, unless the caller is an admin. Razorpay
+webhooks remain provider-signed backend endpoints and do not rely on frontend
+session cookies.
 
 ### Create Razorpay Order
 

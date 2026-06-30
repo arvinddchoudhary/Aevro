@@ -16,7 +16,7 @@ export type EmailVerificationDelivery = {
 };
 
 export type RegisterResult = {
-  user: AuthUser;
+  email: string;
   emailVerification?: EmailVerificationDelivery;
 };
 
@@ -24,7 +24,8 @@ export type AuthResponse =
   | {
       success: true;
       data: {
-        user: AuthUser;
+        user?: AuthUser;
+        email?: string;
         emailVerification?: EmailVerificationDelivery;
       };
     }

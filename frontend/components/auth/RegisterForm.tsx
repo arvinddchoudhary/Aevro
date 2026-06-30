@@ -1,14 +1,15 @@
 'use client';
 
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
-import { FormEvent, useState } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { FormEvent, useEffect, useState } from 'react';
 import { useAuth } from '../../lib/auth';
 import { AuthField } from './AuthField';
 import { GoogleLoginButton } from './GoogleLoginButton';
 
 export function RegisterForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { register, resendEmailOtp, verifyEmailOtp } = useAuth();
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
@@ -20,6 +21,20 @@ export function RegisterForm() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isVerifying, setIsVerifying] = useState(false);
   const [isResending, setIsResending] = useState(false);
+  const [resendCooldown, setResendCooldown] = useState(0);
+  const redirectTo = searchParams.get('redirect') || '/account';
+
+  useEffect(() => {
+    if (resendCooldown <= 0) {
+      return;
+    }
+
+    const timeoutId = window.setTimeout(() => {
+      setResendCooldown((currentValue) => Math.max(0, currentValue - 1));
+    }, 1000);
+
+    return () => window.clearTimeout(timeoutId);
+  }, [resendCooldown]);
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -30,11 +45,12 @@ export function RegisterForm() {
       const result = await register({ name, email, password });
       const delivery = result.emailVerification;
       setIsOtpStep(true);
+      setResendCooldown(60);
       setOtpMessage(
         delivery?.sent
-          ? `We sent a 6-digit verification code to your email. It expires in ${delivery.expiresInMinutes} minutes.`
+          ? `Enter the OTP sent to your email. It expires in ${delivery.expiresInMinutes} minutes.`
           : delivery?.error ??
-              'Account created, but the verification email could not be sent. Please use resend code.',
+              'The verification email could not be sent. Please use resend code.',
       );
     } catch (submitError) {
       setError(
@@ -52,8 +68,8 @@ export function RegisterForm() {
     setIsVerifying(true);
 
     try {
-      await verifyEmailOtp(otpCode);
-      router.push('/account');
+      await verifyEmailOtp(email, otpCode);
+      router.push(redirectTo);
       router.refresh();
     } catch (verifyError) {
       setError(
@@ -70,7 +86,10 @@ export function RegisterForm() {
     setIsResending(true);
 
     try {
-      const result = await resendEmailOtp();
+      const result = await resendEmailOtp(email);
+      if (result.sent) {
+        setResendCooldown(60);
+      }
       setOtpMessage(
         result.alreadyVerified
           ? 'This email is already verified.'
@@ -164,28 +183,35 @@ export function RegisterForm() {
               ? 'Verifying'
               : 'Verify email'
             : isSubmitting
-              ? 'Creating account'
-              : 'Create account'}
+              ? 'Sending OTP'
+              : 'Send OTP'}
         </button>
         {isOtpStep ? (
           <button
             type="button"
-            disabled={isResending}
+            disabled={isResending || resendCooldown > 0}
             onClick={() => void handleResendOtp()}
             className="mt-3 h-11 w-full cursor-pointer border border-[#ddd4c8] text-xs font-medium uppercase tracking-[0.08em] hover:border-[#111111] disabled:cursor-not-allowed disabled:text-[#777777]"
           >
-            {isResending ? 'Sending code' : 'Resend code'}
+            {isResending
+              ? 'Sending code'
+              : resendCooldown > 0
+                ? `Resend in ${resendCooldown}s`
+                : 'Resend code'}
           </button>
         ) : (
           <>
             <div className="my-5 border-t border-[#ddd4c8]" />
-            <GoogleLoginButton onError={setError} />
+            <GoogleLoginButton onError={setError} redirectTo={redirectTo} />
           </>
         )}
       </form>
       <p className="mt-5 text-center text-sm text-[#5f5a53]">
         Already have an account?{' '}
-        <Link href="/login" className="underline underline-offset-4">
+        <Link
+          href={redirectTo === '/account' ? '/login' : `/login?redirect=${encodeURIComponent(redirectTo)}`}
+          className="underline underline-offset-4"
+        >
           Login
         </Link>
       </p>

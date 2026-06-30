@@ -34,8 +34,8 @@ type AuthContextValue = {
   register: (payload: RegisterPayload) => Promise<RegisterResult>;
   login: (payload: LoginPayload) => Promise<AuthUser>;
   googleLogin: (payload: GoogleLoginPayload) => Promise<AuthUser>;
-  verifyEmailOtp: (code: string) => Promise<AuthUser>;
-  resendEmailOtp: () => Promise<{
+  verifyEmailOtp: (email: string, code: string) => Promise<AuthUser>;
+  resendEmailOtp: (email: string) => Promise<{
     alreadyVerified: boolean;
     sent: boolean;
     expiresInMinutes: number;
@@ -70,8 +70,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       status,
       register: async (payload) => {
         const result = await register(payload);
-        setUser(result.user);
-        setStatus('authenticated');
+        setUser(null);
+        setStatus('unauthenticated');
 
         return result;
       },
@@ -89,8 +89,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
         return nextUser;
       },
-      verifyEmailOtp: async (code) => {
-        const nextUser = await verifyEmailOtp(code);
+      verifyEmailOtp: async (email, code) => {
+        const nextUser = await verifyEmailOtp(email, code);
         setUser(nextUser);
         setStatus('authenticated');
 

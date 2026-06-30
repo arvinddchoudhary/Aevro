@@ -1,5 +1,6 @@
 import {
   BadRequestException,
+  ForbiddenException,
   Inject,
   Injectable,
   NotFoundException,
@@ -16,7 +17,11 @@ type OrderWithItems = Prisma.OrderGetPayload<{
 export class OrdersService {
   constructor(@Inject(PrismaService) private readonly prisma: PrismaService) {}
 
-  async createOrder(createOrderDto: CreateOrderDto, userId?: string) {
+  async createOrder(createOrderDto: CreateOrderDto, userId: string) {
+    if (!userId) {
+      throw new BadRequestException('Authenticated user is required to create an order.');
+    }
+
     if (createOrderDto.idempotencyKey) {
       const existingOrder = await this.prisma.order.findUnique({
         where: {
@@ -26,7 +31,7 @@ export class OrdersService {
       });
 
       if (existingOrder) {
-        if (existingOrder.userId && userId && existingOrder.userId !== userId) {
+        if (existingOrder.userId !== userId) {
           throw new BadRequestException('Order idempotency key is already used.');
         }
 
@@ -173,6 +178,25 @@ export class OrdersService {
 
     if (!order) {
       throw new NotFoundException('Order not found.');
+    }
+
+    return this.serializeOrder(order);
+  }
+
+  async getOrderForUserOrAdmin(id: string, userId: string, isAdmin: boolean) {
+    const order = await this.prisma.order.findUnique({
+      where: {
+        id,
+      },
+      include: this.orderInclude(),
+    });
+
+    if (!order) {
+      throw new NotFoundException('Order not found.');
+    }
+
+    if (!isAdmin && order.userId !== userId) {
+      throw new ForbiddenException('You do not have access to this order.');
     }
 
     return this.serializeOrder(order);

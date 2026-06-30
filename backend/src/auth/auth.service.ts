@@ -1,13 +1,13 @@
 import {
   BadRequestException,
+  ConflictException,
   Inject,
   Injectable,
-  Logger,
   ServiceUnavailableException,
   UnauthorizedException,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { User, UserRole } from '@prisma/client';
+import { AuthProvider, User, UserRole } from '@prisma/client';
 import { OAuth2Client } from 'google-auth-library';
 import {
   createHmac,
@@ -25,6 +25,10 @@ import { LoginDto } from './dto/login.dto';
 import { RegisterDto } from './dto/register.dto';
 
 const scrypt = promisify(scryptCallback);
+const OTP_EXPIRES_IN_MINUTES = 10;
+const OTP_MAX_ATTEMPTS = 5;
+const OTP_RESEND_COOLDOWN_MS = 60 * 1000;
+const OTP_MAX_RESENDS = 5;
 
 type SessionContext = {
   userAgent?: string;
@@ -40,7 +44,6 @@ type JwtPayload = {
 
 @Injectable()
 export class AuthService {
-  private readonly logger = new Logger(AuthService.name);
   private readonly googleClient = new OAuth2Client();
   private readonly accessSecret: string;
   private readonly refreshSecret: string;
@@ -64,46 +67,60 @@ export class AuthService {
     this.googleClientId = configService.get<string>('GOOGLE_CLIENT_ID') ?? '';
   }
 
-  async register(dto: RegisterDto, context: SessionContext) {
+  async register(dto: RegisterDto, _context: SessionContext) {
     this.assertJwtConfigured();
 
-    const passwordHash = await this.hashPassword(dto.password);
-    const user = await this.usersService.createEmailUser({
-      name: dto.name.trim(),
-      email: dto.email.trim(),
-      passwordHash,
-    });
+    await this.cleanupExpiredPendingRegistrations();
+    const email = dto.email.trim().toLowerCase();
+    const existingUser = await this.usersService.findByEmail(email);
 
-    const result = await this.createAuthResult(user, context);
-    let emailVerification = {
-      sent: true,
-      expiresInMinutes: 0,
-      error: null as string | null,
-    };
-
-    try {
-      const expiresInMinutes = await this.createAndSendEmailVerificationOtp(user);
-      emailVerification = {
-        sent: true,
-        expiresInMinutes,
-        error: null,
-      };
-    } catch (error) {
-      const message = this.errorMessage(error);
-      this.logger.warn(
-        `Email verification OTP send failed | userId=${user.id} | email=${user.email} | error=${message}`,
-      );
-      emailVerification = {
-        sent: false,
-        expiresInMinutes: 0,
-        error:
-          'Account created, but the verification email could not be sent. Please use resend code.',
-      };
+    if (existingUser) {
+      throw new ConflictException('A user with this email already exists.');
     }
 
+    const passwordHash = await this.hashPassword(dto.password);
+    const otp = this.createEmailOtp();
+    const pending = await this.prisma.pendingRegistration.upsert({
+      where: {
+        email,
+      },
+      create: {
+        name: dto.name.trim(),
+        email,
+        passwordHash,
+        otpHash: this.hashEmailOtp(otp),
+        otpExpiresAt: this.createOtpExpiry(),
+        otpAttemptCount: 0,
+        resendCount: 0,
+        lastSentAt: new Date(),
+      },
+      update: {
+        name: dto.name.trim(),
+        passwordHash,
+        otpHash: this.hashEmailOtp(otp),
+        otpExpiresAt: this.createOtpExpiry(),
+        otpAttemptCount: 0,
+        resendCount: 0,
+        lastSentAt: new Date(),
+      },
+    });
+
+    await this.notificationsService.sendEmailVerificationOtp({
+      user: {
+        name: pending.name,
+        email: pending.email,
+      },
+      code: otp,
+      expiresInMinutes: OTP_EXPIRES_IN_MINUTES,
+    });
+
     return {
-      ...result,
-      emailVerification,
+      email: pending.email,
+      emailVerification: {
+        sent: true,
+        expiresInMinutes: OTP_EXPIRES_IN_MINUTES,
+        error: null,
+      },
     };
   }
 
@@ -216,16 +233,14 @@ export class AuthService {
     return this.usersService.serializeUser(user);
   }
 
-  async resendEmailVerificationOtp(userId: string) {
+  async resendEmailVerificationOtp(emailInput: string) {
     this.assertJwtConfigured();
 
-    const user = await this.usersService.findById(userId);
+    await this.cleanupExpiredPendingRegistrations();
+    const email = emailInput.trim().toLowerCase();
+    const existingUser = await this.usersService.findByEmail(email);
 
-    if (!user) {
-      throw new UnauthorizedException('User not found.');
-    }
-
-    if (user.emailVerified) {
+    if (existingUser) {
       return {
         alreadyVerified: true,
         sent: false,
@@ -233,80 +248,152 @@ export class AuthService {
       };
     }
 
-    const expiresInMinutes = await this.createAndSendEmailVerificationOtp(user);
+    const pending = await this.prisma.pendingRegistration.findUnique({
+      where: {
+        email,
+      },
+    });
+
+    if (!pending) {
+      throw new BadRequestException('No pending registration found for this email.');
+    }
+
+    if (Date.now() - pending.lastSentAt.getTime() < OTP_RESEND_COOLDOWN_MS) {
+      throw new BadRequestException('Please wait before requesting another OTP.');
+    }
+
+    if (pending.resendCount >= OTP_MAX_RESENDS) {
+      throw new BadRequestException(
+        'Too many OTP resend requests. Please register again later.',
+      );
+    }
+
+    const otp = this.createEmailOtp();
+    const updatedPending = await this.prisma.pendingRegistration.update({
+      where: {
+        id: pending.id,
+      },
+      data: {
+        otpHash: this.hashEmailOtp(otp),
+        otpExpiresAt: this.createOtpExpiry(),
+        otpAttemptCount: 0,
+        resendCount: {
+          increment: 1,
+        },
+        lastSentAt: new Date(),
+      },
+    });
+
+    await this.notificationsService.sendEmailVerificationOtp({
+      user: {
+        name: updatedPending.name,
+        email: updatedPending.email,
+      },
+      code: otp,
+      expiresInMinutes: OTP_EXPIRES_IN_MINUTES,
+    });
 
     return {
       alreadyVerified: false,
       sent: true,
-      expiresInMinutes,
+      expiresInMinutes: OTP_EXPIRES_IN_MINUTES,
     };
   }
 
-  async verifyEmailOtp(userId: string, code: string) {
+  async verifyEmailOtp(emailInput: string, code: string, context: SessionContext) {
     this.assertJwtConfigured();
 
+    await this.cleanupExpiredPendingRegistrations();
+    const email = emailInput.trim().toLowerCase();
     const trimmedCode = code.trim();
 
     if (!/^\d{6}$/.test(trimmedCode)) {
       throw new BadRequestException('Enter the 6-digit OTP.');
     }
 
-    const otp = await this.prisma.emailVerificationOtp.findFirst({
+    const pending = await this.prisma.pendingRegistration.findUnique({
       where: {
-        userId,
-        consumedAt: null,
-      },
-      orderBy: {
-        createdAt: 'desc',
+        email,
       },
     });
 
-    if (!otp || otp.expiresAt <= new Date()) {
+    if (!pending) {
+      throw new BadRequestException('OTP expired. Please register again.');
+    }
+
+    if (pending.otpExpiresAt <= new Date()) {
+      await this.prisma.pendingRegistration.delete({
+        where: {
+          id: pending.id,
+        },
+      });
       throw new BadRequestException('OTP expired. Please request a new code.');
     }
 
-    if (otp.attempts >= 5) {
+    if (pending.otpAttemptCount >= OTP_MAX_ATTEMPTS) {
       throw new BadRequestException(
         'Too many attempts. Please request a new code.',
       );
     }
 
-    if (!this.safeCompare(this.hashEmailOtp(trimmedCode), otp.codeHash)) {
-      await this.prisma.emailVerificationOtp.update({
+    if (!this.safeCompare(this.hashEmailOtp(trimmedCode), pending.otpHash)) {
+      await this.prisma.pendingRegistration.update({
         where: {
-          id: otp.id,
+          id: pending.id,
         },
         data: {
-          attempts: {
+          otpAttemptCount: {
             increment: 1,
           },
         },
       });
 
-      throw new BadRequestException('Invalid OTP code.');
+      throw new BadRequestException('Invalid OTP.');
     }
 
     const user = await this.prisma.$transaction(async (tx) => {
-      await tx.emailVerificationOtp.update({
+      const existingUser = await tx.user.findUnique({
         where: {
-          id: otp.id,
-        },
-        data: {
-          consumedAt: new Date(),
+          email,
         },
       });
 
-      return tx.user.update({
-        where: {
-          id: userId,
-        },
+      if (existingUser) {
+        await tx.pendingRegistration.delete({
+          where: {
+            id: pending.id,
+          },
+        });
+
+        return existingUser;
+      }
+
+      const createdUser = await tx.user.create({
         data: {
+          name: pending.name,
+          email: pending.email,
+          passwordHash: pending.passwordHash,
+          role: UserRole.CUSTOMER,
           emailVerified: true,
+          authAccounts: {
+            create: {
+              provider: AuthProvider.EMAIL,
+              providerAccountId: pending.email,
+            },
+          },
         },
       });
+
+      await tx.pendingRegistration.delete({
+        where: {
+          id: pending.id,
+        },
+      });
+
+      return createdUser;
     });
 
-    return this.usersService.serializeUser(user);
+    return this.createAuthResult(user, context);
   }
 
   verifyAccessToken(token: string) {
@@ -419,41 +506,22 @@ export class AuthService {
       .digest('hex');
   }
 
-  private async createAndSendEmailVerificationOtp(user: User) {
-    const code = randomInt(100000, 1000000).toString();
-    const expiresInMinutes = 10;
-    const expiresAt = new Date(Date.now() + expiresInMinutes * 60 * 1000);
+  private createEmailOtp() {
+    return randomInt(100000, 1000000).toString();
+  }
 
-    await this.prisma.$transaction([
-      this.prisma.emailVerificationOtp.updateMany({
-        where: {
-          userId: user.id,
-          consumedAt: null,
-        },
-        data: {
-          consumedAt: new Date(),
-        },
-      }),
-      this.prisma.emailVerificationOtp.create({
-        data: {
-          userId: user.id,
-          codeHash: this.hashEmailOtp(code),
-          expiresAt,
-        },
-      }),
-    ]);
+  private createOtpExpiry() {
+    return new Date(Date.now() + OTP_EXPIRES_IN_MINUTES * 60 * 1000);
+  }
 
-    await this.notificationsService.sendEmailVerificationOtp({
-      user: {
-        id: user.id,
-        name: user.name,
-        email: user.email,
+  private async cleanupExpiredPendingRegistrations() {
+    await this.prisma.pendingRegistration.deleteMany({
+      where: {
+        otpExpiresAt: {
+          lt: new Date(),
+        },
       },
-      code,
-      expiresInMinutes,
     });
-
-    return expiresInMinutes;
   }
 
   private hashEmailOtp(code: string) {
@@ -518,7 +586,4 @@ export class AuthService {
     }
   }
 
-  private errorMessage(error: unknown) {
-    return error instanceof Error ? error.message : 'Unknown error';
-  }
 }
