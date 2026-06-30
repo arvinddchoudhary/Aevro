@@ -18,6 +18,7 @@ import { AuthService } from './auth.service';
 import { GoogleLoginDto } from './dto/google-login.dto';
 import { LoginDto } from './dto/login.dto';
 import { RegisterDto } from './dto/register.dto';
+import { ResendEmailOtpDto } from './dto/resend-email-otp.dto';
 import { VerifyEmailOtpDto } from './dto/verify-email-otp.dto';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { AuthenticatedRequest } from './types/authenticated-request';
@@ -35,15 +36,13 @@ export class AuthController {
   async register(
     @Body() dto: RegisterDto,
     @Req() request: AuthenticatedRequest,
-    @Res({ passthrough: true }) reply: FastifyReply,
   ) {
     const result = await this.authService.register(dto, this.getSessionContext(request));
-    this.setAuthCookies(reply, result);
 
     return {
       success: true,
       data: {
-        user: result.user,
+        email: result.email,
         emailVerification: result.emailVerification,
       },
     };
@@ -135,29 +134,30 @@ export class AuthController {
   }
 
   @Post('verify-email-otp')
-  @UseGuards(JwtAuthGuard)
   async verifyEmailOtp(
     @Req() request: AuthenticatedRequest,
     @Body() dto: VerifyEmailOtpDto,
+    @Res({ passthrough: true }) reply: FastifyReply,
   ) {
-    const user = await this.authService.verifyEmailOtp(
-      request.user?.id ?? '',
+    const result = await this.authService.verifyEmailOtp(
+      dto.email,
       dto.code,
+      this.getSessionContext(request),
     );
+    this.setAuthCookies(reply, result);
 
     return {
       success: true,
       data: {
-        user,
+        user: result.user,
       },
     };
   }
 
   @Post('resend-email-otp')
-  @UseGuards(JwtAuthGuard)
-  async resendEmailOtp(@Req() request: AuthenticatedRequest) {
+  async resendEmailOtp(@Body() dto: ResendEmailOtpDto) {
     const result = await this.authService.resendEmailVerificationOtp(
-      request.user?.id ?? '',
+      dto.email,
     );
 
     return {

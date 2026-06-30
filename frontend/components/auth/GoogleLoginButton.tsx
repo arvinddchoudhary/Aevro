@@ -7,9 +7,13 @@ import { useAuth } from '../../lib/auth';
 
 type GoogleLoginButtonProps = {
   onError: (message: string) => void;
+  redirectTo?: string;
 };
 
-export function GoogleLoginButton({ onError }: GoogleLoginButtonProps) {
+export function GoogleLoginButton({
+  onError,
+  redirectTo = '/account',
+}: GoogleLoginButtonProps) {
   const router = useRouter();
   const { googleLogin } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
@@ -26,7 +30,7 @@ export function GoogleLoginButton({ onError }: GoogleLoginButtonProps) {
     try {
       const idToken = await requestGoogleIdToken(googleClientId);
       await googleLogin({ idToken });
-      router.push('/account');
+      router.push(redirectTo);
       router.refresh();
     } catch (error) {
       onError(error instanceof Error ? error.message : 'Google login failed.');

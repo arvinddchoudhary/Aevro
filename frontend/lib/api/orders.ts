@@ -113,10 +113,19 @@ export async function getMyOrder(id: string): Promise<OrderResponse> {
   }
 }
 
-export async function getOrder(id: string): Promise<OrderResponse> {
+export async function getOrder(
+  id: string,
+  cookieHeader?: string,
+): Promise<OrderResponse> {
   try {
     const response = await fetch(`${API_URL}/orders/${encodeURIComponent(id)}`, {
       cache: 'no-store',
+      credentials: 'include',
+      headers: cookieHeader
+        ? {
+            Cookie: cookieHeader,
+          }
+        : undefined,
     });
 
     if (!response.ok) {

@@ -61,6 +61,10 @@ async function requestAuthData(path: string, options: RequestInit = {}) {
 async function requestAuth(path: string, options: RequestInit = {}) {
   const data = await requestAuthData(path, options);
 
+  if (!data.user) {
+    throw new AuthApiError('Authentication response did not include a user.');
+  }
+
   return data.user;
 }
 
@@ -128,16 +132,16 @@ export function refreshSession() {
   });
 }
 
-export async function verifyEmailOtp(code: string) {
+export async function verifyEmailOtp(email: string, code: string) {
   const data = await requestAuthAction<{ user: AuthUser }>('/auth/verify-email-otp', {
     method: 'POST',
-    body: JSON.stringify({ code }),
+    body: JSON.stringify({ email, code }),
   });
 
   return data.user;
 }
 
-export function resendEmailOtp() {
+export function resendEmailOtp(email: string) {
   return requestAuthAction<{
     alreadyVerified: boolean;
     sent: boolean;
@@ -145,6 +149,7 @@ export function resendEmailOtp() {
     error?: string | null;
   }>('/auth/resend-email-otp', {
     method: 'POST',
+    body: JSON.stringify({ email }),
   });
 }
 

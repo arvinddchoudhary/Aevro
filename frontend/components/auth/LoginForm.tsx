@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { FormEvent, useState } from 'react';
 import { useAuth } from '../../lib/auth';
 import { AuthField } from './AuthField';
@@ -9,11 +9,13 @@ import { GoogleLoginButton } from './GoogleLoginButton';
 
 export function LoginForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { login } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const redirectTo = searchParams.get('redirect') || '/account';
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -22,7 +24,7 @@ export function LoginForm() {
 
     try {
       await login({ email, password });
-      router.push('/account');
+      router.push(redirectTo);
       router.refresh();
     } catch (submitError) {
       setError(
@@ -66,11 +68,14 @@ export function LoginForm() {
           {isSubmitting ? 'Logging in' : 'Login'}
         </button>
         <div className="my-5 border-t border-[#ddd4c8]" />
-        <GoogleLoginButton onError={setError} />
+        <GoogleLoginButton onError={setError} redirectTo={redirectTo} />
       </form>
       <p className="mt-5 text-center text-sm text-[#5f5a53]">
         New to AEVRO?{' '}
-        <Link href="/register" className="underline underline-offset-4">
+        <Link
+          href={redirectTo === '/account' ? '/register' : `/register?redirect=${encodeURIComponent(redirectTo)}`}
+          className="underline underline-offset-4"
+        >
           Create an account
         </Link>
       </p>

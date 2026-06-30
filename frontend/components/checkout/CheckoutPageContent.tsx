@@ -293,6 +293,70 @@ export function CheckoutPageContent() {
     );
   }
 
+  if (status === 'loading') {
+    return (
+      <section className="border border-[#ddd4c8] bg-[#fffaf3]/65 p-6 sm:p-8">
+        <p className="text-xs font-medium uppercase tracking-[0.14em] text-[#77716a]">
+          Checking session
+        </p>
+        <p className="mt-3 text-sm leading-6 text-[#514c45]">
+          Preparing secure checkout.
+        </p>
+      </section>
+    );
+  }
+
+  if (status !== 'authenticated') {
+    return (
+      <section className="grid gap-7 lg:grid-cols-[minmax(0,1fr)_380px] xl:grid-cols-[minmax(0,1fr)_410px]">
+        <div className="border border-[#ddd4c8] bg-[#fffaf3]/65 p-6 sm:p-8">
+          <p className="text-xs font-medium uppercase tracking-[0.14em] text-[#77716a]">
+            Login required
+          </p>
+          <h2 className="mt-4 text-2xl font-light uppercase sm:text-3xl">
+            Please login to place your order
+          </h2>
+          <p className="mt-4 max-w-xl text-sm leading-6 text-[#514c45]">
+            Checkout is available only for signed-in customers. Your cart will stay
+            ready while you login or verify a new account.
+          </p>
+          <div className="mt-6 flex flex-col gap-3 sm:flex-row">
+            <Link
+              href="/login?redirect=%2Fcheckout"
+              className="inline-flex h-11 items-center justify-center bg-[#111111] px-6 text-xs font-semibold uppercase tracking-[0.12em] text-[#fffaf3] hover:bg-[#2a2825]"
+            >
+              Login
+            </Link>
+            <Link
+              href="/register?redirect=%2Fcheckout"
+              className="inline-flex h-11 items-center justify-center border border-[#111111] px-6 text-xs font-semibold uppercase tracking-[0.12em] hover:bg-[#111111] hover:text-[#fffaf3]"
+            >
+              Create account
+            </Link>
+          </div>
+        </div>
+
+        <aside className="h-fit border border-[#ddd4c8] bg-[#fffaf3]/75 p-4 sm:p-6">
+          <div className="flex items-center justify-between gap-4">
+            <p className="text-sm font-medium uppercase tracking-[0.08em]">
+              Order summary ({items.length})
+            </p>
+            <Link href="/cart" className="text-xs underline underline-offset-4">
+              Edit Cart
+            </Link>
+          </div>
+          <div className="mt-5 flex items-end justify-between border-t border-[#ddd4c8] pt-5 text-xl">
+            <div>
+              <p>Total</p>
+              <p className="mt-1 text-xs text-[#514c45]">Inclusive of all taxes</p>
+            </div>
+            <span>{formatPrice(subtotalInPaise)}</span>
+          </div>
+        </aside>
+      </section>
+    );
+  }
+
   return (
     <>
       <form

@@ -43,7 +43,7 @@ type NotificationRequest = {
 
 type EmailVerificationOtpInput = {
   user: {
-    id: string;
+    id?: string;
     name: string;
     email: string;
   };
