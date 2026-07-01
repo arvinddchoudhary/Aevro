@@ -17,6 +17,7 @@ import {
   UpdateAddressDto,
   UpdateProfileDto,
 } from './dto/user-profile.dto';
+import { AddWishlistItemDto } from './dto/wishlist.dto';
 import { UsersService } from './users.service';
 
 @Controller('users/me')
@@ -91,6 +92,55 @@ export class UsersController {
     @Param('id') id: string,
   ) {
     await this.usersService.deleteAddress(this.getUserId(request), id);
+
+    return {
+      success: true,
+      data: {
+        id,
+      },
+    };
+  }
+
+  @Get('wishlist')
+  async listWishlist(@Req() request: AuthenticatedRequest) {
+    return {
+      success: true,
+      data: await this.usersService.listWishlist(this.getUserId(request)),
+    };
+  }
+
+  @Post('wishlist')
+  async addWishlistItem(
+    @Req() request: AuthenticatedRequest,
+    @Body() dto: AddWishlistItemDto,
+  ) {
+    return {
+      success: true,
+      data: await this.usersService.addWishlistItem(this.getUserId(request), dto),
+    };
+  }
+
+  @Delete('wishlist/product/:productId')
+  async deleteWishlistProduct(
+    @Req() request: AuthenticatedRequest,
+    @Param('productId') productId: string,
+  ) {
+    await this.usersService.deleteWishlistProduct(this.getUserId(request), productId);
+
+    return {
+      success: true,
+      data: {
+        productId,
+      },
+    };
+  }
+
+  @Delete('wishlist/:id')
+  async deleteWishlistItem(
+    @Req() request: AuthenticatedRequest,
+    @Param('id') id: string,
+  ) {
+    await this.usersService.deleteWishlistItem(this.getUserId(request), id);
 
     return {
       success: true,

@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { useEffect, useMemo, useState } from 'react';
 import { AddToCartButton } from '../cart/AddToCartButton';
+import { WishlistToggleButton } from '../wishlist/WishlistToggleButton';
 import { formatPrice } from '../../lib/format';
 import type {
   Product,
@@ -327,6 +328,12 @@ export function ProductVariantSelection({ product }: ProductVariantSelectionProp
             }}
             disabled={!canAddToCart}
             disabledLabel={selectedVariant?.stock === 0 ? 'Out of stock' : 'Select options'}
+            className="w-full"
+          />
+          <WishlistToggleButton
+            productId={product.id}
+            variantId={selectedVariant?.variantId}
+            label="Add to Wishlist"
             className="w-full"
           />
           {product.category && (

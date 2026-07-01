@@ -118,6 +118,7 @@ export function OrderRow({ order }: OrderRowProps) {
           <Link
             href={`/account/orders/${order.id}`}
             className="inline-flex h-10 items-center justify-center bg-[#111111] px-5 text-xs font-medium uppercase tracking-[0.08em] text-[#fffaf3] transition hover:bg-[#2d2924]"
+            style={{ color: '#fffaf3' }}
           >
             View Order
           </Link>

@@ -48,6 +48,7 @@ export function AccountSummaryCard({ user }: { user: AuthUser }) {
         <Link
           href="/account/profile"
           className="inline-flex h-12 w-full items-center justify-center bg-[#111111] px-6 text-sm font-medium uppercase tracking-[0.08em] text-[#fffaf3] transition hover:bg-[#2d2924] sm:w-auto"
+          style={{ color: '#fffaf3' }}
         >
           Edit Profile
         </Link>
