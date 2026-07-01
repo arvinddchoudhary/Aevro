@@ -4,10 +4,14 @@ type AccountIconProps = {
     | 'bag'
     | 'calendar'
     | 'card'
+    | 'delete'
+    | 'edit'
     | 'heart'
+    | 'home'
     | 'logout'
     | 'mail'
     | 'phone'
+    | 'plus'
     | 'profile'
     | 'refresh'
     | 'search'
@@ -57,10 +61,32 @@ export function AccountIcon({ name, className = 'h-5 w-5' }: AccountIconProps) {
           <path d="M3.5 10h17M7 14.5h3" />
         </svg>
       );
+    case 'delete':
+      return (
+        <svg {...shared}>
+          <path d="M5 7h14M9 7V5h6v2M7 7l1 13h8l1-13" />
+          <path d="M10 11v5M14 11v5" />
+        </svg>
+      );
+    case 'edit':
+      return (
+        <svg {...shared}>
+          <path d="M4.5 19.5h15" />
+          <path d="m7 15.5-.5 3 3-.5 8.5-8.5-2.5-2.5L7 15.5Z" />
+        </svg>
+      );
     case 'heart':
       return (
         <svg {...shared}>
           <path d="M20.5 8.8c0 5.4-8.5 10.2-8.5 10.2S3.5 14.2 3.5 8.8A4.4 4.4 0 0 1 12 7.2a4.4 4.4 0 0 1 8.5 1.6Z" />
+        </svg>
+      );
+    case 'home':
+      return (
+        <svg {...shared}>
+          <path d="m4 11 8-7 8 7" />
+          <path d="M6.5 10v9h11v-9" />
+          <path d="M10 19v-5h4v5" />
         </svg>
       );
     case 'logout':
@@ -68,6 +94,12 @@ export function AccountIcon({ name, className = 'h-5 w-5' }: AccountIconProps) {
         <svg {...shared}>
           <path d="M9 4.5H5.5v15H9" />
           <path d="M14 8l4 4-4 4M18 12H8.5" />
+        </svg>
+      );
+    case 'plus':
+      return (
+        <svg {...shared}>
+          <path d="M12 5v14M5 12h14" />
         </svg>
       );
     case 'mail':
