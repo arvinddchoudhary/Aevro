@@ -1,8 +1,7 @@
 'use client';
 
-import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { FormEvent, useEffect, useMemo, useState } from 'react';
+import { FormEvent, useEffect, useState } from 'react';
 import {
   createUserAddress,
   deleteUserAddress,
@@ -14,6 +13,12 @@ import { useAuth } from '../../lib/auth';
 import type { AddressPayload, UserAddress } from '../../types/user';
 import { EmptyState } from '../ui/EmptyState';
 import { ErrorState } from '../ui/ErrorState';
+import { AccountBenefitBar } from './AccountBenefitBar';
+import { AccountHero } from './AccountHero';
+import { AccountIcon } from './AccountIcons';
+import { AccountSidebar } from './AccountSidebar';
+import { AddressCard } from './AddressCard';
+import { AddressFormModal } from './AddressFormModal';
 
 const emptyAddress: AddressPayload = {
   label: 'Home',
@@ -41,21 +46,34 @@ function toPayload(address: UserAddress): AddressPayload {
   };
 }
 
+function normalizePayload(payload: AddressPayload): AddressPayload {
+  return {
+    label: payload.label?.trim() || 'Home',
+    fullName: payload.fullName.trim(),
+    phone: payload.phone.trim(),
+    addressLine1: payload.addressLine1.trim(),
+    addressLine2: payload.addressLine2?.trim() || undefined,
+    city: payload.city.trim(),
+    state: payload.state.trim(),
+    postalCode: payload.postalCode.trim(),
+    country: payload.country.trim() || 'India',
+  };
+}
+
 export function AddressesPageContent() {
   const router = useRouter();
-  const { status, user } = useAuth();
+  const { logout, status, user } = useAuth();
   const [addresses, setAddresses] = useState<UserAddress[]>([]);
   const [formValues, setFormValues] = useState<AddressPayload>(emptyAddress);
   const [editingId, setEditingId] = useState<string | null>(null);
+  const [isFormOpen, setIsFormOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const [isSetDefault, setIsSetDefault] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [formError, setFormError] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null);
-
-  const editingAddress = useMemo(
-    () => addresses.find((address) => address.id === editingId) ?? null,
-    [addresses, editingId],
-  );
 
   const loadAddresses = async () => {
     try {
@@ -79,53 +97,69 @@ export function AddressesPageContent() {
     }
   }, [router, status]);
 
-  const updateField = (name: keyof AddressPayload, value: string) => {
-    setFormValues((currentValues) => ({ ...currentValues, [name]: value }));
-    setMessage(null);
-    setError(null);
-  };
-
-  const resetForm = () => {
+  const closeForm = () => {
     setEditingId(null);
     setFormValues(emptyAddress);
+    setFormError(null);
+    setIsSetDefault(false);
+    setIsFormOpen(false);
   };
 
-  const startEditing = (address: UserAddress) => {
+  const openCreateForm = () => {
+    setEditingId(null);
+    setFormValues(emptyAddress);
+    setFormError(null);
+    setIsSetDefault(addresses.length === 0);
+    setIsFormOpen(true);
+  };
+
+  const openEditForm = (address: UserAddress) => {
     setEditingId(address.id);
     setFormValues(toPayload(address));
+    setFormError(null);
+    setIsSetDefault(address.isDefault);
+    setIsFormOpen(true);
+  };
+
+  const updateField = (name: keyof AddressPayload, value: string) => {
+    setFormValues((currentValues) => ({ ...currentValues, [name]: value }));
+    setFormError(null);
     setMessage(null);
-    setError(null);
   };
 
   const submitAddress = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setError(null);
+    setFormError(null);
     setMessage(null);
 
     try {
       setIsSaving(true);
-      if (editingId) {
-        await updateUserAddress(editingId, formValues);
-        setMessage('Address updated.');
-      } else {
-        await createUserAddress(formValues);
-        setMessage('Address saved.');
+      const payload = normalizePayload(formValues);
+      const savedAddress = editingId
+        ? await updateUserAddress(editingId, payload)
+        : await createUserAddress(payload);
+
+      if (isSetDefault && !savedAddress.isDefault) {
+        await setDefaultUserAddress(savedAddress.id);
       }
-      resetForm();
+
+      setMessage(editingId ? 'Address updated.' : 'Address saved.');
+      closeForm();
       await loadAddresses();
     } catch (saveError) {
-      setError(saveError instanceof Error ? saveError.message : 'Unable to save address.');
+      setFormError(saveError instanceof Error ? saveError.message : 'Unable to save address.');
     } finally {
       setIsSaving(false);
     }
   };
 
-  const makeDefault = async (addressId: string) => {
+  const makeDefault = async (address: UserAddress) => {
     try {
       setError(null);
       setMessage(null);
-      await setDefaultUserAddress(addressId);
-      setMessage('Default address updated.');
+      await setDefaultUserAddress(address.id);
+      setMessage(`${address.label} is now your default address.`);
       await loadAddresses();
     } catch (defaultError) {
       setError(
@@ -136,13 +170,19 @@ export function AddressesPageContent() {
     }
   };
 
-  const removeAddress = async (addressId: string) => {
+  const removeAddress = async (address: UserAddress) => {
+    const confirmed = window.confirm(`Delete ${address.label} address?`);
+
+    if (!confirmed) {
+      return;
+    }
+
     try {
       setError(null);
       setMessage(null);
-      await deleteUserAddress(addressId);
-      if (editingId === addressId) {
-        resetForm();
+      await deleteUserAddress(address.id);
+      if (editingId === address.id) {
+        closeForm();
       }
       setMessage('Address removed.');
       await loadAddresses();
@@ -151,6 +191,14 @@ export function AddressesPageContent() {
         deleteError instanceof Error ? deleteError.message : 'Unable to delete address.',
       );
     }
+  };
+
+  const handleLogout = async () => {
+    setIsLoggingOut(true);
+    await logout();
+    setIsLoggingOut(false);
+    router.replace('/login');
+    router.refresh();
   };
 
   if (status === 'loading') {
@@ -162,141 +210,113 @@ export function AddressesPageContent() {
   }
 
   return (
-    <div className="grid gap-7 lg:grid-cols-[minmax(0,1fr)_360px]">
-      <section>
-        <div className="mb-6 border-b border-[#ddd4c8] pb-5">
-          <p className="mb-3 text-xs uppercase tracking-[0.22em] text-[#777777]">
-            Account
-          </p>
-          <h1 className="text-3xl font-light sm:text-4xl">Addresses</h1>
-          <Link
-            href="/account/profile"
-            className="mt-4 inline-flex cursor-pointer text-sm underline underline-offset-4"
-          >
-            Back to profile
-          </Link>
-        </div>
+    <div className="bg-[#fbf7f0]">
+      <AccountHero
+        title="Addresses"
+        breadcrumb={[
+          { label: 'Home', href: '/' },
+          { label: 'Account', href: '/account' },
+          { label: 'Addresses' },
+        ]}
+      />
 
-        {isLoading && <EmptyState title="Loading addresses" message="Fetching saved addresses." />}
-        {error && !isLoading && <ErrorState title="Address request failed" message={error} />}
-        {!isLoading && addresses.length === 0 && !error && (
-          <EmptyState title="No saved addresses" message="Add a shipping address for faster checkout." />
-        )}
+      <section className="aevro-container py-6 sm:py-8 lg:py-10">
+        <div className="grid gap-6 lg:grid-cols-[280px_minmax(0,1fr)] xl:grid-cols-[315px_minmax(0,1fr)]">
+          <AccountSidebar isLoggingOut={isLoggingOut} onLogout={handleLogout} />
 
-        <div className="space-y-4">
-          {addresses.map((address) => (
-            <article key={address.id} className="border border-[#ddd4c8] p-4 sm:p-5">
-              <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-                <div>
-                  <p className="mb-2 text-xs font-medium uppercase tracking-[0.16em] text-[#777777]">
-                    {address.label}
-                  </p>
-                  <div className="flex flex-wrap items-center gap-3">
-                    <p className="text-lg">{address.fullName}</p>
-                    {address.isDefault && (
-                      <span className="border border-[#111111] px-3 py-1 text-xs uppercase tracking-[0.14em]">
-                        Default
-                      </span>
-                    )}
-                  </div>
-                  <p className="mt-2 text-sm text-[#5f5a53]">{address.phone}</p>
-                  <p className="mt-3 max-w-xl text-sm leading-6 text-[#5f5a53]">
-                    {address.addressLine1}
-                    {address.addressLine2 ? `, ${address.addressLine2}` : ''}
-                    <br />
-                    {address.city}, {address.state} {address.postalCode}
-                    <br />
-                    {address.country}
-                  </p>
-                </div>
-                <div className="flex flex-wrap gap-2">
-                  {!address.isDefault && (
-                    <button
-                      type="button"
-                      onClick={() => void makeDefault(address.id)}
-                      className="h-9 cursor-pointer border border-[#ddd4c8] px-3 text-xs uppercase tracking-[0.1em] hover:border-[#111111]"
-                    >
-                      Set default
-                    </button>
-                  )}
-                  <button
-                    type="button"
-                    onClick={() => startEditing(address)}
-                    className="h-9 cursor-pointer border border-[#111111] px-3 text-xs uppercase tracking-[0.1em] hover:bg-[#111111] hover:text-[#fffaf3]"
-                  >
-                    Edit
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => void removeAddress(address.id)}
-                    className="h-9 cursor-pointer border border-[#ddd4c8] px-3 text-xs uppercase tracking-[0.1em] hover:border-[#111111]"
-                  >
-                    Delete
-                  </button>
-                </div>
+          <section className="min-w-0 border border-[#e1d8cc] bg-[#fffaf3]/82 p-5 shadow-[0_26px_80px_rgba(48,38,27,0.04)] sm:p-7">
+            <div className="flex flex-col gap-5 border-b border-[#e5dbcf] pb-6 lg:flex-row lg:items-start lg:justify-between">
+              <div>
+                <h1 className="font-serif text-2xl font-light text-[#111111] sm:text-3xl">
+                  My Saved Addresses
+                </h1>
+                <p className="mt-3 max-w-2xl text-sm leading-6 text-[#625a51]">
+                  Manage your shipping addresses for a faster checkout experience.
+                </p>
               </div>
-            </article>
-          ))}
+              <button
+                type="button"
+                onClick={openCreateForm}
+                className="inline-flex h-12 w-full items-center justify-center gap-2 bg-[#111111] px-6 text-sm font-medium uppercase tracking-[0.08em] text-[#fffaf3] transition hover:bg-[#2d2924] sm:w-auto"
+              >
+                <AccountIcon name="plus" className="h-4 w-4" />
+                Add New Address
+              </button>
+            </div>
+
+            {message && (
+              <p className="mt-5 border border-[#b9d0bd] bg-[#fbfff9] p-4 text-sm text-[#2d6439]">
+                {message}
+              </p>
+            )}
+
+            {isLoading && (
+              <div className="mt-6">
+                <EmptyState
+                  title="Loading addresses"
+                  message="Fetching your saved addresses."
+                />
+              </div>
+            )}
+
+            {error && !isLoading && (
+              <div className="mt-6">
+                <ErrorState title="Address request failed" message={error} />
+              </div>
+            )}
+
+            {!isLoading && !error && addresses.length === 0 && (
+              <div className="mt-6 border border-[#e5dbcf] bg-[#fffdf8] p-8 text-center sm:p-10">
+                <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-[#f0e8de] text-[#211d18]">
+                  <AccountIcon name="address" className="h-8 w-8" />
+                </div>
+                <h2 className="mt-5 font-serif text-2xl font-light text-[#111111]">
+                  No saved addresses yet.
+                </h2>
+                <p className="mx-auto mt-3 max-w-md text-sm leading-6 text-[#625a51]">
+                  Add an address to make checkout faster.
+                </p>
+                <button
+                  type="button"
+                  onClick={openCreateForm}
+                  className="mt-6 inline-flex h-12 w-full items-center justify-center bg-[#111111] px-6 text-sm font-medium uppercase tracking-[0.08em] text-[#fffaf3] transition hover:bg-[#2d2924] sm:w-auto"
+                >
+                  Add New Address
+                </button>
+              </div>
+            )}
+
+            {!isLoading && !error && addresses.length > 0 && (
+              <div className="mt-6 space-y-4">
+                {addresses.map((address) => (
+                  <AddressCard
+                    key={address.id}
+                    address={address}
+                    onDelete={removeAddress}
+                    onEdit={openEditForm}
+                    onSetDefault={makeDefault}
+                  />
+                ))}
+              </div>
+            )}
+          </section>
         </div>
       </section>
 
-      <aside className="h-fit border border-[#ddd4c8] p-4 sm:p-5 lg:sticky lg:top-24">
-        <p className="text-xs uppercase tracking-[0.2em] text-[#777777]">
-          {editingAddress ? 'Edit address' : 'New address'}
-        </p>
-        <form onSubmit={submitAddress} className="mt-5 grid gap-3">
-          {(
-            [
-              ['fullName', 'Full name'],
-              ['label', 'Address name'],
-              ['phone', 'Phone'],
-              ['addressLine1', 'Address line 1'],
-              ['addressLine2', 'Address line 2'],
-              ['city', 'City'],
-              ['state', 'State'],
-              ['postalCode', 'Postal code'],
-              ['country', 'Country'],
-            ] as Array<[keyof AddressPayload, string]>
-          ).map(([name, label]) => (
-            <label key={name}>
-              <span className="mb-2 block text-xs uppercase tracking-[0.16em] text-[#777777]">
-                {label}
-              </span>
-              <input
-                value={formValues[name] ?? ''}
-                onChange={(event) => updateField(name, event.target.value)}
-                className="h-10 w-full border border-[#ddd4c8] px-4 text-sm outline-none focus:border-[#111111]"
-              />
-            </label>
-          ))}
-          {error && (
-            <p className="border border-[#8a1f1f] p-4 text-sm text-[#8a1f1f]">
-              {error}
-            </p>
-          )}
-          {message && (
-            <p className="border border-[#1f6b3a] p-4 text-sm text-[#1f6b3a]">
-              {message}
-            </p>
-          )}
-          <button
-            type="submit"
-            disabled={isSaving}
-            className="h-11 cursor-pointer border border-[#111111] text-xs font-medium uppercase tracking-[0.08em] hover:bg-[#111111] hover:text-[#fffaf3] disabled:cursor-not-allowed disabled:border-[#ddd4c8] disabled:text-[#777777] disabled:hover:bg-[#fffaf3]"
-          >
-            {isSaving ? 'Saving' : editingId ? 'Update address' : 'Save address'}
-          </button>
-          {editingId && (
-            <button
-              type="button"
-              onClick={resetForm}
-              className="h-11 cursor-pointer border border-[#ddd4c8] text-xs font-medium uppercase tracking-[0.08em] hover:border-[#111111]"
-            >
-              Cancel edit
-            </button>
-          )}
-        </form>
-      </aside>
+      <AccountBenefitBar />
+
+      <AddressFormModal
+        error={formError}
+        formValues={formValues}
+        isOpen={isFormOpen}
+        isSaving={isSaving}
+        isSetDefault={isSetDefault}
+        mode={editingId ? 'edit' : 'create'}
+        onCancel={closeForm}
+        onFieldChange={updateField}
+        onSetDefaultChange={setIsSetDefault}
+        onSubmit={submitAddress}
+      />
     </div>
   );
 }
