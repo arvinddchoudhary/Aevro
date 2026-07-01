@@ -167,12 +167,21 @@ function shouldShowPremiumServiceStrip(pathname: string) {
   );
 }
 
+function shouldShowFooterServiceStrip(pathname: string) {
+  return !pathname.startsWith('/account');
+}
+
 export function Footer() {
   const pathname = usePathname();
 
   return (
     <footer className="border-t border-[#ddd4c8] bg-[#fbf7f0]">
-      {shouldShowPremiumServiceStrip(pathname) ? <ServiceBenefitsStrip /> : <CompactServiceStrip />}
+      {shouldShowFooterServiceStrip(pathname) &&
+        (shouldShowPremiumServiceStrip(pathname) ? (
+          <ServiceBenefitsStrip />
+        ) : (
+          <CompactServiceStrip />
+        ))}
 
       <section className="border-t border-[#ddd4c8] bg-[#f3eadf]/55">
         <div className="aevro-container grid gap-10 py-9 lg:grid-cols-[1.1fr_2fr_1fr]">
