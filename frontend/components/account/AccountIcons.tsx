@@ -4,6 +4,7 @@ type AccountIconProps = {
     | 'bag'
     | 'calendar'
     | 'card'
+    | 'chevron'
     | 'delete'
     | 'edit'
     | 'heart'
@@ -59,6 +60,12 @@ export function AccountIcon({ name, className = 'h-5 w-5' }: AccountIconProps) {
         <svg {...shared}>
           <path d="M3.5 6.5h17v11h-17v-11Z" />
           <path d="M3.5 10h17M7 14.5h3" />
+        </svg>
+      );
+    case 'chevron':
+      return (
+        <svg {...shared}>
+          <path d="m7 10 5 5 5-5" />
         </svg>
       );
     case 'delete':
