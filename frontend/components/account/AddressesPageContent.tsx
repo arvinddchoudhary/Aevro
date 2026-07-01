@@ -238,6 +238,7 @@ export function AddressesPageContent() {
                 type="button"
                 onClick={openCreateForm}
                 className="inline-flex h-12 w-full items-center justify-center gap-2 bg-[#111111] px-6 text-sm font-medium uppercase tracking-[0.08em] text-[#fffaf3] transition hover:bg-[#2d2924] sm:w-auto"
+                style={{ color: '#fffaf3' }}
               >
                 <AccountIcon name="plus" className="h-4 w-4" />
                 Add New Address
@@ -280,6 +281,7 @@ export function AddressesPageContent() {
                   type="button"
                   onClick={openCreateForm}
                   className="mt-6 inline-flex h-12 w-full items-center justify-center bg-[#111111] px-6 text-sm font-medium uppercase tracking-[0.08em] text-[#fffaf3] transition hover:bg-[#2d2924] sm:w-auto"
+                  style={{ color: '#fffaf3' }}
                 >
                   Add New Address
                 </button>

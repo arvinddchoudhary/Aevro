@@ -229,6 +229,7 @@ export function AccountOrdersPageContent() {
                     type="button"
                     onClick={() => void loadOrders()}
                     className="mt-6 inline-flex h-12 items-center justify-center bg-[#111111] px-6 text-sm font-medium uppercase tracking-[0.08em] text-[#fffaf3] transition hover:bg-[#2d2924]"
+                    style={{ color: '#fffaf3' }}
                   >
                     Retry
                   </button>
@@ -249,6 +250,7 @@ export function AccountOrdersPageContent() {
                   <Link
                     href="/products"
                     className="mt-6 inline-flex h-12 w-full items-center justify-center bg-[#111111] px-6 text-sm font-medium uppercase tracking-[0.08em] text-[#fffaf3] transition hover:bg-[#2d2924] sm:w-auto"
+                    style={{ color: '#fffaf3' }}
                   >
                     Start Shopping
                   </Link>

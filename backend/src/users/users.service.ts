@@ -1,16 +1,25 @@
 import {
   ConflictException,
+  BadRequestException,
   Inject,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { AuthProvider, User, UserAddress, UserRole } from '@prisma/client';
+import {
+  AuthProvider,
+  Prisma,
+  ProductStatus,
+  User,
+  UserAddress,
+  UserRole,
+} from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import {
   CreateAddressDto,
   UpdateAddressDto,
   UpdateProfileDto,
 } from './dto/user-profile.dto';
+import { AddWishlistItemDto } from './dto/wishlist.dto';
 
 type CreateEmailUserInput = {
   name: string;
@@ -185,6 +194,109 @@ export class UsersService {
     });
   }
 
+  async listWishlist(userId: string) {
+    const items = await this.prisma.wishlistItem.findMany({
+      where: {
+        userId,
+      },
+      orderBy: {
+        createdAt: 'desc',
+      },
+      select: this.wishlistItemSelect(),
+    });
+
+    return items.map((item) => this.serializeWishlistItem(item));
+  }
+
+  async addWishlistItem(userId: string, dto: AddWishlistItemDto) {
+    await this.ensureUserExists(userId);
+
+    const product = await this.prisma.product.findFirst({
+      where: {
+        id: dto.productId,
+        status: ProductStatus.ACTIVE,
+      },
+      select: {
+        id: true,
+      },
+    });
+
+    if (!product) {
+      throw new NotFoundException('Product not found.');
+    }
+
+    if (dto.variantId) {
+      const variant = await this.prisma.productVariant.findFirst({
+        where: {
+          id: dto.variantId,
+          productId: dto.productId,
+        },
+        select: {
+          id: true,
+        },
+      });
+
+      if (!variant) {
+        throw new BadRequestException('Selected variant does not belong to this product.');
+      }
+    }
+
+    const existingItem = await this.prisma.wishlistItem.findFirst({
+      where: {
+        userId,
+        productId: dto.productId,
+        variantId: dto.variantId ?? null,
+      },
+      select: this.wishlistItemSelect(),
+    });
+
+    if (existingItem) {
+      return this.serializeWishlistItem(existingItem);
+    }
+
+    const item = await this.prisma.wishlistItem.create({
+      data: {
+        userId,
+        productId: dto.productId,
+        variantId: dto.variantId ?? null,
+      },
+      select: this.wishlistItemSelect(),
+    });
+
+    return this.serializeWishlistItem(item);
+  }
+
+  async deleteWishlistItem(userId: string, itemId: string) {
+    const item = await this.prisma.wishlistItem.findFirst({
+      where: {
+        id: itemId,
+        userId,
+      },
+      select: {
+        id: true,
+      },
+    });
+
+    if (!item) {
+      throw new NotFoundException('Wishlist item not found.');
+    }
+
+    await this.prisma.wishlistItem.delete({
+      where: {
+        id: itemId,
+      },
+    });
+  }
+
+  async deleteWishlistProduct(userId: string, productId: string) {
+    await this.prisma.wishlistItem.deleteMany({
+      where: {
+        userId,
+        productId,
+      },
+    });
+  }
+
   async createEmailUser(input: CreateEmailUserInput) {
     const email = input.email.toLowerCase();
     const existingUser = await this.findByEmail(email);
@@ -338,6 +450,201 @@ export class UsersService {
       isDefault: address.isDefault,
       createdAt: address.createdAt,
       updatedAt: address.updatedAt,
+    };
+  }
+
+  private wishlistItemSelect() {
+    return {
+      id: true,
+      userId: true,
+      productId: true,
+      variantId: true,
+      createdAt: true,
+      updatedAt: true,
+      variant: {
+        select: {
+          id: true,
+          colorName: true,
+          colorSlug: true,
+          colorHex: true,
+          size: true,
+          stock: true,
+          sku: true,
+          images: {
+            orderBy: {
+              sortOrder: 'asc',
+            },
+            select: {
+              id: true,
+              url: true,
+              altText: true,
+              sortOrder: true,
+              isPrimary: true,
+              variantId: true,
+            },
+          },
+        },
+      },
+      product: {
+        select: {
+          id: true,
+          name: true,
+          slug: true,
+          description: true,
+          priceInPaise: true,
+          sku: true,
+          color: true,
+          size: true,
+          stock: true,
+          status: true,
+          createdAt: true,
+          updatedAt: true,
+          category: {
+            select: {
+              id: true,
+              name: true,
+              slug: true,
+            },
+          },
+          images: {
+            orderBy: {
+              sortOrder: 'asc',
+            },
+            select: {
+              id: true,
+              url: true,
+              altText: true,
+              sortOrder: true,
+              isPrimary: true,
+              variantId: true,
+            },
+          },
+          variants: {
+            orderBy: [{ colorSlug: 'asc' }, { size: 'asc' }],
+            select: {
+              id: true,
+              colorName: true,
+              colorSlug: true,
+              colorHex: true,
+              size: true,
+              stock: true,
+              sku: true,
+              images: {
+                orderBy: {
+                  sortOrder: 'asc',
+                },
+                select: {
+                  id: true,
+                  url: true,
+                  altText: true,
+                  sortOrder: true,
+                  isPrimary: true,
+                  variantId: true,
+                },
+              },
+            },
+          },
+        },
+      },
+    } satisfies Prisma.WishlistItemSelect;
+  }
+
+  private serializeWishlistItem(
+    item: Prisma.WishlistItemGetPayload<{
+      select: ReturnType<UsersService['wishlistItemSelect']>;
+    }>,
+  ) {
+    const variants = item.product.variants.map((variant) => ({
+      id: variant.id,
+      colorName: variant.colorName,
+      colorSlug: variant.colorSlug,
+      colorHex: variant.colorHex,
+      size: variant.size,
+      stock: variant.stock,
+      sku: variant.sku,
+      images: variant.images,
+    }));
+    const variantImages = variants.flatMap((variant) => variant.images);
+    const primaryImage =
+      item.variant?.images.find((image) => image.isPrimary) ??
+      item.variant?.images[0] ??
+      variantImages.find((image) => image.isPrimary) ??
+      item.product.images.find((image) => image.isPrimary) ??
+      variantImages[0] ??
+      item.product.images[0] ??
+      null;
+    const colors = new Map<
+      string,
+      {
+        colorName: string;
+        colorSlug: string;
+        colorHex: string | null;
+        totalStock: number;
+      }
+    >();
+    const sizesByColor: Record<
+      string,
+      {
+        variantId: string;
+        size: string;
+        stock: number;
+      }[]
+    > = {};
+    const imagesByColor: Record<string, typeof item.product.images> = {};
+
+    variants.forEach((variant) => {
+      const existingColor = colors.get(variant.colorSlug);
+
+      colors.set(variant.colorSlug, {
+        colorName: variant.colorName,
+        colorSlug: variant.colorSlug,
+        colorHex: variant.colorHex,
+        totalStock: (existingColor?.totalStock ?? 0) + variant.stock,
+      });
+
+      sizesByColor[variant.colorSlug] = [
+        ...(sizesByColor[variant.colorSlug] ?? []),
+        {
+          variantId: variant.id,
+          size: variant.size,
+          stock: variant.stock,
+        },
+      ];
+
+      imagesByColor[variant.colorSlug] = [
+        ...(imagesByColor[variant.colorSlug] ?? []),
+        ...variant.images,
+      ];
+    });
+
+    return {
+      id: item.id,
+      productId: item.productId,
+      variantId: item.variantId,
+      selectedVariant: item.variant,
+      product: {
+        id: item.product.id,
+        name: item.product.name,
+        slug: item.product.slug,
+        description: item.product.description,
+        priceInPaise: item.product.priceInPaise,
+        sku: item.product.sku,
+        color: item.product.color,
+        size: item.product.size,
+        stock: item.product.stock,
+        status: item.product.status,
+        category: item.product.category,
+        images: item.product.images,
+        primaryImage,
+        availableColors: Array.from(colors.values()),
+        sizesByColor,
+        imagesByColor,
+        variants,
+        createdAt: item.product.createdAt,
+        updatedAt: item.product.updatedAt,
+      },
+      createdAt: item.createdAt,
+      updatedAt: item.updatedAt,
     };
   }
 }

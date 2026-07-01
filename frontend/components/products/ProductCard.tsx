@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { formatPrice } from '../../lib/format';
 import type { Product } from '../../types/catalog';
 import { ProductImageFrame } from './ProductImageFrame';
+import { WishlistToggleButton } from '../wishlist/WishlistToggleButton';
 
 type ProductCardProps = {
   product: Product;
@@ -12,7 +13,7 @@ export function ProductCard({ product, compact = false }: ProductCardProps) {
   const primaryImage = product.primaryImage ?? product.images[0];
 
   return (
-    <article className="group overflow-hidden rounded-[4px] border border-[#ded6cc] bg-[#fffaf3] transition duration-300 hover:-translate-y-0.5 hover:border-[#bfb4a8] hover:shadow-[0_18px_45px_rgba(49,37,26,0.08)]">
+    <article className="group relative overflow-hidden rounded-[4px] border border-[#ded6cc] bg-[#fffaf3] transition duration-300 hover:-translate-y-0.5 hover:border-[#bfb4a8] hover:shadow-[0_18px_45px_rgba(49,37,26,0.08)]">
       <Link href={`/products/${product.slug}`} className="group block cursor-pointer">
         <ProductImageFrame
           image={primaryImage}
@@ -32,6 +33,11 @@ export function ProductCard({ product, compact = false }: ProductCardProps) {
           <p className="mt-3 text-sm font-semibold">{formatPrice(product.priceInPaise)}</p>
         </div>
       </Link>
+      <WishlistToggleButton
+        productId={product.id}
+        label="Save"
+        className="absolute right-3 top-3 z-10 w-24 opacity-95"
+      />
     </article>
   );
 }

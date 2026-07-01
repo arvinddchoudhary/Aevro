@@ -13,10 +13,10 @@ const linkedItems = [
   { label: 'Profile', href: '/account', icon: 'profile' },
   { label: 'Orders', href: '/account/orders', icon: 'bag' },
   { label: 'Addresses', href: '/account/addresses', icon: 'address' },
+  { label: 'Wishlist', href: '/account/wishlist', icon: 'heart' },
 ] as const;
 
 const futureItems = [
-  { label: 'Wishlist', icon: 'heart' },
   { label: 'Payment Methods', icon: 'card' },
 ] as const;
 

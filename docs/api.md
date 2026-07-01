@@ -46,6 +46,10 @@ POST /api/v1/users/me/addresses
 PATCH /api/v1/users/me/addresses/:id
 DELETE /api/v1/users/me/addresses/:id
 PATCH /api/v1/users/me/addresses/:id/default
+GET /api/v1/users/me/wishlist
+POST /api/v1/users/me/wishlist
+DELETE /api/v1/users/me/wishlist/:id
+DELETE /api/v1/users/me/wishlist/product/:productId
 POST /api/v1/orders
 GET /api/v1/orders/:id
 GET /api/v1/orders/me
@@ -234,6 +238,7 @@ GET /account/profile
 GET /account/addresses
 GET /account/orders
 GET /account/orders/:id
+GET /account/wishlist
 ```
 
 The frontend uses:
@@ -248,6 +253,10 @@ The frontend uses:
 - `POST /api/v1/auth/refresh`
 - `POST /api/v1/auth/logout`
 - `GET /api/v1/auth/me`
+- `GET /api/v1/users/me/wishlist`
+- `POST /api/v1/users/me/wishlist`
+- `DELETE /api/v1/users/me/wishlist/:id`
+- `DELETE /api/v1/users/me/wishlist/product/:productId`
 
 All auth requests use `credentials: include` so browser cookies are sent. JWT
 tokens are not stored in frontend storage.
@@ -300,6 +309,37 @@ as default clears the previous default address for the same user. Checkout may
 prefill customer and shipping details from the default saved address.
 Address labels are customer-facing names such as `Home`, `Office`, or
 `Parents Home`.
+
+## Phase 24 Customer Wishlist
+
+Wishlist routes require the same httpOnly cookie JWT session. Guest users cannot
+read or mutate wishlist items.
+
+```txt
+GET /api/v1/users/me/wishlist
+POST /api/v1/users/me/wishlist
+DELETE /api/v1/users/me/wishlist/:id
+DELETE /api/v1/users/me/wishlist/product/:productId
+```
+
+Add wishlist item body:
+
+```json
+{
+  "productId": "product_id",
+  "variantId": "variant_id_optional"
+}
+```
+
+Wishlist items are scoped to the authenticated user. The backend accepts only
+active products. If a variant is provided, it must belong to the product. Adding
+the same product/variant again returns the existing wishlist item instead of
+creating a duplicate.
+
+Wishlist list responses include the wishlist item id, selected variant when
+available, product id, name, slug, price, category, product images, primary
+image, variants, available colors/sizes, and timestamps. Frontend requests use
+`credentials: include`; JWTs are not stored in browser storage.
 
 ## Phase 14 Admin Foundation
 

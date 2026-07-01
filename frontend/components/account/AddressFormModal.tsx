@@ -126,6 +126,7 @@ export function AddressFormModal({
               type="submit"
               disabled={isSaving}
               className="h-12 bg-[#111111] px-6 text-sm font-medium uppercase tracking-[0.08em] text-[#fffaf3] transition hover:bg-[#2d2924] disabled:cursor-not-allowed disabled:bg-[#9a9187]"
+              style={{ color: '#fffaf3' }}
             >
               {isSaving ? 'Saving' : 'Save Address'}
             </button>
