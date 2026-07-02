@@ -117,11 +117,35 @@ class EnvironmentVariables {
 
   @IsString()
   @IsOptional()
+  BREVO_ORDER_PROCESSING_TEMPLATE_ID?: string;
+
+  @IsString()
+  @IsOptional()
+  BREVO_TEMPLATE_ORDER_PROCESSING?: string;
+
+  @IsString()
+  @IsOptional()
+  BREVO_ORDER_SHIPPED_TEMPLATE_ID?: string;
+
+  @IsString()
+  @IsOptional()
   BREVO_TEMPLATE_ORDER_SHIPPED?: string;
 
   @IsString()
   @IsOptional()
+  BREVO_ORDER_DELIVERED_TEMPLATE_ID?: string;
+
+  @IsString()
+  @IsOptional()
   BREVO_TEMPLATE_ORDER_DELIVERED?: string;
+
+  @IsString()
+  @IsOptional()
+  BREVO_ORDER_CANCELLED_TEMPLATE_ID?: string;
+
+  @IsString()
+  @IsOptional()
+  BREVO_TEMPLATE_ORDER_CANCELLED?: string;
 
   @IsString()
   @IsOptional()

@@ -5,10 +5,12 @@ import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { getMyOrders } from '../../lib/api/orders';
 import { getUserAddresses } from '../../lib/api/users';
+import { getWishlist } from '../../lib/api/wishlist';
 import { useAuth } from '../../lib/auth';
 import { formatPrice } from '../../lib/format';
 import type { Order } from '../../types/orders';
 import type { UserAddress } from '../../types/user';
+import type { WishlistItem } from '../../types/wishlist';
 import { AccountBenefitBar } from '../account/AccountBenefitBar';
 import { AccountHero } from '../account/AccountHero';
 import { AccountIcon } from '../account/AccountIcons';
@@ -47,11 +49,16 @@ function orderImage(order: Order) {
   return order.items.find((item) => item.product?.images?.[0])?.product?.images[0] ?? null;
 }
 
+function wishlistImage(item: WishlistItem) {
+  return item.product.primaryImage ?? item.product.images[0] ?? null;
+}
+
 export function AccountPageContent() {
   const router = useRouter();
   const { logout, status, user } = useAuth();
   const [addresses, setAddresses] = useState<UserAddress[]>([]);
   const [orders, setOrders] = useState<Order[]>([]);
+  const [wishlistItems, setWishlistItems] = useState<WishlistItem[]>([]);
   const [isDashboardLoading, setIsDashboardLoading] = useState(false);
   const [dashboardError, setDashboardError] = useState<string | null>(null);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
@@ -73,9 +80,10 @@ export function AccountPageContent() {
       setIsDashboardLoading(true);
       setDashboardError(null);
 
-      const [addressResult, orderResult] = await Promise.allSettled([
+      const [addressResult, orderResult, wishlistResult] = await Promise.allSettled([
         getUserAddresses(),
         getMyOrders(),
+        getWishlist(),
       ]);
 
       if (!isMounted) {
@@ -93,6 +101,13 @@ export function AccountPageContent() {
         setOrders(orderResult.value.data);
       } else {
         setOrders([]);
+        setDashboardError('Some account details could not be loaded.');
+      }
+
+      if (wishlistResult.status === 'fulfilled') {
+        setWishlistItems(wishlistResult.value);
+      } else {
+        setWishlistItems([]);
         setDashboardError('Some account details could not be loaded.');
       }
 
@@ -134,6 +149,7 @@ export function AccountPageContent() {
 
   const defaultAddress = addresses.find((address) => address.isDefault) ?? addresses[0] ?? null;
   const recentOrders = orders.slice(0, 3);
+  const wishlistPreviewItems = wishlistItems.slice(0, 4);
 
   return (
     <div className="bg-[#fbf7f0]">
@@ -261,12 +277,56 @@ export function AccountPageContent() {
                 )}
               </AccountInfoCard>
 
-              <AccountInfoCard title="Wishlist Preview" icon="heart">
-                <div className="grid gap-4 sm:grid-cols-[1fr_auto] sm:items-end">
+              <AccountInfoCard title="Wishlist Preview" href="/account/wishlist" icon="heart">
+                {isDashboardLoading ? (
+                  <p className="text-sm text-[#6e665d]">Loading saved pieces.</p>
+                ) : wishlistPreviewItems.length > 0 ? (
+                  <div>
+                    <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+                      {wishlistPreviewItems.map((item) => {
+                        const image = wishlistImage(item);
+
+                        return (
+                          <Link
+                            key={item.id}
+                            href={`/products/${item.product.slug}`}
+                            className="group min-w-0"
+                          >
+                            <span className="block aspect-[3/4] overflow-hidden bg-[#eee5da]">
+                              {image ? (
+                                <img
+                                  src={image.url}
+                                  alt={image.altText ?? item.product.name}
+                                  className="h-full w-full object-cover transition group-hover:scale-[1.02]"
+                                />
+                              ) : (
+                                <span className="flex h-full w-full items-center justify-center text-[#8a8177]">
+                                  <AccountIcon name="bag" className="h-6 w-6" />
+                                </span>
+                              )}
+                            </span>
+                            <span className="mt-2 block truncate text-xs text-[#211d18]">
+                              {item.product.name}
+                            </span>
+                            <span className="mt-1 block text-xs font-medium text-[#5f574f]">
+                              {formatPrice(item.product.priceInPaise)}
+                            </span>
+                          </Link>
+                        );
+                      })}
+                    </div>
+                    <Link
+                      href="/account/wishlist"
+                      className="mt-5 inline-flex h-10 items-center justify-center border border-[#ddd4c8] px-5 text-xs font-medium uppercase tracking-[0.08em] transition hover:border-[#111111]"
+                    >
+                      View Wishlist
+                    </Link>
+                  </div>
+                ) : (
                   <div>
                     <p className="text-sm leading-6 text-[#6e665d]">
-                      Wishlist curation is coming soon. Your saved pieces will appear
-                      here when the feature is available.
+                      No saved pieces yet. Save your favorite AEVRO styles to see
+                      them here.
                     </p>
                     <Link
                       href="/products"
@@ -275,19 +335,7 @@ export function AccountPageContent() {
                       Browse Collection
                     </Link>
                   </div>
-                  <div
-                    className="hidden grid-cols-3 gap-2 sm:grid"
-                    aria-hidden="true"
-                  >
-                    {['/images/brand/product-detail-black.webp', '/images/products/product-1.jpg', '/images/products/product-2.jpg'].map(
-                      (src) => (
-                        <span key={src} className="block h-24 w-20 overflow-hidden bg-[#eee5da]">
-                          <img src={src} alt="" className="h-full w-full object-cover" />
-                        </span>
-                      ),
-                    )}
-                  </div>
-                </div>
+                )}
               </AccountInfoCard>
             </div>
           </div>

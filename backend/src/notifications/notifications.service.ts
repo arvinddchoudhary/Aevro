@@ -51,6 +51,11 @@ type EmailVerificationOtpInput = {
   expiresInMinutes: number;
 };
 
+type OrderStatusEmailConfig = {
+  eventType: EmailEventType;
+  subject: string;
+};
+
 @Injectable()
 export class NotificationsService {
   private readonly logger = new Logger(NotificationsService.name);
@@ -217,7 +222,9 @@ export class NotificationsService {
       return;
     }
 
-    if (nextStatus !== OrderStatus.SHIPPED && nextStatus !== OrderStatus.DELIVERED) {
+    const emailConfig = this.getOrderStatusEmailConfig(nextStatus);
+
+    if (!emailConfig) {
       return;
     }
 
@@ -227,19 +234,20 @@ export class NotificationsService {
       return;
     }
 
-    const eventType =
-      nextStatus === OrderStatus.SHIPPED
-        ? EmailEventType.ORDER_SHIPPED
-        : EmailEventType.ORDER_DELIVERED;
-    const label = nextStatus === OrderStatus.SHIPPED ? 'shipped' : 'delivered';
+    if (!order.customerEmail?.trim()) {
+      this.logger.warn(
+        `Order status email skipped | orderId=${order.id} | orderNumber=${order.orderNumber} | status=${nextStatus} | reason=missing_customer_email`,
+      );
+      return;
+    }
 
     await this.createAndSendOnce({
-      eventType,
+      eventType: emailConfig.eventType,
       order,
       recipientEmail: order.customerEmail,
       recipientName: order.customerName,
-      subject: `Your AEVRO order has been ${label}: ${order.orderNumber}`,
-      idempotencyKey: `${eventType}:${order.id}:${order.customerEmail}`,
+      subject: `${emailConfig.subject}: ${order.orderNumber}`,
+      idempotencyKey: `${emailConfig.eventType}:${order.id}:${order.customerEmail}`,
       params: this.buildCustomerOrderParams(order),
     });
   }
@@ -489,20 +497,26 @@ export class NotificationsService {
     const paymentStatus = order.payment?.status ?? PaymentStatus.PENDING;
 
     return {
+      brandName: 'AEVRO',
       customerName: order.customerName,
       orderNumber: order.orderNumber,
       orderId: order.id,
+      orderStatus: order.status,
+      orderStatusText: this.formatOrderStatus(order.status),
       paymentStatus,
       paymentStatusText: paymentStatus,
       orderDate: order.createdAt.toISOString(),
       orderDateText: this.formatDate(order.createdAt),
       items: this.buildItems(order),
       itemsText: this.buildItemsText(order),
+      totalAmount: total,
       totalPaid: total,
       orderTotal: total,
       shippingAddress: this.buildShippingAddress(order),
       shippingAddressText: this.buildShippingAddressText(order),
       estimatedDelivery: '5-7 business days',
+      trackingNumber: null,
+      trackingUrl: null,
       orderUrl: `${this.frontendUrl}/account/orders/${order.id}`,
       supportEmail: this.supportEmail,
     };
@@ -611,6 +625,48 @@ export class NotificationsService {
       currency: 'INR',
       maximumFractionDigits: 0,
     }).format(amountInPaise / 100);
+  }
+
+  private getOrderStatusEmailConfig(
+    status: OrderStatus,
+  ): OrderStatusEmailConfig | null {
+    if (status === OrderStatus.PROCESSING) {
+      return {
+        eventType: EmailEventType.ORDER_PROCESSING,
+        subject: 'Your AEVRO order is being processed',
+      };
+    }
+
+    if (status === OrderStatus.SHIPPED) {
+      return {
+        eventType: EmailEventType.ORDER_SHIPPED,
+        subject: 'Your AEVRO order has shipped',
+      };
+    }
+
+    if (status === OrderStatus.DELIVERED) {
+      return {
+        eventType: EmailEventType.ORDER_DELIVERED,
+        subject: 'Your AEVRO order has been delivered',
+      };
+    }
+
+    if (status === OrderStatus.CANCELLED) {
+      return {
+        eventType: EmailEventType.ORDER_CANCELLED,
+        subject: 'Your AEVRO order has been cancelled',
+      };
+    }
+
+    return null;
+  }
+
+  private formatOrderStatus(status: OrderStatus) {
+    return status
+      .toLowerCase()
+      .split('_')
+      .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+      .join(' ');
   }
 
   private mapBrevoEventToStatus(event: string) {

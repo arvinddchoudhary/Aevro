@@ -2,6 +2,9 @@ import { Transform } from 'class-transformer';
 import { IsEnum, IsInt, IsOptional, IsString, Max, Min } from 'class-validator';
 import { OrderStatus, PaymentStatus } from '@prisma/client';
 
+export const SUPPORTED_ORDER_STATUSES = Object.values(OrderStatus);
+export const INVALID_ORDER_STATUS_MESSAGE = `Invalid order status. Supported statuses are: ${SUPPORTED_ORDER_STATUSES.join(', ')}`;
+
 export enum AdminOrderSort {
   Newest = 'newest',
   Oldest = 'oldest',
@@ -25,7 +28,7 @@ export class ListAdminOrdersQueryDto {
   @IsOptional()
   search?: string;
 
-  @IsEnum(OrderStatus)
+  @IsEnum(OrderStatus, { message: INVALID_ORDER_STATUS_MESSAGE })
   @IsOptional()
   status?: OrderStatus;
 
@@ -39,6 +42,6 @@ export class ListAdminOrdersQueryDto {
 }
 
 export class UpdateAdminOrderStatusDto {
-  @IsEnum(OrderStatus)
+  @IsEnum(OrderStatus, { message: INVALID_ORDER_STATUS_MESSAGE })
   status!: OrderStatus;
 }

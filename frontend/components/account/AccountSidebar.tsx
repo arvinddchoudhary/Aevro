@@ -14,11 +14,10 @@ const linkedItems = [
   { label: 'Orders', href: '/account/orders', icon: 'bag' },
   { label: 'Addresses', href: '/account/addresses', icon: 'address' },
   { label: 'Wishlist', href: '/account/wishlist', icon: 'heart' },
+  { label: 'Payment Methods', href: '/account/payment-methods', icon: 'card' },
 ] as const;
 
-const futureItems = [
-  { label: 'Payment Methods', icon: 'card' },
-] as const;
+const futureItems = [] as Array<{ label: string; icon: 'card' }>;
 
 export function AccountSidebar({ isLoggingOut, onLogout }: AccountSidebarProps) {
   const pathname = usePathname();
