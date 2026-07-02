@@ -1,10 +1,18 @@
-import { Inject, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Inject,
+  Injectable,
+  Logger,
+  NotFoundException,
+} from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { NotificationsService } from '../notifications/notifications.service';
 import { PrismaService } from '../prisma/prisma.service';
 import {
   AdminOrderSort,
+  INVALID_ORDER_STATUS_MESSAGE,
   ListAdminOrdersQueryDto,
+  SUPPORTED_ORDER_STATUSES,
   UpdateAdminOrderStatusDto,
 } from './dto/admin-order.dto';
 
@@ -14,8 +22,11 @@ type AdminOrderWithDetails = Prisma.OrderGetPayload<{
 
 @Injectable()
 export class AdminOrdersService {
+  private readonly logger = new Logger(AdminOrdersService.name);
+
   constructor(
     @Inject(PrismaService) private readonly prisma: PrismaService,
+    @Inject(NotificationsService)
     private readonly notificationsService: NotificationsService,
   ) {}
 
@@ -64,21 +75,47 @@ export class AdminOrdersService {
   }
 
   async updateOrderStatus(id: string, dto: UpdateAdminOrderStatusDto) {
+    if (!SUPPORTED_ORDER_STATUSES.includes(dto.status)) {
+      throw new BadRequestException(INVALID_ORDER_STATUS_MESSAGE);
+    }
+
     const existingOrder = await this.ensureOrderExists(id);
 
-    const order = await this.prisma.order.update({
-      where: { id },
-      data: {
-        status: dto.status,
-      },
-      include: this.orderInclude(),
-    });
+    if (existingOrder.status === dto.status) {
+      return this.getOrder(id);
+    }
+
+    let order: AdminOrderWithDetails;
+
+    try {
+      order = await this.prisma.order.update({
+        where: { id },
+        data: {
+          status: dto.status,
+        },
+        include: this.orderInclude(),
+      });
+    } catch (error) {
+      if (error instanceof Prisma.PrismaClientValidationError) {
+        throw new BadRequestException(INVALID_ORDER_STATUS_MESSAGE);
+      }
+
+      throw error;
+    }
 
     void this.notificationsService
       .handleOrderStatusTransition(order.id, existingOrder.status, order.status)
-      .catch(() => undefined);
+      .catch((error: unknown) => {
+        this.logger.error(
+          `Order status notification failed | orderId=${order.id} | previousStatus=${existingOrder.status} | nextStatus=${order.status} | error=${this.errorMessage(error)}`,
+        );
+      });
 
     return this.serializeOrder(order);
+  }
+
+  private errorMessage(error: unknown) {
+    return error instanceof Error ? error.message : String(error);
   }
 
   private buildOrderWhere(query: ListAdminOrdersQueryDto): Prisma.OrderWhereInput {

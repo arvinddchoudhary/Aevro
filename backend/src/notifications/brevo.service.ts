@@ -48,11 +48,21 @@ export class BrevoService {
       [EmailEventType.ORDER_CONFIRMED_ADMIN]: this.getTemplateId(
         'BREVO_TEMPLATE_ORDER_CONFIRMED_ADMIN',
       ),
+      [EmailEventType.ORDER_PROCESSING]: this.getTemplateId(
+        'BREVO_ORDER_PROCESSING_TEMPLATE_ID',
+        'BREVO_TEMPLATE_ORDER_PROCESSING',
+      ),
       [EmailEventType.ORDER_SHIPPED]: this.getTemplateId(
+        'BREVO_ORDER_SHIPPED_TEMPLATE_ID',
         'BREVO_TEMPLATE_ORDER_SHIPPED',
       ),
       [EmailEventType.ORDER_DELIVERED]: this.getTemplateId(
+        'BREVO_ORDER_DELIVERED_TEMPLATE_ID',
         'BREVO_TEMPLATE_ORDER_DELIVERED',
+      ),
+      [EmailEventType.ORDER_CANCELLED]: this.getTemplateId(
+        'BREVO_ORDER_CANCELLED_TEMPLATE_ID',
+        'BREVO_TEMPLATE_ORDER_CANCELLED',
       ),
       [EmailEventType.PAYMENT_FAILED]: this.getTemplateId(
         'BREVO_TEMPLATE_PAYMENT_FAILED',
@@ -123,8 +133,11 @@ export class BrevoService {
     }
   }
 
-  private getTemplateId(envKey: string) {
-    const value = this.configService.get<string>(envKey);
+  private getTemplateId(...envKeys: string[]) {
+    const value = envKeys
+      .map((envKey) => this.configService.get<string>(envKey))
+      .find(Boolean);
+
     if (!value) {
       return undefined;
     }

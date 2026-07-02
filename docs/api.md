@@ -462,6 +462,17 @@ sort=newest
 
 Supported `sort` values are `newest` and `oldest`.
 
+Supported order statuses:
+
+```txt
+PENDING
+CONFIRMED
+PROCESSING
+SHIPPED
+DELIVERED
+CANCELLED
+```
+
 Status update body:
 
 ```json
@@ -469,6 +480,29 @@ Status update body:
   "status": "PROCESSING"
 }
 ```
+
+Invalid status values return `400 Bad Request` with:
+
+```txt
+Invalid order status. Supported statuses are: PENDING, CONFIRMED, PROCESSING, SHIPPED, DELIVERED, CANCELLED
+```
+
+When an admin changes an order status, the backend updates the order first and
+then attempts a non-blocking Brevo transactional email for these statuses:
+
+```txt
+PROCESSING -> ORDER_PROCESSING
+SHIPPED -> ORDER_SHIPPED
+DELIVERED -> ORDER_DELIVERED
+CANCELLED -> ORDER_CANCELLED
+```
+
+Setting `CONFIRMED` from admin does not send a duplicate confirmation email;
+the customer confirmation email is sent by the paid-order payment flow. If the
+same status event was already created as `PENDING`, `SENT`, or `DELIVERED`, the
+backend does not create a duplicate email. Brevo/template failures are logged
+and marked on `email_notifications` when possible, but they do not fail the
+order status update.
 
 Admin order responses include customer details, shipping address, order items,
 product references, order total, order status, payment status, and timestamps.
@@ -1109,8 +1143,10 @@ Triggered email events:
 ```txt
 ORDER_CONFIRMED_CUSTOMER
 ORDER_CONFIRMED_ADMIN
+ORDER_PROCESSING
 ORDER_SHIPPED
 ORDER_DELIVERED
+ORDER_CANCELLED
 PAYMENT_FAILED
 EMAIL_VERIFICATION_OTP
 ```
@@ -1128,6 +1164,22 @@ WELCOME
 
 Order confirmation emails are created only after backend payment verification
 marks the local payment `PAID` and the order `CONFIRMED`.
+
+Admin order status email template environment variables:
+
+```txt
+BREVO_ORDER_PROCESSING_TEMPLATE_ID
+BREVO_ORDER_SHIPPED_TEMPLATE_ID
+BREVO_ORDER_DELIVERED_TEMPLATE_ID
+BREVO_ORDER_CANCELLED_TEMPLATE_ID
+```
+
+Legacy shipped/delivered names remain supported as fallbacks:
+
+```txt
+BREVO_TEMPLATE_ORDER_SHIPPED
+BREVO_TEMPLATE_ORDER_DELIVERED
+```
 
 ### Brevo Webhook
 

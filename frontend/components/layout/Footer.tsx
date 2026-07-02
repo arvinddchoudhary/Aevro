@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { BenefitStrip } from './BenefitStrip';
 
 const serviceItems = [
   {
@@ -176,12 +177,7 @@ export function Footer() {
 
   return (
     <footer className="border-t border-[#ddd4c8] bg-[#fbf7f0]">
-      {shouldShowFooterServiceStrip(pathname) &&
-        (shouldShowPremiumServiceStrip(pathname) ? (
-          <ServiceBenefitsStrip />
-        ) : (
-          <CompactServiceStrip />
-        ))}
+      {shouldShowFooterServiceStrip(pathname) && <BenefitStrip />}
 
       <section className="border-t border-[#ddd4c8] bg-[#f3eadf]/55">
         <div className="aevro-container grid gap-10 py-9 lg:grid-cols-[1.1fr_2fr_1fr]">
