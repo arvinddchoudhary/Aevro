@@ -125,6 +125,15 @@ export function ProfilePageContent() {
           Account
         </p>
         <div className="mt-6 flex flex-col gap-3">
+          {user.role === 'ADMIN' && (
+            <Link
+              href="/admin"
+              className="inline-flex h-12 cursor-pointer items-center justify-center bg-[#111111] px-6 text-sm font-medium uppercase tracking-[0.08em] text-[#fffaf3] hover:bg-[#2d2924]"
+              style={{ color: '#fffaf3' }}
+            >
+              Open admin dashboard
+            </Link>
+          )}
           <Link
             href="/account/addresses"
             className="inline-flex h-12 cursor-pointer items-center justify-center border border-[#111111] px-6 text-sm font-medium uppercase tracking-[0.08em] hover:bg-[#111111] hover:text-[#fffaf3]"

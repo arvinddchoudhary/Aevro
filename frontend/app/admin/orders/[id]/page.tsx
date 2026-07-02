@@ -1,4 +1,5 @@
 import { AdminRouteGuard } from '../../../../components/admin/AdminRouteGuard';
+import { AdminLayout } from '../../../../components/admin/AdminLayout';
 import { AdminOrderDetailPageContent } from '../../../../components/admin/orders/AdminOrderDetailPageContent';
 
 export default async function AdminOrderDetailPage({
@@ -9,10 +10,10 @@ export default async function AdminOrderDetailPage({
   const { id } = await params;
 
   return (
-    <main className="aevro-container min-h-screen py-14">
-      <AdminRouteGuard>
+    <AdminRouteGuard>
+      <AdminLayout>
         <AdminOrderDetailPageContent orderId={id} />
-      </AdminRouteGuard>
-    </main>
+      </AdminLayout>
+    </AdminRouteGuard>
   );
 }

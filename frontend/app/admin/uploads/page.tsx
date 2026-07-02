@@ -1,16 +1,12 @@
 import { AdminRouteGuard } from '../../../components/admin/AdminRouteGuard';
 import { AdminLayout } from '../../../components/admin/AdminLayout';
-import {
-  AdminProductsHeader,
-  AdminProductsList,
-} from '../../../components/admin/products/AdminProductsList';
+import { AdminUploadsPageContent } from '../../../components/admin/uploads/AdminUploadsPageContent';
 
-export default function AdminProductsPage() {
+export default function AdminUploadsPage() {
   return (
     <AdminRouteGuard>
       <AdminLayout>
-        <AdminProductsHeader />
-        <AdminProductsList />
+        <AdminUploadsPageContent />
       </AdminLayout>
     </AdminRouteGuard>
   );

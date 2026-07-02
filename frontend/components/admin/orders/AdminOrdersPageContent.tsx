@@ -13,6 +13,11 @@ import type {
 import type { PaginationMeta } from '../../../types/catalog';
 import { EmptyState } from '../../ui/EmptyState';
 import { ErrorState } from '../../ui/ErrorState';
+import { AdminIcon } from '../AdminIcons';
+import {
+  AdminOrderStatusBadge,
+  AdminPaymentStatusBadge,
+} from '../AdminStatusBadge';
 
 const orderStatuses: Array<AdminOrderStatus | ''> = [
   '',
@@ -74,30 +79,43 @@ export function AdminOrdersPageContent() {
 
   return (
     <div>
-      <div className="mb-8 border-b border-[#ddd4c8] pb-6">
-        <p className="mb-3 text-xs uppercase tracking-[0.22em] text-[#777777]">
-          Admin
+      <div className="mb-8">
+        <p className="text-xs font-semibold uppercase tracking-[0.28em] text-[#a56f3c]">
+          Order management
         </p>
-        <h1 className="text-3xl font-light sm:text-4xl md:text-5xl">Orders</h1>
+        <h1 className="mt-4 font-serif text-5xl font-light leading-none text-[#111111] sm:text-6xl">
+          Orders
+        </h1>
+        <p className="mt-6 max-w-2xl text-base leading-8 text-[#625a51]">
+          View and manage all customer orders. Use filters to find specific
+          orders or track their status.
+        </p>
       </div>
 
-      <div className="mb-8 border border-[#ddd4c8] p-4 sm:p-5">
-        <form onSubmit={submitSearch} className="grid gap-4 lg:grid-cols-[1fr_auto]">
-          <input
-            value={searchInput}
-            onChange={(event) => setSearchInput(event.target.value)}
-            placeholder="Search order id, name, or email"
-            className="h-11 border border-[#ddd4c8] px-4 text-sm outline-none focus:border-[#111111]"
-          />
+      <div className="mb-6 rounded-[8px] border border-[#ddd4c8] bg-[#fffaf3]/84 p-5 shadow-[0_18px_70px_rgba(44,34,24,0.035)] sm:p-6">
+        <form onSubmit={submitSearch} className="grid gap-4 xl:grid-cols-[1fr_auto]">
+          <label className="relative block">
+            <AdminIcon
+              name="search"
+              className="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-[#8a8177]"
+            />
+            <input
+              value={searchInput}
+              onChange={(event) => setSearchInput(event.target.value)}
+              placeholder="Search order id, name, or email"
+              className="h-[52px] w-full rounded-[4px] border border-[#ddd4c8] bg-[#fffdf8] pl-12 pr-4 text-sm outline-none focus:border-[#111111]"
+            />
+          </label>
           <button
             type="submit"
-            className="h-11 cursor-pointer border border-[#111111] px-6 text-sm font-medium uppercase tracking-[0.08em] hover:bg-[#111111] hover:text-[#fffaf3]"
+            className="h-[52px] cursor-pointer rounded-[4px] bg-[#111111] px-9 text-sm font-medium text-[#fffaf3] transition hover:bg-[#2d2924]"
+            style={{ color: '#fffaf3' }}
           >
             Search
           </button>
         </form>
 
-        <div className="mt-4 grid gap-4 md:grid-cols-3">
+        <div className="mt-4 grid gap-4 lg:grid-cols-3">
           <select
             value={query.status ?? ''}
             onChange={(event) =>
@@ -107,7 +125,7 @@ export function AdminOrdersPageContent() {
                 status: (event.target.value || undefined) as AdminOrderStatus | undefined,
               }))
             }
-            className="h-11 cursor-pointer border border-[#ddd4c8] bg-[#fffaf3] px-4 text-sm outline-none focus:border-[#111111]"
+            className="h-[52px] cursor-pointer rounded-[4px] border border-[#ddd4c8] bg-[#fffdf8] px-4 text-sm outline-none focus:border-[#111111]"
           >
             {orderStatuses.map((status) => (
               <option key={status || 'all'} value={status}>
@@ -127,7 +145,7 @@ export function AdminOrdersPageContent() {
                   | undefined,
               }))
             }
-            className="h-11 cursor-pointer border border-[#ddd4c8] bg-[#fffaf3] px-4 text-sm outline-none focus:border-[#111111]"
+            className="h-[52px] cursor-pointer rounded-[4px] border border-[#ddd4c8] bg-[#fffdf8] px-4 text-sm outline-none focus:border-[#111111]"
           >
             {paymentStatuses.map((status) => (
               <option key={status || 'all'} value={status}>
@@ -145,7 +163,7 @@ export function AdminOrdersPageContent() {
                 sort: event.target.value as 'newest' | 'oldest',
               }))
             }
-            className="h-11 cursor-pointer border border-[#ddd4c8] bg-[#fffaf3] px-4 text-sm outline-none focus:border-[#111111]"
+            className="h-[52px] cursor-pointer rounded-[4px] border border-[#ddd4c8] bg-[#fffdf8] px-4 text-sm outline-none focus:border-[#111111]"
           >
             <option value="newest">Newest first</option>
             <option value="oldest">Oldest first</option>
@@ -167,32 +185,46 @@ export function AdminOrdersPageContent() {
               <Link
                 key={order.id}
                 href={`/admin/orders/${order.id}`}
-            className="grid cursor-pointer gap-4 border border-[#ddd4c8] bg-[#fffaf3] p-4 transition hover:border-[#111111] sm:gap-5 sm:p-5 lg:grid-cols-[1.2fr_1fr_auto]"
+                className="grid cursor-pointer gap-5 rounded-[8px] border border-[#ddd4c8] bg-[#fffaf3]/84 p-5 shadow-[0_18px_70px_rgba(44,34,24,0.025)] transition hover:border-[#c8bcae] hover:bg-[#fffdf8] lg:grid-cols-[minmax(0,1.15fr)_minmax(260px,0.85fr)_auto_24px] lg:items-center"
               >
-                <div>
-                  <p className="text-xs uppercase tracking-[0.18em] text-[#777777]">
-                    {order.orderNumber}
-                  </p>
-                  <p className="mt-3 text-base sm:text-lg">{order.customer.name}</p>
-                  <p className="mt-1 text-sm text-[#5f5a53]">{order.customer.email}</p>
+                <div className="flex min-w-0 gap-4">
+                  <span className="flex h-[52px] w-[52px] shrink-0 items-center justify-center rounded-full bg-[#eee7dd] text-[#111111]">
+                    <AdminIcon name="bag" className="h-6 w-6" />
+                  </span>
+                  <div className="min-w-0">
+                    <p className="truncate text-xs uppercase tracking-[0.22em] text-[#777777]">
+                      {order.orderNumber}
+                    </p>
+                    <p className="mt-3 truncate text-lg text-[#111111]">
+                      {order.customer.name}
+                    </p>
+                    <p className="mt-1 truncate text-sm text-[#625a51]">
+                      {order.customer.email}
+                    </p>
+                  </div>
                 </div>
-                <div className="flex flex-wrap items-start gap-2">
-                  <span className="border border-[#ddd4c8] px-3 py-1 text-xs uppercase tracking-[0.14em]">
-                    {order.status}
-                  </span>
-                  <span className="border border-[#ddd4c8] px-3 py-1 text-xs uppercase tracking-[0.14em]">
-                    {order.payment?.status ?? 'NO PAYMENT'}
-                  </span>
-                  <span className="text-sm text-[#666666]">
+
+                <div className="space-y-4">
+                  <div className="flex flex-wrap items-center gap-3">
+                    <AdminOrderStatusBadge status={order.status} />
+                    <AdminPaymentStatusBadge status={order.payment?.status} />
+                  </div>
+                  <span className="inline-flex items-center gap-2 text-sm text-[#625a51]">
+                    <AdminIcon name="calendar" className="h-4 w-4" />
                     {new Date(order.createdAt).toLocaleDateString()}
                   </span>
                 </div>
+
                 <div className="text-left lg:text-right">
-                  <p className="text-lg">{formatPrice(order.totalInPaise)}</p>
-                  <p className="mt-1 text-sm text-[#666666]">
+                  <p className="font-serif text-2xl text-[#111111]">
+                    {formatPrice(order.totalInPaise)}
+                  </p>
+                  <p className="mt-2 text-sm text-[#625a51]">
                     {order.items.length} item{order.items.length === 1 ? '' : 's'}
                   </p>
                 </div>
+
+                <AdminIcon name="chevron" className="hidden h-5 w-5 text-[#625a51] lg:block" />
               </Link>
             ))}
           </div>

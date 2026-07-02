@@ -15,6 +15,7 @@ import type {
   AdminProductStatus,
   UploadedProductImage,
 } from '../../../types/admin/products';
+import { AdminIcon } from '../AdminIcons';
 
 type VariantForm = {
   colorName: string;
@@ -121,7 +122,7 @@ function validateImageFiles(files: File[], existingCount: number) {
 
 function FieldLabel({ children }: { children: string }) {
   return (
-    <span className="mb-2 block text-xs uppercase tracking-[0.16em] text-[#777777]">
+    <span className="mb-2 block text-xs font-medium uppercase tracking-[0.16em] text-[#625a51]">
       {children}
     </span>
   );
@@ -148,7 +149,7 @@ function TextInput({
         placeholder={placeholder}
         inputMode={inputMode}
         onChange={(event) => onChange(event.target.value)}
-        className="h-11 w-full border border-[#ddd4c8] px-4 text-sm outline-none focus:border-[#111111]"
+        className="h-11 w-full rounded-[3px] border border-[#ddd4c8] bg-[#fffdf8] px-4 text-sm outline-none focus:border-[#111111]"
       />
     </label>
   );
@@ -178,7 +179,7 @@ function ColorHexInput({
           value={value}
           placeholder="#111111"
           onChange={(event) => onChange(event.target.value)}
-          className="h-11 w-full border border-[#ddd4c8] px-4 text-sm outline-none focus:border-[#111111]"
+          className="h-11 w-full rounded-r-[3px] border border-[#ddd4c8] bg-[#fffdf8] px-4 text-sm outline-none focus:border-[#111111]"
         />
       </div>
     </label>
@@ -263,6 +264,7 @@ export function AdminProductForm({ product }: AdminProductFormProps) {
     (total, variant) => total + variant.images.length,
     0,
   );
+  const primaryImage = variants.flatMap((variant) => variant.images)[0];
 
   const updateVariant = (index: number, patch: Partial<VariantForm>) => {
     setVariants((current) =>
@@ -448,34 +450,34 @@ export function AdminProductForm({ product }: AdminProductFormProps) {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="grid gap-7 lg:grid-cols-[minmax(0,1fr)_340px] xl:grid-cols-[minmax(0,1fr)_380px]">
-      <section className="space-y-6 sm:space-y-8">
-        <div className="border border-[#ddd4c8] bg-[#fffaf3] p-5 sm:p-7">
-          <div className="mb-7 flex flex-col gap-3 border-b border-[#e7ded2] pb-5 sm:flex-row sm:items-end sm:justify-between">
-            <div>
-              <p className="text-xs uppercase tracking-[0.22em] text-[#777777]">
-                Product setup
-              </p>
-              <h2 className="mt-2 text-xl font-light sm:text-2xl">Core product details</h2>
-            </div>
-            <p className="text-sm text-[#666666]">
-              Slug preview: {productSlug || 'product-slug'}
-            </p>
-          </div>
-
-          <div className="grid gap-4 sm:grid-cols-2 sm:gap-5">
-            <div className="sm:col-span-2">
-              <TextInput label="Name" value={name} onChange={setName} />
+    <form
+      onSubmit={handleSubmit}
+      className="grid gap-7 xl:grid-cols-[minmax(0,1fr)_360px]"
+    >
+      <section className="space-y-5">
+        <div className="rounded-[8px] border border-[#ddd4c8] bg-[#fffaf3]/84 p-5 shadow-[0_18px_70px_rgba(44,34,24,0.035)] sm:p-6">
+          <p className="text-xs font-semibold uppercase tracking-[0.28em] text-[#a56f3c]">
+            Core product details
+          </p>
+          <div className="mt-5 grid gap-4 md:grid-cols-2">
+            <div className="md:col-span-2">
+              <TextInput
+                label="Name"
+                value={name}
+                placeholder="Enter product name"
+                onChange={setName}
+              />
             </div>
             <TextInput
               label="Slug"
               value={slug}
-              placeholder={slugify(name)}
+              placeholder="Enter slug (e.g. linen-trousers)"
               onChange={(value) => setSlug(slugify(value))}
             />
             <TextInput
               label="Price INR"
               value={price}
+              placeholder="Enter price (INR)"
               inputMode="decimal"
               onChange={setPrice}
             />
@@ -484,7 +486,7 @@ export function AdminProductForm({ product }: AdminProductFormProps) {
               <select
                 value={categoryId}
                 onChange={(event) => setCategoryId(event.target.value)}
-                className="h-11 w-full cursor-pointer border border-[#ddd4c8] bg-[#fffaf3] px-4 text-sm outline-none focus:border-[#111111]"
+                className="h-11 w-full cursor-pointer rounded-[3px] border border-[#ddd4c8] bg-[#fffdf8] px-4 text-sm outline-none focus:border-[#111111]"
               >
                 {categories.length === 0 && <option value="">No categories</option>}
                 {categories.map((category) => (
@@ -499,206 +501,241 @@ export function AdminProductForm({ product }: AdminProductFormProps) {
               <select
                 value={status}
                 onChange={(event) => setStatus(event.target.value as AdminProductStatus)}
-                className="h-11 w-full cursor-pointer border border-[#ddd4c8] bg-[#fffaf3] px-4 text-sm outline-none focus:border-[#111111]"
+                className="h-11 w-full cursor-pointer rounded-[3px] border border-[#ddd4c8] bg-[#fffdf8] px-4 text-sm outline-none focus:border-[#111111]"
               >
                 <option value="DRAFT">Draft</option>
                 <option value="ACTIVE">Active</option>
                 <option value="ARCHIVED">Archived</option>
               </select>
             </label>
-            <label className="block sm:col-span-2">
+            <label className="block md:col-span-2">
               <FieldLabel>Description</FieldLabel>
               <textarea
                 value={description}
+                placeholder="Describe the product, fabric, fit, and other key details..."
                 onChange={(event) => setDescription(event.target.value)}
-                className="min-h-32 w-full border border-[#ddd4c8] px-4 py-3 text-sm leading-6 outline-none focus:border-[#111111]"
+                className="min-h-24 w-full rounded-[3px] border border-[#ddd4c8] bg-[#fffdf8] px-4 py-3 text-sm leading-6 outline-none focus:border-[#111111]"
               />
             </label>
           </div>
         </div>
 
-        <div className="space-y-5">
-          <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+        <div className="rounded-[8px] border border-[#ddd4c8] bg-[#fffaf3]/84 p-5 shadow-[0_18px_70px_rgba(44,34,24,0.03)] sm:p-6">
+          <div className="grid gap-5 lg:grid-cols-[190px_minmax(0,1fr)]">
             <div>
-              <p className="text-xs uppercase tracking-[0.22em] text-[#777777]">
-                Variants
+              <p className="text-xs font-semibold uppercase tracking-[0.28em] text-[#a56f3c]">
+                Color variants
               </p>
-              <h2 className="mt-2 text-xl font-light sm:text-2xl">Colors, sizes, and stock</h2>
+              <p className="mt-3 text-sm leading-6 text-[#625a51]">
+                Add colorways, size, and stock for this product.
+              </p>
             </div>
-            <button
-              type="button"
-              onClick={() => setVariants((current) => [...current, emptyVariant()])}
-              className="h-11 w-full cursor-pointer border border-[#111111] px-5 text-sm font-medium uppercase tracking-[0.08em] hover:bg-[#111111] hover:text-[#fffaf3] sm:w-auto"
-            >
-              Add variant
-            </button>
-          </div>
-
-          {variants.map((variant, index) => (
-            <div key={index} className="border border-[#ddd4c8] bg-[#fffaf3] p-4 sm:p-7">
-              <div className="mb-6 flex flex-col gap-3 border-b border-[#e7ded2] pb-5 sm:flex-row sm:items-center sm:justify-between">
-                <div className="flex items-center gap-4">
+            <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+              {variants.map((variant, index) => (
+                <article
+                  key={index}
+                  className="relative rounded-[6px] border border-[#e1d8cc] bg-[#fffdf8] p-4"
+                >
+                  {variants.length > 1 && (
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setVariants((current) =>
+                          current.filter((_, variantIndex) => variantIndex !== index),
+                        )
+                      }
+                      className="absolute right-3 top-3 flex h-6 w-6 cursor-pointer items-center justify-center rounded-full border border-[#ddd4c8] bg-[#fffaf3] text-xs"
+                      aria-label="Remove variant"
+                    >
+                      ×
+                    </button>
+                  )}
                   <span
-                    className="h-9 w-9 border border-[#ddd4c8]"
+                    className="block h-16 rounded-[4px] border border-[#ddd4c8]"
                     style={{ backgroundColor: variant.colorHex || '#ffffff' }}
                   />
-                  <div>
-                    <p className="text-xs uppercase tracking-[0.2em] text-[#777777]">
-                      Variant {index + 1}
-                    </p>
-                    <p className="mt-1 text-lg">{variant.colorName || 'New color'}</p>
+                  <div className="mt-4 grid gap-3">
+                    <TextInput
+                      label="Color name"
+                      value={variant.colorName}
+                      onChange={(value) => {
+                        const matchedHex = getHexForColorName(value);
+
+                        updateVariant(index, {
+                          colorName: value,
+                          colorSlug: slugify(value),
+                          ...(matchedHex ? { colorHex: matchedHex } : {}),
+                        });
+                      }}
+                    />
+                    <ColorHexInput
+                      value={variant.colorHex}
+                      onChange={(value) => updateVariant(index, { colorHex: value })}
+                    />
+                    <div className="grid grid-cols-2 gap-3">
+                      <TextInput
+                        label="Size"
+                        value={variant.size}
+                        onChange={(value) => updateVariant(index, { size: value })}
+                      />
+                      <TextInput
+                        label="Stock"
+                        value={variant.stock}
+                        inputMode="numeric"
+                        onChange={(value) => updateVariant(index, { stock: value })}
+                      />
+                    </div>
+                    <TextInput
+                      label="SKU"
+                      value={variant.sku}
+                      onChange={(value) => updateVariant(index, { sku: value })}
+                    />
                   </div>
-                </div>
-                {variants.length > 1 && (
-                  <button
-                    type="button"
-                    onClick={() =>
-                      setVariants((current) =>
-                        current.filter((_, variantIndex) => variantIndex !== index),
-                      )
-                    }
-                    className="cursor-pointer text-sm underline-offset-4 hover:underline"
-                  >
-                    Remove variant
-                  </button>
-                )}
-              </div>
+                </article>
+              ))}
+              <button
+                type="button"
+                onClick={() => setVariants((current) => [...current, emptyVariant()])}
+                className="flex min-h-32 cursor-pointer flex-col items-center justify-center rounded-[6px] border border-dashed border-[#bfb2a4] bg-[#fffdf8] p-5 text-sm transition hover:border-[#111111]"
+              >
+                <AdminIcon name="plus" className="h-5 w-5" />
+                <span className="mt-3">Add color</span>
+              </button>
+            </div>
+          </div>
+        </div>
 
-              <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-                <TextInput
-                  label="Color name"
-                  value={variant.colorName}
-                  onChange={(value) => {
-                    const matchedHex = getHexForColorName(value);
-
-                    updateVariant(index, {
-                      colorName: value,
-                      colorSlug: slugify(value),
-                      ...(matchedHex ? { colorHex: matchedHex } : {}),
-                    });
-                  }}
-                />
-                <TextInput
-                  label="Color slug"
-                  value={variant.colorSlug}
-                  onChange={(value) => updateVariant(index, { colorSlug: slugify(value) })}
-                />
-                <ColorHexInput
-                  value={variant.colorHex}
-                  onChange={(value) => updateVariant(index, { colorHex: value })}
-                />
-                <TextInput
-                  label="Size"
-                  value={variant.size}
-                  onChange={(value) => updateVariant(index, { size: value })}
-                />
-                <TextInput
-                  label="Stock"
-                  value={variant.stock}
-                  inputMode="numeric"
-                  onChange={(value) => updateVariant(index, { stock: value })}
-                />
-                <TextInput
-                  label="SKU"
-                  value={variant.sku}
-                  onChange={(value) => updateVariant(index, { sku: value })}
-                />
-              </div>
-
-              <div className="mt-7 border-t border-[#e7ded2] pt-6">
-                <div className="mb-4 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
-                  <div>
-                    <p className="text-xs uppercase tracking-[0.18em] text-[#777777]">
-                      Images for {variant.colorName || 'this color'}
+        <div className="rounded-[8px] border border-[#ddd4c8] bg-[#fffaf3]/84 p-5 shadow-[0_18px_70px_rgba(44,34,24,0.03)] sm:p-6">
+          <div className="grid gap-5 lg:grid-cols-[190px_minmax(0,1fr)]">
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-[0.28em] text-[#a56f3c]">
+                Product images
+              </p>
+              <p className="mt-3 text-sm leading-6 text-[#625a51]">
+                Upload images for each color. Recommended: 1080x1350px or higher.
+              </p>
+            </div>
+            <div className="space-y-5">
+              {variants.map((variant, index) => (
+                <div key={index}>
+                  <div className="mb-3 flex items-center justify-between gap-4">
+                    <p className="text-sm font-medium text-[#111111]">
+                      {variant.colorName || `Variant ${index + 1}`}
                     </p>
-                    <p className="mt-2 text-sm text-[#5f5a53]">
-                      Upload up to 5 images for this color.
+                    <p className="text-xs uppercase tracking-[0.14em] text-[#77716a]">
+                      {variant.images.length}/{MAX_IMAGES_PER_COLOR}
                     </p>
                   </div>
-                  <p className="text-sm text-[#5f5a53]">
-                    {variant.images.length}/{MAX_IMAGES_PER_COLOR} uploaded
-                  </p>
-                </div>
-
-                <label
-                  className={`flex min-h-32 cursor-pointer flex-col items-center justify-center border border-dashed px-4 py-7 text-center transition sm:min-h-36 sm:px-5 sm:py-8 ${
-                    uploadingIndex === index
-                      ? 'border-[#111111] bg-[#f5efe6]'
-                      : 'border-[#c8bcae] hover:border-[#111111]'
-                  }`}
-                >
-                  <input
-                    type="file"
-                    accept="image/jpeg,image/jpg,image/png,image/webp"
-                    multiple
-                    disabled={uploadingIndex === index}
-                    onChange={(event) => void handleUploadImages(index, event)}
-                    className="sr-only"
-                  />
-                  <span className="text-sm font-medium uppercase tracking-[0.1em]">
-                    {uploadingIndex === index ? 'Uploading images' : 'Choose images'}
-                  </span>
-                  <span className="mt-3 max-w-md text-sm leading-6 text-[#666666]">
-                    JPG, JPEG, PNG, or WEBP. Max 5MB each. Multiple selection is
-                    supported.
-                  </span>
-                </label>
-
-                {uploadErrors[index] && (
-                  <p className="mt-3 text-sm leading-6 text-[#8a1f1f]">
-                    {uploadErrors[index]}
-                  </p>
-                )}
-
-                {variant.images.length > 0 && (
-                  <div className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-4 xl:grid-cols-5">
-                    {variant.images.map((image, imageIndex) => (
-                      <div key={image.publicId ?? image.url} className="group">
-                        <div className="aspect-square overflow-hidden bg-[#f5f5f5]">
+                  <div className="grid gap-3 sm:grid-cols-[112px_minmax(0,1fr)]">
+                    <label
+                      className={`flex min-h-28 cursor-pointer flex-col items-center justify-center rounded-[6px] border border-dashed px-4 py-5 text-center transition ${
+                        uploadingIndex === index
+                          ? 'border-[#111111] bg-[#f5efe6]'
+                          : 'border-[#c8bcae] bg-[#fffdf8] hover:border-[#111111]'
+                      }`}
+                    >
+                      <input
+                        type="file"
+                        accept="image/jpeg,image/jpg,image/png,image/webp"
+                        multiple
+                        disabled={uploadingIndex === index}
+                        onChange={(event) => void handleUploadImages(index, event)}
+                        className="sr-only"
+                      />
+                      <AdminIcon name="upload" className="h-6 w-6" />
+                      <span className="mt-3 text-xs font-medium">
+                        {uploadingIndex === index ? 'Uploading' : 'Upload images'}
+                      </span>
+                    </label>
+                    <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 xl:grid-cols-5">
+                      {variant.images.map((image) => (
+                        <div
+                          key={image.publicId ?? image.url}
+                          className="group relative aspect-square overflow-hidden rounded-[6px] bg-[#f5f0e8]"
+                        >
                           <img
                             src={image.url}
                             alt={image.altText ?? 'Product image'}
                             className="h-full w-full object-cover"
                           />
-                        </div>
-                        <div className="mt-2 flex items-center justify-between gap-2 text-xs">
-                          <span className="uppercase tracking-[0.14em] text-[#777777]">
-                            {imageIndex === 0 ? 'Primary' : `Image ${imageIndex + 1}`}
-                          </span>
                           <button
                             type="button"
                             onClick={() =>
                               removeVariantImage(index, image.publicId ?? image.url)
                             }
-                            className="cursor-pointer underline-offset-4 hover:underline"
+                            className="absolute right-2 top-2 flex h-6 w-6 cursor-pointer items-center justify-center rounded-full bg-[#fffaf3] text-xs shadow"
+                            aria-label="Remove image"
                           >
-                            Remove
+                            ×
                           </button>
                         </div>
-                      </div>
-                    ))}
+                      ))}
+                    </div>
                   </div>
-                )}
-              </div>
+                  {uploadErrors[index] && (
+                    <p className="mt-3 text-sm leading-6 text-[#8a1f1f]">
+                      {uploadErrors[index]}
+                    </p>
+                  )}
+                </div>
+              ))}
             </div>
-          ))}
+          </div>
         </div>
       </section>
 
-      <aside className="h-fit border border-[#ddd4c8] bg-[#fffaf3] p-4 sm:p-6 lg:sticky lg:top-24">
-        <p className="text-xs uppercase tracking-[0.2em] text-[#777777]">
+      <aside className="h-fit rounded-[8px] border border-[#ddd4c8] bg-[#fffaf3]/84 p-5 shadow-[0_18px_70px_rgba(44,34,24,0.04)] sm:p-6 xl:sticky xl:top-24">
+        <p className="text-xs font-semibold uppercase tracking-[0.28em] text-[#a56f3c]">
           {isEditMode ? 'Update checklist' : 'Publish checklist'}
         </p>
-        <div className="mt-5 space-y-3 border-b border-[#e7ded2] pb-5 text-sm text-[#5f5a53]">
-          <p>Name: {name.trim() ? 'Ready' : 'Missing'}</p>
-          <p>Category: {selectedCategory?.name ?? 'Missing'}</p>
-          <p>Variants: {variants.length}</p>
-          <p>Images: {totalImages}</p>
-          <p>Status: {status}</p>
+        <div className="mt-5 space-y-4 border-b border-[#e7ded2] pb-5 text-sm text-[#514c45]">
+          {[
+            ['Name', name.trim() ? name.trim() : '—'],
+            ['Category', selectedCategory?.name ?? '—'],
+            ['Variants', String(variants.length)],
+            ['Images', String(totalImages)],
+            ['Status', status.charAt(0) + status.slice(1).toLowerCase()],
+          ].map(([label, value], index) => (
+            <div key={label} className="flex items-center gap-3">
+              <span className="flex h-7 w-7 items-center justify-center rounded-full bg-[#eee7dd]">
+                <AdminIcon
+                  name={index === 0 ? 'box' : index === 1 ? 'product' : index === 3 ? 'upload' : 'shield'}
+                  className="h-4 w-4"
+                />
+              </span>
+              <span>{label}: </span>
+              <span className="ml-auto text-[#111111]">{value}</span>
+            </div>
+          ))}
         </div>
 
         <div className="mt-5 border-b border-[#e7ded2] pb-5">
-          <p className="text-xs uppercase tracking-[0.18em] text-[#777777]">
+          <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[#a56f3c]">
+            Product preview
+          </p>
+          <div className="mt-4 overflow-hidden rounded-[6px] border border-[#e1d8cc] bg-[#fffdf8]">
+            <div className="aspect-[16/10] bg-[#f6f0e8]">
+              {primaryImage ? (
+                <img
+                  src={primaryImage.url}
+                  alt={primaryImage.altText ?? name ?? 'Product preview'}
+                  className="h-full w-full object-cover"
+                />
+              ) : (
+                <div className="flex h-full items-center justify-center text-[#d8cfc2]">
+                  <AdminIcon name="product" className="h-16 w-16" />
+                </div>
+              )}
+            </div>
+          </div>
+          <p className="mt-4 font-serif text-lg text-[#111111]">
+            {name || 'Product name'}
+          </p>
+          <p className="mt-1 text-sm text-[#111111]">₹{price || '0'} INR</p>
+        </div>
+
+        <div className="mt-5 border-b border-[#e7ded2] pb-5">
+          <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[#a56f3c]">
             Quick category
           </p>
           <div className="mt-4 space-y-3">
@@ -709,19 +746,20 @@ export function AdminProductForm({ product }: AdminProductFormProps) {
                 setCategoryError(null);
               }}
               placeholder="Category name"
-              className="h-11 w-full border border-[#ddd4c8] px-3 text-sm outline-none focus:border-[#111111]"
+              className="h-11 w-full rounded-[3px] border border-[#ddd4c8] bg-[#fffdf8] px-3 text-sm outline-none focus:border-[#111111]"
             />
             <input
               value={newCategoryDescription}
               onChange={(event) => setNewCategoryDescription(event.target.value)}
               placeholder="Description optional"
-              className="h-11 w-full border border-[#ddd4c8] px-3 text-sm outline-none focus:border-[#111111]"
+              className="h-11 w-full rounded-[3px] border border-[#ddd4c8] bg-[#fffdf8] px-3 text-sm outline-none focus:border-[#111111]"
             />
             <button
               type="button"
               disabled={isCreatingCategory}
               onClick={handleCreateCategory}
-              className="h-11 w-full cursor-pointer border border-[#111111] px-4 text-sm uppercase tracking-[0.08em] hover:bg-[#111111] hover:text-[#fffaf3] disabled:cursor-not-allowed disabled:border-[#ddd4c8] disabled:text-[#777777] disabled:hover:bg-[#fffaf3]"
+              className="h-11 w-full cursor-pointer rounded-[3px] bg-[#111111] px-4 text-sm uppercase tracking-[0.08em] text-[#fffaf3] hover:bg-[#2d2924] disabled:cursor-not-allowed disabled:bg-[#ddd4c8]"
+              style={{ color: '#fffaf3' }}
             >
               {isCreatingCategory ? 'Adding category' : 'Add category'}
             </button>
@@ -743,7 +781,8 @@ export function AdminProductForm({ product }: AdminProductFormProps) {
         )}
         <button
           disabled={isSubmitting}
-          className="mt-6 h-12 w-full cursor-pointer border border-[#111111] text-sm font-medium uppercase tracking-[0.08em] hover:bg-[#111111] hover:text-[#fffaf3] disabled:cursor-not-allowed disabled:border-[#ddd4c8] disabled:text-[#777777] disabled:hover:bg-[#fffaf3]"
+          className="mt-6 h-12 w-full cursor-pointer rounded-[3px] bg-[#111111] text-sm font-medium uppercase tracking-[0.12em] text-[#fffaf3] hover:bg-[#2d2924] disabled:cursor-not-allowed disabled:bg-[#ddd4c8]"
+          style={{ color: '#fffaf3' }}
         >
           {isSubmitting
             ? isEditMode
@@ -753,6 +792,10 @@ export function AdminProductForm({ product }: AdminProductFormProps) {
               ? 'Update product'
               : 'Create product'}
         </button>
+        <p className="mt-5 flex items-center gap-2 text-xs leading-5 text-[#625a51]">
+          <AdminIcon name="shield" className="h-4 w-4" />
+          You can edit and publish this product later.
+        </p>
       </aside>
     </form>
   );

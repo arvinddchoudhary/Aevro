@@ -161,6 +161,26 @@ export function AccountPageContent() {
           <div className="min-w-0 space-y-5 sm:space-y-6">
             <AccountSummaryCard user={user} />
 
+            {user.role === 'ADMIN' && (
+              <div className="flex flex-col gap-4 border border-[#ddd4c8] bg-[#fffaf3] p-5 shadow-[0_18px_60px_rgba(44,34,24,0.035)] sm:flex-row sm:items-center sm:justify-between">
+                <div>
+                  <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[#a56f3c]">
+                    Admin access
+                  </p>
+                  <p className="mt-2 text-sm leading-6 text-[#625a51]">
+                    Manage AEVRO catalog, homepage content, and customer orders.
+                  </p>
+                </div>
+                <Link
+                  href="/admin"
+                  className="inline-flex h-11 w-full cursor-pointer items-center justify-center bg-[#111111] px-6 text-sm font-medium uppercase tracking-[0.08em] text-[#fffaf3] transition hover:bg-[#2d2924] sm:w-auto"
+                  style={{ color: '#fffaf3' }}
+                >
+                  Open Admin
+                </Link>
+              </div>
+            )}
+
             {dashboardError && (
               <p className="border border-[#d8c8b8] bg-[#fffaf3] p-4 text-sm text-[#6b6258]">
                 {dashboardError}
