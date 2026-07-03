@@ -1,4 +1,13 @@
+import type { Metadata } from 'next';
 import { CartPageContent } from '../../components/cart/CartPageContent';
+import { pageMetadata } from '../../lib/seo';
+
+export const metadata: Metadata = pageMetadata({
+  title: 'Your Bag',
+  description: 'Review your AEVRO bag before secure checkout.',
+  path: '/cart',
+  noIndex: true,
+});
 
 export default function CartPage() {
   return (

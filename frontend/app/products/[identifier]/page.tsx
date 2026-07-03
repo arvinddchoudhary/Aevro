@@ -1,11 +1,73 @@
 import Link from 'next/link';
+import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { ProductVariantSelection } from '../../../components/products/ProductVariantSelection';
 import { ProductCard } from '../../../components/products/ProductCard';
 import { ErrorState } from '../../../components/ui/ErrorState';
 import { getProduct, getProducts } from '../../../lib/api/catalog';
+import { absoluteUrl, pageMetadata, siteName } from '../../../lib/seo';
 
 export const dynamic = 'force-dynamic';
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ identifier: string }>;
+}): Promise<Metadata> {
+  const { identifier } = await params;
+  const result = await getProduct(identifier);
+
+  if (!result.success) {
+    return pageMetadata({
+      title: 'Product',
+      description: 'View refined AEVRO trousers and modern essentials.',
+      path: `/products/${identifier}`,
+      noIndex: result.statusCode === 404,
+    });
+  }
+
+  const product = result.data;
+  const image = product.primaryImage?.url ?? product.images[0]?.url;
+  const description =
+    product.description ??
+    `${product.name} by ${siteName}: refined tailoring, timeless form, and everyday comfort.`;
+
+  return {
+    ...pageMetadata({
+      title: product.name,
+      description,
+      path: `/products/${product.slug || identifier}`,
+      image: image ?? '/images/brand/product-detail-black.webp',
+    }),
+    openGraph: {
+      title: `${product.name} | ${siteName}`,
+      description,
+      url: absoluteUrl(`/products/${product.slug || identifier}`),
+      siteName,
+      images: image
+        ? [
+            {
+              url: absoluteUrl(image),
+              alt: product.primaryImage?.altText ?? product.name,
+            },
+          ]
+        : [
+            {
+              url: absoluteUrl('/images/brand/product-detail-black.webp'),
+              alt: product.name,
+            },
+          ],
+      locale: 'en_IN',
+      type: 'website',
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: `${product.name} | ${siteName}`,
+      description,
+      images: [absoluteUrl(image ?? '/images/brand/product-detail-black.webp')],
+    },
+  };
+}
 
 export default async function ProductDetailsPage({
   params,

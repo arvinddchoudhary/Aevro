@@ -1,12 +1,21 @@
 import Link from 'next/link';
 import { cookies } from 'next/headers';
+import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { RazorpayPaymentPanel } from '../../../../components/payments/RazorpayPaymentPanel';
 import { ErrorState } from '../../../../components/ui/ErrorState';
 import { getOrder } from '../../../../lib/api/orders';
 import { formatPrice } from '../../../../lib/format';
+import { pageMetadata } from '../../../../lib/seo';
 
 export const dynamic = 'force-dynamic';
+
+export const metadata: Metadata = pageMetadata({
+  title: 'Order Confirmation',
+  description: 'Complete or review your private AEVRO order confirmation.',
+  path: '/checkout/confirmation',
+  noIndex: true,
+});
 
 export default async function OrderConfirmationPage({
   params,
