@@ -1,11 +1,21 @@
 import Link from 'next/link';
+import type { Metadata } from 'next';
 import { ProductCard } from '../../components/products/ProductCard';
 import { EmptyState } from '../../components/ui/EmptyState';
 import { ErrorState } from '../../components/ui/ErrorState';
 import { getCategories, getProducts } from '../../lib/api/catalog';
+import { pageMetadata } from '../../lib/seo';
 import type { ProductSort } from '../../types/catalog';
 
 export const dynamic = 'force-dynamic';
+
+export const metadata: Metadata = pageMetadata({
+  title: 'Shop Refined Trousers and Essentials',
+  description:
+    'Explore AEVRO trousers and modern essentials designed with refined silhouettes, clean tailoring, and everyday comfort.',
+  path: '/products',
+  image: '/images/brand/plp-hero.webp',
+});
 
 type SearchParams = Record<string, string | string[] | undefined>;
 
@@ -117,7 +127,7 @@ export default async function ProductsPage({
               <p className="text-xs font-semibold uppercase tracking-[0.08em]">
                 Shop / Trousers
               </p>
-              <h1 className="mt-4 text-4xl font-light uppercase leading-none sm:text-5xl md:text-7xl">
+              <h1 className="mt-4 text-4xl font-light uppercase leading-none sm:text-5xl md:text-6xl lg:text-7xl">
                 Trousers
               </h1>
               <p className="mt-6 text-base leading-7 text-[#2f2a25]">
@@ -268,7 +278,10 @@ export default async function ProductsPage({
                   />
                 </div>
               </div>
-              <button className="h-12 w-full bg-[#111111] px-5 text-sm font-medium uppercase tracking-[0.08em] text-[#fffaf3] hover:bg-[#2a2825]">
+              <button
+                className="h-12 w-full bg-[#111111] px-5 text-sm font-medium uppercase tracking-[0.08em] text-[#fffaf3] hover:bg-[#2a2825]"
+                aria-label="Apply product filters"
+              >
                 Apply filters
               </button>
             </form>

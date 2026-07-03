@@ -1,13 +1,22 @@
 import Link from 'next/link';
+import type { Metadata } from 'next';
 import { ProductCard } from '../components/products/ProductCard';
 import { EmptyState } from '../components/ui/EmptyState';
 import { ErrorState } from '../components/ui/ErrorState';
 import { getProducts } from '../lib/api/catalog';
 import { getHomepageSections } from '../lib/api/homepage';
+import { defaultSeoDescription, pageMetadata } from '../lib/seo';
 import type { HomepageSection } from '../types/homepage';
 import type { Product } from '../types/catalog';
 
 export const dynamic = 'force-dynamic';
+
+export const metadata: Metadata = pageMetadata({
+  title: 'AEVRO — Refined Trousers and Modern Essentials',
+  description: defaultSeoDescription,
+  path: '/',
+  image: '/images/brand/hero-trousers.webp',
+});
 
 export default async function HomePage() {
   const [catalogResult, homepageResult] = await Promise.allSettled([

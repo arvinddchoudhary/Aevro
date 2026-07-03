@@ -1,4 +1,14 @@
+import type { Metadata } from 'next';
 import Link from 'next/link';
+import { pageMetadata } from '../../lib/seo';
+
+export const metadata: Metadata = pageMetadata({
+  title: 'About AEVRO',
+  description:
+    'Learn about AEVRO, a modern essentials brand focused on refined trousers, lasting design, thoughtful construction, and timeless everyday style.',
+  path: '/about',
+  image: '/images/brand/About-Top-Image.webp',
+});
 
 const values = [
   {
@@ -60,7 +70,7 @@ export default function AboutPage() {
                 <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[#4d473f]">
                   Our story
                 </p>
-                <h1 className="mt-6 font-serif text-[3.35rem] font-light uppercase leading-[0.98] tracking-normal text-[#111111] sm:text-[4.8rem] lg:text-[3.7rem]">
+                <h1 className="mt-6 font-serif text-[2.55rem] font-light uppercase leading-[0.98] tracking-normal text-[#111111] sm:text-[4.8rem] lg:text-[3.7rem]">
                   Built on simplicity. Driven by purpose.
                 </h1>
                 <div className="mt-8 max-w-[390px] space-y-3   text-sm leading-7 text-[#3f3932]">

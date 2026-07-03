@@ -1,4 +1,13 @@
+import type { Metadata } from 'next';
 import { AccountOrderDetailsPageContent } from '../../../../components/orders/AccountOrderDetailsPageContent';
+import { pageMetadata } from '../../../../lib/seo';
+
+export const metadata: Metadata = pageMetadata({
+  title: 'Order Details',
+  description: 'View private AEVRO order details.',
+  path: '/account/orders',
+  noIndex: true,
+});
 
 export default async function AccountOrderDetailsPage({
   params,

@@ -207,15 +207,21 @@ export function Footer() {
                 {group.title}
               </p>
               <div className="mt-4 space-y-2 text-sm text-[#514c45]">
-                {group.links.map((link) => (
-                  <Link
-                    key={link}
-                    href={group.title === 'Shop' ? '/products' : '#'}
-                    className="block underline-offset-4 hover:underline"
-                  >
-                    {link}
-                  </Link>
-                ))}
+                {group.links.map((link) =>
+                  group.title === 'Shop' ? (
+                    <Link
+                      key={link}
+                      href="/products"
+                      className="block underline-offset-4 hover:underline"
+                    >
+                      {link}
+                    </Link>
+                  ) : (
+                    <span key={link} className="block text-[#6d665d]">
+                      {link}
+                    </span>
+                  ),
+                )}
               </div>
             </div>
           ))}
@@ -245,11 +251,11 @@ Be the first to discover new collections, restocks, and exclusive releases.
       <section className="border-t border-[#ddd4c8]">
         <div className="aevro-container flex flex-col gap-3 py-6 text-xs text-[#514c45] sm:flex-row sm:items-center sm:justify-between">
           <p>© 2026 AEVRO. All rights reserved.</p>
-          <div className="flex gap-8">
-            <Link href="#">Privacy Policy</Link>
-            <Link href="#">Shipping Policy </Link>
-            <Link href="#">Return Policy </Link>
-            <Link href="#">Terms & Conditions</Link>
+          <div className="flex flex-wrap gap-x-8 gap-y-2">
+            <span>Privacy Policy</span>
+            <span>Shipping Policy</span>
+            <span>Return Policy</span>
+            <span>Terms & Conditions</span>
 
           </div>
         </div>

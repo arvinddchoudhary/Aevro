@@ -1,4 +1,13 @@
+import type { Metadata } from 'next';
 import { CheckoutPageContent } from '../../components/checkout/CheckoutPageContent';
+import { pageMetadata } from '../../lib/seo';
+
+export const metadata: Metadata = pageMetadata({
+  title: 'Secure Checkout',
+  description: 'Complete your AEVRO order through a secure checkout flow.',
+  path: '/checkout',
+  noIndex: true,
+});
 
 export default function CheckoutPage() {
   return (
