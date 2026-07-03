@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import type { Metadata } from 'next';
+import Image from 'next/image';
 import { ProductCard } from '../../components/products/ProductCard';
 import { EmptyState } from '../../components/ui/EmptyState';
 import { ErrorState } from '../../components/ui/ErrorState';
@@ -67,6 +68,7 @@ export default async function ProductsPage({
   const page = Math.max(getNumberParam(params, 'page') ?? 1, 1);
   const category = getStringParam(params, 'category');
   const search = getStringParam(params, 'search');
+  const activeSearch = search?.trim();
   const color = getStringParam(params, 'color');
   const size = getStringParam(params, 'size');
   const minPrice = getNumberParam(params, 'minPrice');
@@ -115,22 +117,26 @@ export default async function ProductsPage({
   return (
     <main>
       <section className="border-b border-[#ddd4c8]">
-        <div className="relative min-h-[300px] overflow-hidden sm:min-h-[360px] lg:aspect-[2880/900] lg:min-h-0">
-          <img
+        <div className="relative aspect-[2880/900] min-h-[260px] overflow-hidden bg-[#d8bea0]">
+          <Image
             src="/images/brand/plp-hero.webp"
             alt="AEVRO trouser collection"
-            className="absolute inset-0 h-full w-full object-cover object-center"
+            fill
+            priority
+            quality={100}
+            sizes="100vw"
+            className="object-contain object-center"
           />
-          <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(251,247,240,0.95)_0%,rgba(251,247,240,0.86)_35%,rgba(251,247,240,0.18)_65%,rgba(251,247,240,0)_100%)]" />
-          <div className="relative flex min-h-[300px] items-center px-5 py-10 sm:min-h-[360px] sm:px-12 lg:min-h-full lg:px-20 xl:px-28">
-            <div className="max-w-lg">
-              <p className="text-xs font-semibold uppercase tracking-[0.08em]">
-                Shop / Trousers
+          <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(226,196,158,0.28)_0%,rgba(226,196,158,0.16)_29%,rgba(226,196,158,0.03)_48%,rgba(226,196,158,0)_100%)]" />
+          <div className="relative flex h-full items-center px-6 sm:px-12 lg:px-20 xl:px-28">
+            <div className="max-w-[560px]">
+              <p className="text-[0.7rem] font-semibold uppercase tracking-[0.03em] text-[#171717] sm:text-xs">
+                Home / <span className="font-bold">Trousers</span>
               </p>
-              <h1 className="mt-4 text-4xl font-light uppercase leading-none sm:text-5xl md:text-6xl lg:text-7xl">
+              <h1 className="mt-7 text-[3.4rem] font-medium uppercase leading-[0.92] tracking-[-0.04em] text-[#181818] sm:text-[4.4rem] md:text-[5.15rem] lg:text-[5.7rem] xl:text-[6rem]">
                 Trousers
               </h1>
-              <p className="mt-6 text-base leading-7 text-[#2f2a25]">
+              <p className="mt-6 max-w-[500px] text-[0.95rem] leading-7 text-[#27221e] sm:text-base">
                 Refined silhouettes. Timeless style. Explore our collection of
                 trousers crafted for comfort, versatility, and effortless
                 elegance.
@@ -291,9 +297,17 @@ export default async function ProductsPage({
         <div>
           <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <p className="text-xs font-semibold uppercase tracking-[0.08em]">
-              {meta.total} products
+              {activeSearch ? `Showing results for “${activeSearch}”` : `${meta.total} products`}
             </p>
             <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-xs font-semibold uppercase tracking-[0.08em]">
+              {activeSearch ? (
+                <Link
+                  href={buildProductsHref(params, { search: undefined, page: undefined })}
+                  className="border-b border-[#111111] pb-1"
+                >
+                  Clear search
+                </Link>
+              ) : null}
               <span>Sort by</span>
               <Link
                 href={buildProductsHref(params, { sort: 'newest', page: undefined })}
@@ -318,8 +332,12 @@ export default async function ProductsPage({
 
           {products.length === 0 ? (
             <EmptyState
-              title="No products found"
-              message="Try a different category, search term, or sorting option."
+              title={activeSearch ? 'No exact matches found' : 'No products found'}
+              message={
+                activeSearch
+                  ? 'Try trousers, wide leg trousers, black trousers, or formal trousers.'
+                  : 'Try a different category, search term, or sorting option.'
+              }
             />
           ) : (
             <div className="grid grid-cols-2 gap-3 sm:gap-5 md:grid-cols-3 xl:grid-cols-4">

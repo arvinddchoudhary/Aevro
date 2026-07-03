@@ -9,9 +9,14 @@ import { AccountIcon } from '../account/AccountIcons';
 import { AccountSidebar } from '../account/AccountSidebar';
 import {
   deleteWishlistItem,
+  deleteWishlistProduct,
   getWishlist,
 } from '../../lib/api/wishlist';
 import { useAuth } from '../../lib/auth';
+import {
+  markWishlistProductRemoved,
+  syncWishlistProductIds,
+} from '../../lib/wishlist-cache';
 import type { WishlistItem } from '../../types/wishlist';
 import { EmptyState } from '../ui/EmptyState';
 import { WishlistProductCard } from './WishlistProductCard';
@@ -54,9 +59,15 @@ export function WishlistPageContent() {
     try {
       setIsLoading(true);
       setError(null);
-      setItems(await getWishlist());
-    } catch {
-      setError('We could not load your wishlist.');
+      const wishlistItems = await getWishlist();
+      setItems(wishlistItems);
+      syncWishlistProductIds(wishlistItems.map((item) => item.productId));
+    } catch (loadError) {
+      setError(
+        loadError instanceof Error
+          ? `We could not load your wishlist. ${loadError.message}`
+          : 'We could not load your wishlist.',
+      );
     } finally {
       setIsLoading(false);
     }
@@ -103,11 +114,20 @@ export function WishlistPageContent() {
   const removeItem = async (item: WishlistItem) => {
     try {
       setMessage(null);
-      await deleteWishlistItem(item.id);
+      try {
+        await deleteWishlistItem(item.id);
+      } catch {
+        await deleteWishlistProduct(item.productId);
+      }
       setItems((currentItems) => currentItems.filter((currentItem) => currentItem.id !== item.id));
+      markWishlistProductRemoved(item.productId);
       setMessage('Removed from wishlist.');
-    } catch {
-      setMessage('Unable to remove item. Try again.');
+    } catch (removeError) {
+      setMessage(
+        removeError instanceof Error
+          ? `Unable to remove item. ${removeError.message}`
+          : 'Unable to remove item. Try again.',
+      );
     }
   };
 

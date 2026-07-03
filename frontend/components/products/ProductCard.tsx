@@ -35,8 +35,8 @@ export function ProductCard({ product, compact = false }: ProductCardProps) {
       </Link>
       <WishlistToggleButton
         productId={product.id}
-        label="Save"
-        className="absolute right-3 top-3 z-10 w-24 opacity-95"
+        variant="icon"
+        className="absolute right-3 top-3 z-10"
       />
     </article>
   );
