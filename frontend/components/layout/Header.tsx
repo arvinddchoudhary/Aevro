@@ -6,6 +6,7 @@ import type { ReactNode } from 'react';
 import { useState } from 'react';
 import { useAuth } from '../../lib/auth';
 import { useCart } from '../../lib/cart';
+import { SearchOverlay } from '../search/SearchOverlay';
 
 const navigationLinks = [
   ['HOME', '/'],
@@ -169,11 +170,34 @@ function DesktopAction({
   );
 }
 
+function DesktopActionButton({
+  label,
+  icon,
+  onClick,
+}: {
+  label: string;
+  icon: ReactNode;
+  onClick: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className="relative inline-flex min-h-12 cursor-pointer items-center justify-center gap-2.5 px-3 text-[0.66rem] font-semibold uppercase tracking-[0.18em] text-[#111111] transition hover:bg-[#efe8df]/70"
+      aria-label={label}
+    >
+      <span className="text-[#111111]">{icon}</span>
+      <span>{label}</span>
+    </button>
+  );
+}
+
 export function Header() {
   const router = useRouter();
   const { itemCount } = useCart();
   const { logout, status, user } = useAuth();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const accountHref = status === 'authenticated' && user ? '/account' : '/login';
 
@@ -190,13 +214,13 @@ export function Header() {
 
   const mobileLinks = [
     ...navigationLinks,
-    ['SEARCH', '/products'],
     ['ACCOUNT', accountHref],
     ['WISHLIST', '/account/wishlist'],
     ['BAG', '/cart'],
   ] as const;
 
   return (
+    <>
     <header className="sticky top-0 z-30 border-b border-[#ddd4c8] bg-[#fbf7f0]/96 text-[#111111] backdrop-blur">
       <div className="mx-auto grid h-[66px] w-full max-w-[1920px] grid-cols-[auto_1fr_auto] items-center gap-3 px-5 sm:h-[74px] sm:px-8 lg:h-[82px] lg:grid-cols-[minmax(210px,0.8fr)_minmax(380px,1fr)_minmax(390px,0.9fr)] lg:px-10 xl:px-16">
         <Link
@@ -225,7 +249,11 @@ export function Header() {
         </nav>
 
         <div className="hidden items-center justify-end gap-2 lg:flex">
-          <DesktopAction href="/products" label="SEARCH" icon={<SearchIcon />} />
+          <DesktopActionButton
+            label="SEARCH"
+            icon={<SearchIcon />}
+            onClick={() => setIsSearchOpen(true)}
+          />
           <span className="h-9 w-px bg-[#d8cfc2]" aria-hidden="true" />
           <DesktopAction href={accountHref} label="ACCOUNT" icon={<AccountIcon />} />
           <DesktopAction
@@ -250,6 +278,17 @@ export function Header() {
           <button
             type="button"
             className="inline-flex h-10 w-10 cursor-pointer items-center justify-center border border-[#ddd4c8] bg-[#fffaf3]/70"
+            aria-label="Search products"
+            onClick={() => {
+              closeMenu();
+              setIsSearchOpen(true);
+            }}
+          >
+            <SearchIcon className="h-5 w-5" />
+          </button>
+          <button
+            type="button"
+            className="inline-flex h-10 w-10 cursor-pointer items-center justify-center border border-[#ddd4c8] bg-[#fffaf3]/70"
             aria-label={isMenuOpen ? 'Close navigation menu' : 'Open navigation menu'}
             aria-expanded={isMenuOpen}
             onClick={() => setIsMenuOpen((current) => !current)}
@@ -262,6 +301,17 @@ export function Header() {
       {isMenuOpen ? (
         <div className="border-t border-[#ddd4c8] bg-[#fbf7f0] px-5 py-4 shadow-[0_18px_40px_rgba(49,37,26,0.08)] lg:hidden">
           <nav className="grid gap-2 text-xs font-semibold uppercase tracking-[0.22em]">
+            <button
+              type="button"
+              onClick={() => {
+                closeMenu();
+                setIsSearchOpen(true);
+              }}
+              className="flex min-h-12 cursor-pointer items-center justify-between border-b border-[#e6ddd1] py-3 text-left"
+            >
+              <span>SEARCH</span>
+              <span aria-hidden="true">→</span>
+            </button>
             {mobileLinks.map(([label, href]) => (
               <Link
                 key={`${label}-${href}`}
@@ -294,5 +344,7 @@ export function Header() {
         </div>
       ) : null}
     </header>
+    <SearchOverlay isOpen={isSearchOpen} onClose={() => setIsSearchOpen(false)} />
+    </>
   );
 }

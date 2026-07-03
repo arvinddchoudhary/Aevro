@@ -94,6 +94,52 @@ export class ProductsService {
               mode: 'insensitive',
             },
           },
+          {
+            category: {
+              is: {
+                name: {
+                  contains: query.search,
+                  mode: 'insensitive',
+                },
+              },
+            },
+          },
+          {
+            category: {
+              is: {
+                slug: {
+                  contains: query.search,
+                  mode: 'insensitive',
+                },
+              },
+            },
+          },
+          {
+            variants: {
+              some: {
+                OR: [
+                  {
+                    colorName: {
+                      contains: query.search,
+                      mode: 'insensitive',
+                    },
+                  },
+                  {
+                    colorSlug: {
+                      contains: query.search,
+                      mode: 'insensitive',
+                    },
+                  },
+                  {
+                    size: {
+                      contains: query.search,
+                      mode: 'insensitive',
+                    },
+                  },
+                ],
+              },
+            },
+          },
         ],
       });
     }

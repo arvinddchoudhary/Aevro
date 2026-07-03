@@ -92,10 +92,10 @@ export function WishlistProductCard({
         <button
           type="button"
           onClick={() => onRemove(item)}
-          className="absolute right-3 top-3 flex h-9 w-9 items-center justify-center rounded-full border border-[#ddd4c8] bg-[#fffaf3]/92 text-[#111111] transition hover:bg-white"
+          className="absolute right-3 top-3 flex h-9 w-9 items-center justify-center rounded-full border border-[#ddd4c8] bg-[#fffaf3]/92 text-[#d21f1f] transition hover:bg-white"
           aria-label={`Remove ${item.product.name} from wishlist`}
         >
-          <AccountIcon name="heart" className="h-5 w-5" />
+          <AccountIcon name="heart" className="h-5 w-5 fill-current" />
         </button>
       </div>
 

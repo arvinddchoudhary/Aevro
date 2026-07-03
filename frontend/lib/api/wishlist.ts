@@ -18,27 +18,35 @@ export class WishlistApiError extends Error {
 
 async function parseErrorMessage(response: Response) {
   try {
-    const body = (await response.json()) as { message?: string | string[] };
+    const body = (await response.json()) as {
+      detail?: string | string[];
+      error?: string | string[];
+      message?: string | string[];
+    };
+    const message = body.message ?? body.detail ?? body.error;
 
-    if (Array.isArray(body.message)) {
-      return body.message.join(' ');
+    if (Array.isArray(message)) {
+      return message.join(' ');
     }
 
-    return body.message ?? 'Wishlist request failed.';
+    return message ?? 'Wishlist request failed.';
   } catch {
     return 'Wishlist request failed.';
   }
 }
 
 async function wishlistRequest<T>(path: string, options: RequestInit = {}) {
+  const headers = new Headers(options.headers);
+
+  if (options.body && !headers.has('Content-Type')) {
+    headers.set('Content-Type', 'application/json');
+  }
+
   const response = await fetch(`${API_URL}${path}`, {
     ...options,
     cache: 'no-store',
     credentials: 'include',
-    headers: {
-      'Content-Type': 'application/json',
-      ...options.headers,
-    },
+    headers,
   });
 
   if (!response.ok) {
