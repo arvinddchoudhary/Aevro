@@ -15,7 +15,7 @@ export const metadata: Metadata = pageMetadata({
   description:
     'Explore AEVRO trousers and modern essentials designed with refined silhouettes, clean tailoring, and everyday comfort.',
   path: '/products',
-  image: '/images/brand/plp-hero.webp',
+  image: '/images/brand/plp-hero-2029-sharp.webp',
 });
 
 type SearchParams = Record<string, string | string[] | undefined>;
@@ -117,15 +117,16 @@ export default async function ProductsPage({
   return (
     <main>
       <section className="border-b border-[#ddd4c8]">
-        <div className="relative aspect-[2880/900] min-h-[260px] overflow-hidden bg-[#d8bea0]">
+        <div className="relative aspect-[2029/775] min-h-[300px] overflow-hidden bg-[#d8bea0]">
           <Image
-            src="/images/brand/plp-hero.webp"
+            src="/images/brand/plp-hero-2029-sharp.webp"
             alt="AEVRO trouser collection"
             fill
             priority
+            unoptimized
             quality={100}
             sizes="100vw"
-            className="object-contain object-center"
+            className="object-cover object-center"
           />
           <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(226,196,158,0.28)_0%,rgba(226,196,158,0.16)_29%,rgba(226,196,158,0.03)_48%,rgba(226,196,158,0)_100%)]" />
           <div className="relative flex h-full items-center px-6 sm:px-12 lg:px-20 xl:px-28">

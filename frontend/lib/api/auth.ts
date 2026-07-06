@@ -35,13 +35,16 @@ async function parseErrorMessage(response: Response) {
 }
 
 async function requestAuthData(path: string, options: RequestInit = {}) {
+  const headers = new Headers(options.headers);
+
+  if (options.body && !headers.has('Content-Type')) {
+    headers.set('Content-Type', 'application/json');
+  }
+
   const response = await fetch(`${API_URL}${path}`, {
     ...options,
     credentials: 'include',
-    headers: {
-      'Content-Type': 'application/json',
-      ...options.headers,
-    },
+    headers,
   });
 
   if (!response.ok) {
@@ -82,13 +85,16 @@ type AuthActionResponse<T> =
     };
 
 async function requestAuthAction<T>(path: string, options: RequestInit = {}) {
+  const headers = new Headers(options.headers);
+
+  if (options.body && !headers.has('Content-Type')) {
+    headers.set('Content-Type', 'application/json');
+  }
+
   const response = await fetch(`${API_URL}${path}`, {
     ...options,
     credentials: 'include',
-    headers: {
-      'Content-Type': 'application/json',
-      ...options.headers,
-    },
+    headers,
   });
 
   if (!response.ok) {
