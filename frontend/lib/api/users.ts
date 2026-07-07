@@ -6,8 +6,7 @@ import type {
   UserItemResponse,
   UserProfile,
 } from '../../types/user';
-
-const API_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8000/api/v1';
+import { authenticatedFetch } from './authenticated-request';
 
 export class UsersApiError extends Error {
   constructor(
@@ -33,13 +32,8 @@ async function parseErrorMessage(response: Response) {
 }
 
 async function userRequest<T>(path: string, options: RequestInit = {}) {
-  const response = await fetch(`${API_URL}${path}`, {
+  const response = await authenticatedFetch(path, {
     ...options,
-    credentials: 'include',
-    headers: {
-      'Content-Type': 'application/json',
-      ...options.headers,
-    },
   });
 
   if (!response.ok) {

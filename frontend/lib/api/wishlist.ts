@@ -4,8 +4,7 @@ import type {
   WishlistItemResponse,
   WishlistPayload,
 } from '../../types/wishlist';
-
-const API_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8000/api/v1';
+import { authenticatedFetch } from './authenticated-request';
 
 export class WishlistApiError extends Error {
   constructor(
@@ -36,17 +35,9 @@ async function parseErrorMessage(response: Response) {
 }
 
 async function wishlistRequest<T>(path: string, options: RequestInit = {}) {
-  const headers = new Headers(options.headers);
-
-  if (options.body && !headers.has('Content-Type')) {
-    headers.set('Content-Type', 'application/json');
-  }
-
-  const response = await fetch(`${API_URL}${path}`, {
+  const response = await authenticatedFetch(path, {
     ...options,
     cache: 'no-store',
-    credentials: 'include',
-    headers,
   });
 
   if (!response.ok) {

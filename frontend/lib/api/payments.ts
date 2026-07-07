@@ -4,8 +4,7 @@ import type {
   PaymentVerificationPayload,
   RazorpayOrder,
 } from '../../types/payments';
-
-const API_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8000/api/v1';
+import { authenticatedFetch } from './authenticated-request';
 
 class PaymentsApiError extends Error {
   constructor(
@@ -31,12 +30,8 @@ async function parseErrorMessage(response: Response) {
 }
 
 async function postPaymentRequest<T>(path: string, body: unknown) {
-  const response = await fetch(`${API_URL}${path}`, {
+  const response = await authenticatedFetch(path, {
     method: 'POST',
-    credentials: 'include',
-    headers: {
-      'Content-Type': 'application/json',
-    },
     body: JSON.stringify(body),
   });
 

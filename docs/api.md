@@ -73,6 +73,22 @@ login methods issue the same backend-managed session cookies:
 Refresh tokens are stored only as hashes in the database and are rotated on
 refresh. Frontend code must not store JWTs in `localStorage`.
 
+Access tokens are custom HMAC JWT-style tokens stored only in the httpOnly
+`aevro_access_token` cookie. The payload includes `sub`, `email`, `role`,
+`type: "access"`, `iat`, and `exp`.
+
+Refresh tokens are opaque random values stored only in the httpOnly
+`aevro_refresh_token` cookie. Only the HMAC hash is stored in
+`RefreshSession.refreshTokenHash`.
+
+Cookie-authenticated unsafe requests use strict Origin/Referer protection.
+Allowed origins come from `FRONTEND_URL` and `CORS_ORIGINS`. Razorpay and Brevo
+webhook routes are exempt from this protection and continue to rely on provider
+webhook validation.
+
+Auth endpoints are rate-limited by IP address, and email-based endpoints are
+also limited by normalized email where available. Exceeded limits return `429`.
+
 ### Register
 
 ```txt
@@ -165,8 +181,8 @@ POST /api/v1/auth/google
 ```
 
 The backend verifies this ID token against `GOOGLE_CLIENT_ID`.
-Google login does not require OTP. Google-authenticated users are treated as
-verified after the backend verifies the Google ID token.
+Google login does not require OTP. The backend accepts Google login only when
+the Google token contains `email_verified: true`.
 
 ### Verify Email OTP
 
@@ -210,6 +226,11 @@ POST /api/v1/auth/refresh
 Requires the `aevro_refresh_token` httpOnly cookie. Returns the current user and
 sets rotated access/refresh cookies.
 
+Refresh rotation revokes the old refresh session and creates a new refresh
+session. If a revoked refresh token is presented again, the backend treats it as
+suspicious reuse, revokes the user's other active refresh sessions, clears auth
+cookies, and returns unauthorized.
+
 ### Logout
 
 ```txt
@@ -217,6 +238,9 @@ POST /api/v1/auth/logout
 ```
 
 Revokes the active refresh session and clears auth cookies.
+
+Existing access tokens remain valid until their short expiry, but logout
+prevents future refresh through the revoked refresh token.
 
 ### Me
 
@@ -261,9 +285,23 @@ The frontend uses:
 All auth requests use `credentials: include` so browser cookies are sent. JWT
 tokens are not stored in frontend storage.
 
+Protected frontend API clients for account, wishlist, orders, checkout,
+payments, and admin use a shared authenticated request helper. On the first
+`401`, it calls `POST /api/v1/auth/refresh` once and retries the original
+request once if refresh succeeds. It does not retry `/auth/refresh` itself.
+Public product/category/search APIs are not routed through this authenticated
+helper.
+
 Register is a two-step flow: `POST /auth/register` sends an OTP but does not log
 the user in, then `POST /auth/verify-email-otp` creates the account and starts
 the session.
+
+Auth cleanup can be run manually or from a scheduled backend job:
+
+```bash
+cd backend
+npm run auth:cleanup
+```
 
 ## Phase 20 User Profile And Addresses
 

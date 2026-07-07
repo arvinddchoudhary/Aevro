@@ -122,10 +122,18 @@ export class AuthController {
     @Req() request: AuthenticatedRequest,
     @Res({ passthrough: true }) reply: FastifyReply,
   ) {
-    const result = await this.authService.refresh(
-      request.cookies?.[REFRESH_TOKEN_COOKIE],
-      this.getSessionContext(request),
-    );
+    let result: AuthResult;
+
+    try {
+      result = await this.authService.refresh(
+        request.cookies?.[REFRESH_TOKEN_COOKIE],
+        this.getSessionContext(request),
+      );
+    } catch (error) {
+      this.clearAuthCookies(reply);
+      throw error;
+    }
+
     this.setAuthCookies(reply, result);
 
     return {

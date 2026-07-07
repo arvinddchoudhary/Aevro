@@ -3,6 +3,7 @@ import {
   ConflictException,
   Inject,
   Injectable,
+  Logger,
   ServiceUnavailableException,
   UnauthorizedException,
 } from '@nestjs/common';
@@ -44,6 +45,7 @@ type JwtPayload = {
 
 @Injectable()
 export class AuthService {
+  private readonly logger = new Logger(AuthService.name);
   private readonly googleClient = new OAuth2Client();
   private readonly accessSecret: string;
   private readonly refreshSecret: string;
@@ -312,11 +314,15 @@ export class AuthService {
       throw new UnauthorizedException('Invalid Google token.');
     }
 
+    if (!payload.email_verified) {
+      throw new UnauthorizedException('Google email must be verified.');
+    }
+
     const user = await this.usersService.upsertGoogleUser({
       name: payload.name ?? payload.email,
       email: payload.email,
       providerAccountId: payload.sub,
-      emailVerified: payload.email_verified ?? false,
+      emailVerified: true,
     });
 
     return this.createAuthResult(user, context);
@@ -339,7 +345,27 @@ export class AuthService {
       },
     });
 
-    if (!session || session.revokedAt || session.expiresAt <= new Date()) {
+    if (!session) {
+      throw new UnauthorizedException('Invalid refresh session.');
+    }
+
+    if (session.revokedAt) {
+      this.logger.warn(
+        `Revoked refresh token reuse detected for user ${session.userId}. Revoking active sessions.`,
+      );
+      await this.prisma.refreshSession.updateMany({
+        where: {
+          userId: session.userId,
+          revokedAt: null,
+        },
+        data: {
+          revokedAt: new Date(),
+        },
+      });
+      throw new UnauthorizedException('Invalid refresh session.');
+    }
+
+    if (session.expiresAt <= new Date()) {
       throw new UnauthorizedException('Invalid refresh session.');
     }
 
@@ -381,6 +407,82 @@ export class AuthService {
     }
 
     return this.usersService.serializeUser(user);
+  }
+
+  async cleanupExpiredAuthRows() {
+    const now = new Date();
+    const revokedRefreshCutoff = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
+    const consumedOtpCutoff = new Date(Date.now() - 24 * 60 * 60 * 1000);
+
+    const [
+      refreshSessions,
+      pendingRegistrations,
+      loginOtps,
+      emailVerificationOtps,
+    ] = await this.prisma.$transaction([
+      this.prisma.refreshSession.deleteMany({
+        where: {
+          OR: [
+            {
+              expiresAt: {
+                lt: now,
+              },
+            },
+            {
+              revokedAt: {
+                lt: revokedRefreshCutoff,
+              },
+            },
+          ],
+        },
+      }),
+      this.prisma.pendingRegistration.deleteMany({
+        where: {
+          otpExpiresAt: {
+            lt: now,
+          },
+        },
+      }),
+      this.prisma.loginOtp.deleteMany({
+        where: {
+          OR: [
+            {
+              expiresAt: {
+                lt: now,
+              },
+            },
+            {
+              consumedAt: {
+                lt: consumedOtpCutoff,
+              },
+            },
+          ],
+        },
+      }),
+      this.prisma.emailVerificationOtp.deleteMany({
+        where: {
+          OR: [
+            {
+              expiresAt: {
+                lt: now,
+              },
+            },
+            {
+              consumedAt: {
+                lt: consumedOtpCutoff,
+              },
+            },
+          ],
+        },
+      }),
+    ]);
+
+    return {
+      refreshSessions: refreshSessions.count,
+      pendingRegistrations: pendingRegistrations.count,
+      loginOtps: loginOtps.count,
+      emailVerificationOtps: emailVerificationOtps.count,
+    };
   }
 
   async resendEmailVerificationOtp(emailInput: string) {
