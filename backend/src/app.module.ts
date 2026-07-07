@@ -1,8 +1,11 @@
 import { Module } from '@nestjs/common';
+import { APP_GUARD } from '@nestjs/core';
 import { ConfigModule } from '@nestjs/config';
 import { AdminModule } from './admin/admin.module';
 import { AuthModule } from './auth/auth.module';
+import { AuthRateLimitGuard } from './auth/guards/auth-rate-limit.guard';
 import { CategoriesModule } from './categories/categories.module';
+import { OriginProtectionGuard } from './common/guards/origin-protection.guard';
 import { validateEnvironment } from './config/env.validation';
 import { HealthModule } from './health/health.module';
 import { HomepageModule } from './homepage/homepage.module';
@@ -30,6 +33,16 @@ import { UsersModule } from './users/users.module';
     ProductsModule,
     OrdersModule,
     PaymentsModule,
+  ],
+  providers: [
+    {
+      provide: APP_GUARD,
+      useClass: OriginProtectionGuard,
+    },
+    {
+      provide: APP_GUARD,
+      useClass: AuthRateLimitGuard,
+    },
   ],
 })
 export class AppModule {}

@@ -3,8 +3,7 @@ import type {
   OrderResponse,
   OrdersResponse,
 } from '../../types/orders';
-
-const API_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8000/api/v1';
+import { authenticatedFetch } from './authenticated-request';
 
 class OrdersApiError extends Error {
   constructor(
@@ -30,12 +29,8 @@ async function parseErrorMessage(response: Response) {
 }
 
 export async function createOrder(payload: CreateOrderPayload) {
-  const response = await fetch(`${API_URL}/orders`, {
+  const response = await authenticatedFetch('/orders', {
     method: 'POST',
-    credentials: 'include',
-    headers: {
-      'Content-Type': 'application/json',
-    },
     body: JSON.stringify(payload),
   });
 
@@ -59,9 +54,8 @@ export async function createOrder(payload: CreateOrderPayload) {
 
 export async function getMyOrders(): Promise<OrdersResponse> {
   try {
-    const response = await fetch(`${API_URL}/orders/me`, {
+    const response = await authenticatedFetch('/orders/me', {
       cache: 'no-store',
-      credentials: 'include',
     });
 
     if (!response.ok) {
@@ -87,10 +81,12 @@ export async function getMyOrders(): Promise<OrdersResponse> {
 
 export async function getMyOrder(id: string): Promise<OrderResponse> {
   try {
-    const response = await fetch(`${API_URL}/orders/me/${encodeURIComponent(id)}`, {
-      cache: 'no-store',
-      credentials: 'include',
-    });
+    const response = await authenticatedFetch(
+      `/orders/me/${encodeURIComponent(id)}`,
+      {
+        cache: 'no-store',
+      },
+    );
 
     if (!response.ok) {
       throw new OrdersApiError(await parseErrorMessage(response), response.status);
@@ -118,9 +114,8 @@ export async function getOrder(
   cookieHeader?: string,
 ): Promise<OrderResponse> {
   try {
-    const response = await fetch(`${API_URL}/orders/${encodeURIComponent(id)}`, {
+    const response = await authenticatedFetch(`/orders/${encodeURIComponent(id)}`, {
       cache: 'no-store',
-      credentials: 'include',
       headers: cookieHeader
         ? {
             Cookie: cookieHeader,

@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "build": "tsc -p tsconfig.build.json",
+    "auth:cleanup": "tsx scripts/cleanup-auth.ts",
     "db:seed": "tsx prisma/seed.ts",
     "prisma:deploy": "prisma migrate deploy",
     "prisma:dev": "prisma migrate dev",

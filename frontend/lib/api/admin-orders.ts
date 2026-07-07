@@ -5,8 +5,7 @@ import type {
   AdminOrdersResponse,
   AdminOrderStatus,
 } from '../../types/admin/orders';
-
-const API_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8000/api/v1';
+import { authenticatedFetch } from './authenticated-request';
 
 class AdminOrdersApiError extends Error {
   constructor(
@@ -46,14 +45,9 @@ function buildQueryString(query: AdminOrdersQuery) {
 }
 
 async function adminOrderRequest<T>(path: string, options: RequestInit = {}) {
-  const response = await fetch(`${API_URL}${path}`, {
+  const response = await authenticatedFetch(path, {
     ...options,
     cache: 'no-store',
-    credentials: 'include',
-    headers: {
-      'Content-Type': 'application/json',
-      ...options.headers,
-    },
   });
 
   if (!response.ok) {

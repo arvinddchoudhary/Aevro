@@ -6,8 +6,7 @@ import type {
   CreateAdminProductPayload,
   UploadedProductImage,
 } from '../../types/admin/products';
-
-const API_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8000/api/v1';
+import { authenticatedFetch } from './authenticated-request';
 
 class AdminApiError extends Error {
   constructor(
@@ -47,16 +46,8 @@ async function parseErrorMessage(response: Response) {
 }
 
 async function adminRequest<T>(path: string, options: RequestInit = {}) {
-  const response = await fetch(`${API_URL}${path}`, {
+  const response = await authenticatedFetch(path, {
     ...options,
-    credentials: 'include',
-    headers:
-      options.body instanceof FormData
-        ? options.headers
-        : {
-            'Content-Type': 'application/json',
-            ...options.headers,
-          },
   });
 
   if (!response.ok) {
