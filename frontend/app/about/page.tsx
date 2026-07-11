@@ -88,6 +88,23 @@ export default function AboutPage() {
                       <p>This is only the beginning, 
                         <br />
                         Welcome to AEVRO.</p>
+
+                      <div className="mt-6 flex flex-wrap gap-x-6 gap-y-2">
+                        {[
+                          { label: 'Our Story', href: '/about/our-story' },
+                          { label: 'Philosophy', href: '/about/philosophy' },
+                          { label: 'Craftsmanship', href: '/about/craftsmanship' },
+                          { label: 'Sustainability', href: '/about/sustainability' },
+                        ].map((sub) => (
+                          <Link
+                            key={sub.href}
+                            href={sub.href}
+                            className="text-xs font-semibold uppercase tracking-[0.1em] text-[#4d473f] underline-offset-8 hover:underline"
+                          >
+                            {sub.label}
+                          </Link>
+                        ))}
+                      </div>
               </div>
               </div>
             </div>

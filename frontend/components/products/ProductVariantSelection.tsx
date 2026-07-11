@@ -345,20 +345,7 @@ export function ProductVariantSelection({ product }: ProductVariantSelectionProp
             </Link>
           )}
         </div>
-        <div className="mt-5 border-t border-[#ddd4c8]">
-          {['Details', 'Fabric & care', 'Shipping & returns'].map((item) => (
-            <details key={item} className="group border-b border-[#ddd4c8] py-3">
-              <summary className="flex list-none items-center justify-between text-xs font-semibold uppercase tracking-[0.1em]">
-                {item}
-                <span className="text-lg leading-none group-open:rotate-45">+</span>
-              </summary>
-              <p className="mt-3 text-sm leading-6 text-[#514c45]">
-                Premium everyday construction with a clean drape, refined finish,
-                and considered proportions.
-              </p>
-            </details>
-          ))}
-        </div>
+
       </section>
 
       <ProductImageLightbox

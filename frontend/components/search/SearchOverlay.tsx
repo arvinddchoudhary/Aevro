@@ -222,14 +222,14 @@ export function SearchOverlay({ isOpen, onClose }: SearchOverlayProps) {
                 value={query}
                 onChange={(event) => setQuery(event.target.value)}
                 placeholder="Search trousers, black trousers, pleated trousers..."
-                className="h-[72px] w-full border border-[#a89078] bg-[#fffdf8]/72 pl-16 pr-4 font-serif text-2xl font-light text-[#111111] outline-none transition placeholder:text-[#82786f] focus:border-[#111111] sm:text-[1.8rem]"
+                className="h-[72px] w-full border border-[#d8cfc2] bg-[#fffdf8]/72 pl-16 pr-4 font-serif text-2xl font-light text-[#111111] outline-none transition placeholder:text-[#82786f] focus:border-[#111111] sm:text-[1.8rem]"
                 aria-label="Search products"
               />
             </div>
             <button
               type="submit"
               disabled={!normalizedQuery}
-              className="h-[72px] cursor-pointer bg-[#a39079] px-7 text-xs font-semibold uppercase tracking-[0.34em] text-[#fffaf3] transition hover:bg-[#8d7b66] disabled:cursor-not-allowed disabled:bg-[#c3b8ab]"
+              className="h-[72px] cursor-pointer bg-[#111111] px-7 text-xs font-semibold uppercase tracking-[0.34em] text-[#fffaf3] transition hover:bg-[#2a2a2a] disabled:cursor-not-allowed disabled:bg-[#c3b8ab] disabled:text-[#8a8177]"
             >
               Search
             </button>
