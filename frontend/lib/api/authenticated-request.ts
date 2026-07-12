@@ -1,5 +1,8 @@
-export const API_URL =
-  process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8000/api/v1';
+import { buildApiUrl, getApiBaseUrl } from './base-url';
+
+export const API_URL = getApiBaseUrl();
+
+let refreshPromise: Promise<Response> | null = null;
 
 type AuthenticatedRequestOptions = RequestInit & {
   retryOnUnauthorized?: boolean;
@@ -20,9 +23,13 @@ export async function authenticatedFetch(
     return response;
   }
 
-  const refreshResponse = await fetchWithAuth('/auth/refresh', {
+  refreshPromise ??= fetchWithAuth('/auth/refresh', {
     method: 'POST',
+  }).finally(() => {
+    refreshPromise = null;
   });
+
+  const refreshResponse = await refreshPromise;
 
   if (!refreshResponse.ok) {
     return response;
@@ -42,7 +49,7 @@ function fetchWithAuth(path: string, options: RequestInit = {}) {
     headers.set('Content-Type', 'application/json');
   }
 
-  return fetch(`${API_URL}${path}`, {
+  return fetch(buildApiUrl(path), {
     ...options,
     credentials: 'include',
     headers,

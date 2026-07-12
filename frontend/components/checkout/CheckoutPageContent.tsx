@@ -566,7 +566,7 @@ export function CheckoutPageContent() {
             {items.map((item) => (
               <div
                 key={item.itemKey}
-                className="grid grid-cols-[58px_1fr_auto] gap-4 border-b border-[#e7ded2] pb-4 last:border-b-0"
+                className="grid grid-cols-[58px_minmax(0,1fr)] gap-3 border-b border-[#e7ded2] pb-4 last:border-b-0 min-[390px]:grid-cols-[58px_minmax(0,1fr)_auto] sm:gap-4"
               >
                 <div className="h-[74px] overflow-hidden rounded-[3px] bg-[#f5f5f5]">
                   {item.imageUrl ? (
@@ -581,7 +581,7 @@ export function CheckoutPageContent() {
                     </div>
                   )}
                 </div>
-                <div>
+                <div className="min-w-0">
                   <p className="text-sm leading-5">{item.name}</p>
                   {(item.selectedColor || item.selectedSize) && (
                     <p className="mt-1 text-xs leading-5 text-[#5f5a53]">
@@ -603,7 +603,7 @@ export function CheckoutPageContent() {
                     </p>
                   ) : null}
                 </div>
-                <p className="self-center text-sm">
+                <p className="col-span-2 text-right text-sm min-[390px]:col-span-1 min-[390px]:self-center">
                   {formatPrice(item.priceInPaise * item.quantity)}
                 </p>
               </div>

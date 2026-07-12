@@ -59,14 +59,14 @@ export function OrderRow({ order }: OrderRowProps) {
     paymentStatusStyles.UNPAID;
 
   return (
-    <article className="border border-[#e1d8cc] bg-[#fffaf3]/80 p-4 transition hover:border-[#cfc1b1] sm:p-5">
-      <div className="grid gap-5 xl:grid-cols-[190px_minmax(180px,1fr)_120px_120px_145px_24px] xl:items-center">
-        <div className="flex items-center gap-2">
+    <article className="border border-[#e1d8cc] bg-[#fffaf3]/80 p-3 transition hover:border-[#cfc1b1] sm:p-5">
+      <div className="grid gap-4 sm:gap-5 xl:grid-cols-[190px_minmax(180px,1fr)_120px_120px_145px_24px] xl:items-center">
+        <div className="flex min-w-0 items-center gap-2 overflow-x-auto pb-1 xl:overflow-visible xl:pb-0">
           {images.length > 0 ? (
             images.map((image) => (
               <span
                 key={`${order.id}-${image.url}`}
-                className="block h-16 w-16 shrink-0 overflow-hidden bg-[#eee5da]"
+                className="block h-14 w-14 shrink-0 overflow-hidden bg-[#eee5da] sm:h-16 sm:w-16"
               >
                 <img src={image.url} alt={image.alt} className="h-full w-full object-cover" />
               </span>
@@ -84,12 +84,13 @@ export function OrderRow({ order }: OrderRowProps) {
         </div>
 
         <div className="min-w-0">
-          <h3 className="truncate text-base text-[#111111] sm:text-lg">
+          <h3 className="break-words text-base text-[#111111] sm:truncate sm:text-lg">
             Order {order.orderNumber}
           </h3>
           <p className="mt-1 text-sm text-[#625a51]">{formatOrderDate(order.createdAt)}</p>
         </div>
 
+        <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 xl:contents">
         <div>
           <p className="text-xs uppercase tracking-[0.14em] text-[#777067]">Total</p>
           <p className="mt-1 text-sm font-medium text-[#111111]">
@@ -112,6 +113,7 @@ export function OrderRow({ order }: OrderRowProps) {
           >
             {displayStatus(order.status)}
           </span>
+        </div>
         </div>
 
         <div className="grid gap-2 sm:grid-cols-2 xl:grid-cols-1">

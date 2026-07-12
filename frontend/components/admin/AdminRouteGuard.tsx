@@ -1,20 +1,21 @@
 'use client';
 
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { ReactNode, useEffect } from 'react';
 import { useAuth } from '../../lib/auth';
 import { EmptyState } from '../ui/EmptyState';
 
 export function AdminRouteGuard({ children }: { children: ReactNode }) {
   const router = useRouter();
+  const pathname = usePathname();
   const { status, user } = useAuth();
 
   useEffect(() => {
     if (status === 'unauthenticated') {
-      router.replace('/login');
+      router.replace(`/login?redirect=${encodeURIComponent(pathname)}`);
     }
-  }, [router, status]);
+  }, [pathname, router, status]);
 
   if (status === 'loading') {
     return (

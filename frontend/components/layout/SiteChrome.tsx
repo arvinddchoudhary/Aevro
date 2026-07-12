@@ -4,6 +4,7 @@ import { usePathname } from 'next/navigation';
 import type { ReactNode } from 'react';
 import { Footer } from './Footer';
 import { Header } from './Header';
+import { MobileBottomNav } from './MobileBottomNav';
 
 export function SiteChrome({ children }: { children: ReactNode }) {
   const pathname = usePathname();
@@ -16,8 +17,9 @@ export function SiteChrome({ children }: { children: ReactNode }) {
   return (
     <>
       <Header />
-      {children}
+      <div className="pb-24 lg:pb-0">{children}</div>
       <Footer />
+      {!pathname.startsWith('/admin') && <MobileBottomNav />}
     </>
   );
 }

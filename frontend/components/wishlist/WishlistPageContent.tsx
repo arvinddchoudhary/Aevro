@@ -30,7 +30,7 @@ function itemCountLabel(count: number) {
 
 function WishlistSkeleton() {
   return (
-    <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4 2xl:grid-cols-5">
+    <div className="grid grid-cols-2 gap-2.5 sm:gap-3 xl:grid-cols-4 2xl:grid-cols-5">
       {[0, 1, 2, 3].map((item) => (
         <div key={item} className="border border-[#e1d8cc] bg-[#fffaf3]/82 p-3">
           <span className="block aspect-[3/4] animate-pulse bg-[#eee5da]" />
@@ -163,7 +163,7 @@ export function WishlistPageContent() {
           <AccountSidebar isLoggingOut={isLoggingOut} onLogout={handleLogout} />
 
           <section className="min-w-0 border border-[#e1d8cc] bg-[#fffaf3]/82 shadow-[0_26px_80px_rgba(48,38,27,0.04)]">
-            <div className="grid gap-5 border-b border-[#e5dbcf] p-5 sm:p-7 xl:grid-cols-[1fr_auto] xl:items-center">
+            <div className="grid gap-5 border-b border-[#e5dbcf] p-4 sm:p-7 xl:grid-cols-[1fr_auto] xl:items-center">
               <div>
                 <h1 className="font-serif text-2xl font-light text-[#111111] sm:text-3xl">
                   My Wishlist
@@ -222,7 +222,7 @@ export function WishlistPageContent() {
               </p>
             )}
 
-            <div className="p-5 sm:p-7">
+            <div className="p-4 sm:p-7">
               {isLoading && <WishlistSkeleton />}
 
               {error && !isLoading && (
@@ -274,7 +274,7 @@ export function WishlistPageContent() {
                 <div
                   className={
                     layout === 'grid'
-                      ? 'grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4 2xl:grid-cols-5'
+                      ? 'grid grid-cols-2 gap-2.5 sm:gap-3 xl:grid-cols-4 2xl:grid-cols-5'
                       : 'grid gap-3'
                   }
                 >

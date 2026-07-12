@@ -18,13 +18,13 @@ export function AccountInfoCard({
   title,
 }: AccountInfoCardProps) {
   return (
-    <section className="min-h-[225px] border border-[#e1d8cc] bg-[#fffaf3]/76 p-5 shadow-[0_22px_70px_rgba(48,38,27,0.035)] sm:p-6">
+    <section className="min-h-[205px] border border-[#e1d8cc] bg-[#fffaf3]/76 p-4 shadow-[0_22px_70px_rgba(48,38,27,0.035)] sm:min-h-[225px] sm:p-6">
       <div className="flex items-start justify-between gap-4">
-        <div className="flex items-center gap-4">
-          <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-[#f0e8de] text-[#2a251f]">
-            <AccountIcon name={icon} className="h-6 w-6" />
+        <div className="flex min-w-0 items-center gap-3 sm:gap-4">
+          <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-[#f0e8de] text-[#2a251f] sm:h-14 sm:w-14">
+            <AccountIcon name={icon} className="h-5 w-5 sm:h-6 sm:w-6" />
           </span>
-          <h3 className="text-xs font-semibold uppercase tracking-[0.18em] text-[#111111]">
+          <h3 className="min-w-0 text-xs font-semibold uppercase tracking-[0.14em] text-[#111111] sm:tracking-[0.18em]">
             {title}
           </h3>
         </div>
@@ -37,7 +37,7 @@ export function AccountInfoCard({
           </Link>
         )}
       </div>
-      <div className="mt-6">{children}</div>
+      <div className="mt-5 sm:mt-6">{children}</div>
     </section>
   );
 }

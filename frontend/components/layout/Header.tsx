@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import type { ReactNode } from 'react';
 import { useState } from 'react';
 import { useAuth } from '../../lib/auth';
@@ -193,6 +193,7 @@ function DesktopActionButton({
 }
 
 export function Header() {
+  const pathname = usePathname();
   const router = useRouter();
   const { itemCount } = useCart();
   const { logout, status, user } = useAuth();
@@ -200,6 +201,7 @@ export function Header() {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const accountHref = status === 'authenticated' && user ? '/account' : '/login';
+  const showMobileWishlist = pathname.startsWith('/products');
 
   const closeMenu = () => setIsMenuOpen(false);
 
@@ -222,17 +224,28 @@ export function Header() {
   return (
     <>
     <header className="sticky top-0 z-30 border-b border-[#ddd4c8] bg-[#fbf7f0]/96 text-[#111111] backdrop-blur">
-      <div className="mx-auto grid h-[66px] w-full max-w-[1920px] grid-cols-[auto_1fr_auto] items-center gap-3 px-5 sm:h-[74px] sm:px-8 lg:h-[82px] lg:grid-cols-[minmax(210px,0.8fr)_minmax(380px,1fr)_minmax(390px,0.9fr)] lg:px-10 xl:px-16">
+      <div className="mx-auto grid h-[72px] w-full max-w-[1920px] grid-cols-[1fr_auto_1fr] items-center gap-2 px-5 sm:h-[78px] sm:gap-3 sm:px-6 lg:h-[82px] lg:grid-cols-[minmax(210px,0.8fr)_minmax(380px,1fr)_minmax(390px,0.9fr)] lg:px-10 xl:px-16">
+        <div className="flex items-center justify-start lg:hidden">
+          <button
+            type="button"
+            className="inline-flex h-10 w-10 cursor-pointer items-center justify-center text-[#111111]"
+            aria-label={isMenuOpen ? 'Close navigation menu' : 'Open navigation menu'}
+            aria-expanded={isMenuOpen}
+            onClick={() => setIsMenuOpen((current) => !current)}
+          >
+            {isMenuOpen ? <CloseIcon className="h-6 w-6" /> : <MenuIcon className="h-6 w-6" />}
+          </button>
+        </div>
         <Link
           href="/"
-          className="inline-flex shrink-0 cursor-pointer focus-visible:outline-none"
+          className="inline-flex h-full max-w-[108px] shrink-0 cursor-pointer items-center justify-center overflow-hidden focus-visible:outline-none min-[390px]:max-w-[116px] sm:max-w-[130px] lg:max-w-[240px] lg:justify-start"
           aria-label="AEVRO home"
           onClick={closeMenu}
         >
           <img
             src="/images/brand/aevro-wordmark.png"
             alt="AEVRO"
-            className="h-8 w-auto sm:h-9 lg:h-[42px]"
+            className="block h-auto max-h-6 w-auto max-w-full object-contain min-[390px]:max-h-7 sm:max-h-8 lg:max-h-11"
           />
         </Link>
 
@@ -265,36 +278,37 @@ export function Header() {
           <DesktopAction href="/cart" label="BAG" icon={<BagIcon />} count={itemCount} />
         </div>
 
-        <div className="flex items-center justify-end gap-2 lg:hidden">
-          <Link
-            href="/cart"
-            className="relative inline-flex h-10 w-10 cursor-pointer items-center justify-center border border-[#ddd4c8] bg-[#fffaf3]/70"
-            aria-label={`Bag with ${itemCount} item${itemCount === 1 ? '' : 's'}`}
-            onClick={closeMenu}
-          >
-            <BagIcon className="h-5 w-5" />
-            <CountBadge count={itemCount} label={`Bag count ${itemCount}`} />
-          </Link>
+        <div className="flex items-center justify-end gap-0.5 sm:gap-1.5 lg:hidden">
           <button
             type="button"
-            className="inline-flex h-10 w-10 cursor-pointer items-center justify-center border border-[#ddd4c8] bg-[#fffaf3]/70"
+            className={`inline-flex cursor-pointer items-center justify-center text-[#111111] ${showMobileWishlist ? 'h-9 w-9' : 'h-10 w-10'}`}
             aria-label="Search products"
             onClick={() => {
               closeMenu();
               setIsSearchOpen(true);
             }}
           >
-            <SearchIcon className="h-5 w-5" />
+            <SearchIcon className="h-6 w-6" />
           </button>
-          <button
-            type="button"
-            className="inline-flex h-10 w-10 cursor-pointer items-center justify-center border border-[#ddd4c8] bg-[#fffaf3]/70"
-            aria-label={isMenuOpen ? 'Close navigation menu' : 'Open navigation menu'}
-            aria-expanded={isMenuOpen}
-            onClick={() => setIsMenuOpen((current) => !current)}
+          {showMobileWishlist ? (
+            <Link
+              href="/account/wishlist"
+              className="inline-flex h-9 w-9 cursor-pointer items-center justify-center text-[#111111]"
+              aria-label="Wishlist"
+              onClick={closeMenu}
+            >
+              <HeartIcon className="h-6 w-6" />
+            </Link>
+          ) : null}
+          <Link
+            href="/cart"
+            className={`relative inline-flex cursor-pointer items-center justify-center text-[#111111] ${showMobileWishlist ? 'h-9 w-9' : 'h-10 w-10'}`}
+            aria-label={`Bag with ${itemCount} item${itemCount === 1 ? '' : 's'}`}
+            onClick={closeMenu}
           >
-            {isMenuOpen ? <CloseIcon className="h-5 w-5" /> : <MenuIcon className="h-5 w-5" />}
-          </button>
+            <BagIcon className="h-6 w-6" />
+            <CountBadge count={itemCount} label={`Bag count ${itemCount}`} />
+          </Link>
         </div>
       </div>
 

@@ -26,14 +26,14 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className="min-h-screen bg-[#fbf7f0]">
       <div className="grid min-h-screen lg:grid-cols-[290px_minmax(0,1fr)]">
-        <aside className="border-b border-[#ddd4c8] bg-[#fbf7f0]/95 px-5 py-5 lg:sticky lg:top-20 lg:h-[calc(100vh-5rem)] lg:border-b-0 lg:border-r lg:px-8 lg:py-14">
+        <aside className="sticky top-[66px] z-20 border-b border-[#ddd4c8] bg-[#fbf7f0]/95 px-4 py-3 backdrop-blur sm:top-[74px] sm:px-5 sm:py-4 lg:top-20 lg:h-[calc(100vh-5rem)] lg:border-b-0 lg:border-r lg:px-8 lg:py-14">
           <p className="hidden text-xs uppercase tracking-[0.28em] text-[#77716a] lg:block">
             Admin
           </p>
-          <nav className="flex gap-2 overflow-x-auto pb-1 lg:mt-7 lg:block lg:space-y-2 lg:overflow-visible lg:pb-0">
+          <nav className="flex snap-x gap-2 overflow-x-auto pb-1 lg:mt-7 lg:block lg:space-y-2 lg:overflow-visible lg:pb-0">
             {adminNavItems.map((item) => {
               const active = item.href ? isActive(pathname, item.href) : false;
-              const className = `flex h-12 shrink-0 cursor-pointer items-center gap-3 rounded-[7px] px-4 text-sm transition lg:w-full ${
+              const className = `flex h-11 shrink-0 snap-start cursor-pointer items-center gap-2.5 rounded-full px-4 text-sm transition lg:h-12 lg:w-full lg:rounded-[7px] ${
                 active
                   ? 'bg-[#ede5da] text-[#111111]'
                   : item.href
@@ -74,7 +74,7 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
           </div>
         </aside>
 
-        <main className="min-w-0 px-5 py-8 sm:px-8 lg:px-12 lg:py-14 xl:px-16">
+        <main className="min-w-0 px-4 py-6 sm:px-8 sm:py-8 lg:px-12 lg:py-14 xl:px-16">
           {children}
         </main>
       </div>

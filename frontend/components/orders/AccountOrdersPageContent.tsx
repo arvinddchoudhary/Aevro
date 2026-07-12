@@ -152,12 +152,12 @@ export function AccountOrdersPageContent() {
           <AccountSidebar isLoggingOut={isLoggingOut} onLogout={handleLogout} />
 
           <section className="min-w-0 border border-[#e1d8cc] bg-[#fffaf3]/82 shadow-[0_26px_80px_rgba(48,38,27,0.04)]">
-            <div className="grid gap-5 border-b border-[#e5dbcf] p-5 sm:p-7 lg:grid-cols-[1fr_minmax(260px,360px)] lg:items-center">
-              <div className="flex items-center gap-5">
-                <span className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-[#f0e8de] text-[#211d18]">
-                  <AccountIcon name="bag" className="h-8 w-8" />
+            <div className="grid gap-5 border-b border-[#e5dbcf] p-4 sm:p-7 lg:grid-cols-[1fr_minmax(260px,360px)] lg:items-center">
+              <div className="flex items-center gap-4 sm:gap-5">
+                <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-[#f0e8de] text-[#211d18] sm:h-16 sm:w-16">
+                  <AccountIcon name="bag" className="h-6 w-6 sm:h-8 sm:w-8" />
                 </span>
-                <div>
+                <div className="min-w-0">
                   <h1 className="font-serif text-2xl font-light text-[#111111] sm:text-3xl">
                     Your Orders
                   </h1>
@@ -180,14 +180,14 @@ export function AccountOrdersPageContent() {
               </label>
             </div>
 
-            <div className="grid gap-4 border-b border-[#e5dbcf] p-5 sm:p-7 xl:grid-cols-[1fr_180px] xl:items-center">
+            <div className="grid gap-4 border-b border-[#e5dbcf] p-4 sm:p-7 xl:grid-cols-[1fr_180px] xl:items-center">
               <div className="flex gap-2 overflow-x-auto pb-1">
                 {filterItems.map((item) => (
                   <button
                     key={item.value}
                     type="button"
                     onClick={() => setActiveFilter(item.value)}
-                    className={`h-10 shrink-0 border px-4 text-xs font-medium transition ${
+                    className={`h-10 shrink-0 rounded-full border px-4 text-xs font-medium transition sm:rounded-none ${
                       activeFilter === item.value
                         ? 'border-[#eee5da] bg-[#eee5da] text-[#111111]'
                         : 'border-[#ddd4c8] bg-[#fffdf8] text-[#2f2a25] hover:border-[#111111]'
@@ -214,7 +214,7 @@ export function AccountOrdersPageContent() {
               </label>
             </div>
 
-            <div className="p-5 sm:p-7">
+            <div className="p-4 sm:p-7">
               {isLoading && <LoadingRows />}
 
               {error && !isLoading && (

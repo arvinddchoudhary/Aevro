@@ -26,7 +26,7 @@ export function AccountSidebar({ isLoggingOut, onLogout }: AccountSidebarProps) 
     <aside className="h-fit border border-[#e1d8cc] bg-[#fffaf3]/78 p-2 shadow-[0_24px_70px_rgba(48,38,27,0.04)] lg:sticky lg:top-28">
       <nav
         aria-label="Account navigation"
-        className="flex gap-2 overflow-x-auto lg:block lg:overflow-visible"
+        className="flex snap-x gap-2 overflow-x-auto pb-1 lg:block lg:overflow-visible lg:pb-0"
       >
         {linkedItems.map((item) => {
           const isActive =
@@ -37,7 +37,7 @@ export function AccountSidebar({ isLoggingOut, onLogout }: AccountSidebarProps) 
             <Link
               key={item.href}
               href={item.href}
-              className={`flex min-h-12 shrink-0 items-center gap-3 px-4 text-sm transition hover:bg-[#f2eadf] lg:w-full ${
+              className={`flex min-h-11 shrink-0 snap-start items-center gap-2.5 rounded-full px-4 text-sm transition hover:bg-[#f2eadf] lg:min-h-12 lg:w-full lg:rounded-none ${
                 isActive ? 'bg-[#eee5da] text-[#111111]' : 'text-[#2f2a25]'
               }`}
             >
@@ -65,7 +65,7 @@ export function AccountSidebar({ isLoggingOut, onLogout }: AccountSidebarProps) 
           type="button"
           disabled={isLoggingOut}
           onClick={onLogout}
-          className="flex min-h-12 shrink-0 items-center gap-3 px-4 text-sm text-[#2f2a25] transition hover:bg-[#f2eadf] disabled:cursor-not-allowed disabled:text-[#8a8177] lg:w-full"
+          className="flex min-h-11 shrink-0 snap-start items-center gap-2.5 rounded-full px-4 text-sm text-[#2f2a25] transition hover:bg-[#f2eadf] disabled:cursor-not-allowed disabled:text-[#8a8177] lg:min-h-12 lg:w-full lg:rounded-none"
         >
           <AccountIcon name="logout" className="h-[18px] w-[18px] shrink-0" />
           <span>{isLoggingOut ? 'Logging out' : 'Logout'}</span>
