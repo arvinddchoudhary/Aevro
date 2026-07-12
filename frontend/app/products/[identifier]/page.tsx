@@ -117,13 +117,12 @@ export default async function ProductDetailsPage({
         </div>
         <ProductVariantSelection product={product} />
 
-        <section className="mt-6 grid overflow-hidden rounded-[6px] border border-[#eadfd2] bg-[#fffaf3]/70 lg:grid-cols-2">
+        <section className="mt-6 grid overflow-hidden rounded-[6px] border border-[#eadfd2] bg-[#fffaf3]/70 lg:grid-cols-3">
           <div className="border-b border-[#eadfd2] p-5 sm:p-6 lg:border-b-0 lg:border-r">
             <p className="text-xs font-semibold uppercase tracking-[0.1em]">Details</p>
             <p className="mt-5 max-w-md text-sm leading-7 text-[#2f2a25]">
-              Tailored with precision, these trousers feature a refined drape,
-              considered proportions, and versatile styling for formal and casual
-              looks.
+              {product.description ??
+                'Tailored with precision, these trousers feature a refined drape, considered proportions, and versatile styling for formal and casual looks.'}
             </p>
             <ul className="mt-5 space-y-2 text-sm text-[#2f2a25]">
               <li>• Relaxed fit</li>
@@ -132,10 +131,8 @@ export default async function ProductDetailsPage({
               <li>• Belt loops</li>
             </ul>
           </div>
-          <div className="p-5 sm:p-6">
-            <p className="text-xs font-semibold uppercase tracking-[0.1em]">
-              Fabric & care
-            </p>
+          <div className="border-b border-[#eadfd2] p-5 sm:p-6 lg:border-b-0 lg:border-r">
+            <p className="text-xs font-semibold uppercase tracking-[0.1em]">Fabric & care</p>
             <p className="mt-5 text-sm text-[#2f2a25]">
               Premium trouser-weight fabric selected for structure and drape.
             </p>
@@ -144,6 +141,22 @@ export default async function ProductDetailsPage({
               <span>Do not bleach</span>
               <span>Iron on low</span>
               <span>Dry clean recommended</span>
+            </div>
+          </div>
+          <div className="p-5 sm:p-6">
+            <p className="text-xs font-semibold uppercase tracking-[0.1em]">Shipping & returns</p>
+            <p className="mt-5 text-sm text-[#2f2a25]">
+              Free shipping on orders above ₹4,999. Delivered in 3–7 business days across India.
+            </p>
+            <div className="mt-5 grid gap-3 text-sm text-[#2f2a25]">
+              <span>14-day returns on unworn items</span>
+              <span>Free exchanges, subject to stock</span>
+              <Link href="/help/shipping" className="underline underline-offset-4 hover:text-[#111111]">
+                Full shipping policy →
+              </Link>
+              <Link href="/help/returns" className="underline underline-offset-4 hover:text-[#111111]">
+                Full returns policy →
+              </Link>
             </div>
           </div>
         </section>

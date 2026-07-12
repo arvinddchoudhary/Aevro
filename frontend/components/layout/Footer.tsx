@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { BenefitStrip } from './BenefitStrip';
@@ -78,19 +79,33 @@ const compactServiceItems = [
 const footerGroups = [
   {
     title: 'Shop',
-    links: ['Trousers'],
+    links: [{ label: 'Trousers', href: '/products' }],
   },
   {
     title: 'Collections',
-    links: ['Signature Pleats ', 'Core Collection', 'Launch Collection', ],
+    links: [
+      { label: 'Signature Pleats', href: '/collections/signature-pleats' },
+      { label: 'Core Collection', href: '/collections/core-collection' },
+    ],
   },
   {
     title: 'About',
-    links: ['Our Story', 'Philosophy', 'Craftsmanship', 'Sustainability'],
+    links: [
+      { label: 'Our Story', href: '/about/our-story' },
+      { label: 'Philosophy', href: '/about/philosophy' },
+      { label: 'Craftsmanship', href: '/about/craftsmanship' },
+      { label: 'Sustainability', href: '/about/sustainability' },
+    ],
   },
   {
     title: 'Help',
-    links: ['Size Guide','Orders & Shipping', 'Returns & Exchanges', 'Contact Us', 'FAQs' ],
+    links: [
+      { label: 'Size Guide', href: '/help/size-guide' },
+      { label: 'Orders & Shipping', href: '/help/shipping' },
+      { label: 'Returns & Exchanges', href: '/help/returns' },
+      { label: 'Contact Us', href: '/help/contact' },
+      { label: 'FAQs', href: '/help/faq' },
+    ],
   },
 ];
 
@@ -172,6 +187,50 @@ function shouldShowFooterServiceStrip(pathname: string) {
   return !pathname.startsWith('/account');
 }
 
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+function NewsletterForm() {
+  const [email, setEmail] = useState('');
+  const [status, setStatus] = useState<'idle' | 'success' | 'error'>('idle');
+
+  function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    if (!email.trim() || !EMAIL_REGEX.test(email.trim())) {
+      setStatus('error');
+      return;
+    }
+    setStatus('success');
+    setEmail('');
+  }
+
+  return (
+    <form onSubmit={handleSubmit} noValidate className="mt-6">
+      <div className="flex border-b border-[#111111]">
+        <input
+          type="email"
+          value={email}
+          onChange={(e) => {
+            setEmail(e.target.value);
+            if (status !== 'idle') setStatus('idle');
+          }}
+          placeholder="Email address"
+          className="h-11 flex-1 bg-transparent text-sm outline-none"
+          aria-label="Email address"
+        />
+        <button type="submit" className="px-2 text-xl" aria-label="Submit email">
+          →
+        </button>
+      </div>
+      {status === 'success' && (
+        <p className="mt-3 text-sm text-[#3f6d3f]">Thanks — you&apos;re on the list.</p>
+      )}
+      {status === 'error' && (
+        <p className="mt-3 text-sm text-[#9b3b3b]">Please enter a valid email address.</p>
+      )}
+    </form>
+  );
+}
+
 export function Footer() {
   const pathname = usePathname();
 
@@ -193,10 +252,24 @@ export function Footer() {
             Modern essentials. Timeless design. Thoughtfully made to move with
             you, every day.
           </p>
-          <div className="mt-6 flex gap-4 text-sm">
-            <span>Instagram</span>
-            <span>Facebook</span>
-            <span>Pinterest</span>
+          <div className="mt-6 flex gap-4">
+            <a href="https://instagram.com/aevro" target="_blank" rel="noopener noreferrer" aria-label="AEVRO on Instagram" className="text-[#514c45] transition-colors hover:text-[#111111]">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5" aria-hidden="true">
+                <rect x="2" y="2" width="20" height="20" rx="5" />
+                <circle cx="12" cy="12" r="5" />
+                <circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none" />
+              </svg>
+            </a>
+            <a href="https://facebook.com/aevro" target="_blank" rel="noopener noreferrer" aria-label="AEVRO on Facebook" className="text-[#514c45] transition-colors hover:text-[#111111]">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5" aria-hidden="true">
+                <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3V2Z" />
+              </svg>
+            </a>
+            <a href="https://pinterest.com/aevro" target="_blank" rel="noopener noreferrer" aria-label="AEVRO on Pinterest" className="text-[#514c45] transition-colors hover:text-[#111111]">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5" aria-hidden="true">
+                <path d="M12 2a10 10 0 0 0-3.16 19.5c-.07-.63-.13-1.6.03-2.29l1.15-4.88s-.29-.58-.29-1.44c0-1.35.78-2.36 1.76-2.36.83 0 1.23.62 1.23 1.37 0 .84-.53 2.09-.81 3.25-.23.97.49 1.76 1.45 1.76 1.74 0 3.07-1.83 3.07-4.48 0-2.34-1.68-3.98-4.09-3.98-2.79 0-4.42 2.09-4.42 4.25 0 .84.32 1.74.73 2.23a.29.29 0 0 1 .07.28l-.27 1.11c-.04.18-.15.22-.34.13-1.26-.59-2.05-2.42-2.05-3.9 0-3.18 2.31-6.1 6.66-6.1 3.5 0 6.22 2.49 6.22 5.82 0 3.47-2.19 6.27-5.23 6.27-1.02 0-1.98-.53-2.31-1.16l-.63 2.4c-.23.88-.85 1.99-1.26 2.66A10 10 0 1 0 12 2Z" />
+              </svg>
+            </a>
           </div>
         </div>
 
@@ -207,21 +280,15 @@ export function Footer() {
                 {group.title}
               </p>
               <div className="mt-4 space-y-2 text-sm text-[#514c45]">
-                {group.links.map((link) =>
-                  group.title === 'Shop' ? (
-                    <Link
-                      key={link}
-                      href="/products"
-                      className="block underline-offset-4 hover:underline"
-                    >
-                      {link}
-                    </Link>
-                  ) : (
-                    <span key={link} className="block text-[#6d665d]">
-                      {link}
-                    </span>
-                  ),
-                )}
+                {group.links.map((link) => (
+                  <Link
+                    key={link.href}
+                    href={link.href}
+                    className="block underline-offset-4 hover:underline"
+                  >
+                    {link.label}
+                  </Link>
+                ))}
               </div>
             </div>
           ))}
@@ -232,8 +299,7 @@ export function Footer() {
              Join AEVRO.
           </p>
           <p className="mt-4 text-sm leading-6 text-[#514c45]">
-           
-Be the first to discover new collections, restocks, and exclusive releases.
+            Be the first to discover new collections, restocks, and exclusive releases.
           </p>
           <div className="mt-6 flex min-w-0 border-b border-[#111111]">
             <input
@@ -252,11 +318,10 @@ Be the first to discover new collections, restocks, and exclusive releases.
         <div className="aevro-container flex flex-col gap-3 py-6 text-xs text-[#514c45] sm:flex-row sm:items-center sm:justify-between">
           <p>© 2026 AEVRO. All rights reserved.</p>
           <div className="flex flex-wrap gap-x-8 gap-y-2">
-            <span>Privacy Policy</span>
-            <span>Shipping Policy</span>
-            <span>Return Policy</span>
-            <span>Terms & Conditions</span>
-
+            <Link href="/legal/privacy" className="underline-offset-4 hover:underline">Privacy Policy</Link>
+            <Link href="/legal/shipping-policy" className="underline-offset-4 hover:underline">Shipping Policy</Link>
+            <Link href="/legal/returns-policy" className="underline-offset-4 hover:underline">Return Policy</Link>
+            <Link href="/legal/terms" className="underline-offset-4 hover:underline">Terms &amp; Conditions</Link>
           </div>
         </div>
       </section>
