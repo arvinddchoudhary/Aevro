@@ -148,15 +148,15 @@ export function ProductVariantSelection({ product }: ProductVariantSelectionProp
   }, [colorImages, selectedImageIndex]);
 
   return (
-    <div className="grid gap-8 lg:grid-cols-[minmax(0,560px)_minmax(360px,1fr)] lg:gap-10 xl:grid-cols-[minmax(0,620px)_minmax(400px,1fr)]">
-      <section className="mx-auto grid w-full max-w-[620px] gap-4 sm:grid-cols-[76px_minmax(0,520px)] xl:grid-cols-[82px_minmax(0,540px)]">
-        <div className="order-2 grid grid-cols-4 gap-3 sm:order-1 sm:block sm:space-y-4">
+    <div className="grid gap-6 lg:grid-cols-[minmax(0,560px)_minmax(360px,1fr)] lg:gap-10 xl:grid-cols-[minmax(0,620px)_minmax(400px,1fr)]">
+      <section className="mx-auto grid w-full max-w-[620px] gap-3 sm:grid-cols-[76px_minmax(0,520px)] sm:gap-4 xl:grid-cols-[82px_minmax(0,540px)]">
+        <div className="order-2 grid grid-cols-4 gap-2 overflow-x-auto pb-1 sm:order-1 sm:block sm:space-y-4 sm:overflow-visible sm:pb-0">
           {(colorImages.length > 0 ? colorImages : [undefined]).map((image, index) => (
             <button
               key={image?.id ?? index}
               type="button"
               onClick={() => setSelectedImageId(image?.id ?? null)}
-              className={`cursor-pointer overflow-hidden rounded-[5px] border bg-[#eee8de] transition hover:border-[#111111] ${
+              className={`min-w-[68px] cursor-pointer overflow-hidden rounded-[5px] border bg-[#eee8de] transition hover:border-[#111111] sm:min-w-0 ${
                 image?.id === selectedImage?.id ? 'border-[#111111]' : 'border-[#ddd4c8]'
               }`}
               aria-label={`View ${product.name} image ${index + 1}`}
@@ -179,7 +179,7 @@ export function ProductVariantSelection({ product }: ProductVariantSelectionProp
             <ProductImageFrame
               image={selectedImage}
               productName={product.name}
-              className="aspect-[1086/1448] w-full max-w-[540px] rounded-[6px]"
+              className="aspect-[4/5] w-full rounded-[8px] sm:aspect-[1086/1448] sm:max-w-[540px] sm:rounded-[6px]"
               imageClassName="object-contain"
             />
           </button>
@@ -242,7 +242,7 @@ export function ProductVariantSelection({ product }: ProductVariantSelectionProp
         <span className="mb-3 inline-flex rounded-full bg-[#efe8df] px-3 py-1 text-[0.68rem] font-semibold uppercase tracking-[0.08em] text-[#514c45]">
           Best seller
         </span>
-        <h1 className="max-w-2xl text-2xl font-light uppercase leading-[1.05] sm:text-3xl md:text-4xl">
+        <h1 className="max-w-2xl text-[1.55rem] font-light uppercase leading-[1.08] sm:text-3xl md:text-4xl">
           {product.name}
         </h1>
         <p className="mt-4 text-lg font-semibold sm:text-xl">{formatPrice(product.priceInPaise)}</p>
@@ -290,14 +290,14 @@ export function ProductVariantSelection({ product }: ProductVariantSelectionProp
               </p>
               <p className="text-xs text-[#514c45]">{stockLabel}</p>
             </div>
-            <div className="grid grid-cols-4 gap-3 sm:grid-cols-5">
+            <div className="grid grid-cols-4 gap-2.5 sm:grid-cols-5 sm:gap-3">
               {availableSizes.map((size) => (
                 <button
                   key={size.variantId}
                   type="button"
                   disabled={size.stock <= 0}
                   onClick={() => setSelectedSize(size.size)}
-                  className={`h-10 cursor-pointer rounded-[4px] border text-sm transition disabled:cursor-not-allowed disabled:border-[#e8ded2] disabled:text-[#b6aea5] ${
+                  className={`h-11 cursor-pointer rounded-[4px] border text-sm transition disabled:cursor-not-allowed disabled:border-[#e8ded2] disabled:text-[#b6aea5] ${
                     selectedSize === size.size
                       ? 'border-[#111111] bg-[#fffaf3] text-[#111111] shadow-[inset_0_0_0_1px_#111111]'
                       : 'border-[#ddd4c8] bg-transparent hover:border-[#111111]'
@@ -347,6 +347,37 @@ export function ProductVariantSelection({ product }: ProductVariantSelectionProp
         </div>
 
       </section>
+
+      <div className="fixed inset-x-0 bottom-[4.85rem] z-30 border-t border-[#ddd4c8] bg-[#fbf7f0]/96 px-4 py-3 shadow-[0_-12px_36px_rgba(49,37,26,0.08)] backdrop-blur lg:hidden">
+        <div className="mx-auto flex max-w-md items-center gap-3">
+          <div className="min-w-0 flex-1">
+            <p className="truncate text-xs font-semibold uppercase tracking-[0.08em]">
+              {product.name}
+            </p>
+            <p className="text-sm font-semibold">{formatPrice(product.priceInPaise)}</p>
+          </div>
+          <WishlistToggleButton
+            productId={product.id}
+            variantId={selectedVariant?.variantId}
+            variant="icon"
+            className="shrink-0"
+          />
+          <AddToCartButton
+            product={product}
+            selection={{
+              variantId: selectedVariant?.variantId,
+              selectedColor: selectedColor?.colorName,
+              selectedSize,
+              stock: selectedVariant?.stock ?? 0,
+              imageUrl: selectedImage?.url,
+              imageAltText: selectedImage?.altText,
+            }}
+            disabled={!canAddToCart}
+            disabledLabel={selectedVariant?.stock === 0 ? 'Out' : 'Select'}
+            className="w-[8rem] shrink-0"
+          />
+        </div>
+      </div>
 
       <ProductImageLightbox
         images={colorImages}

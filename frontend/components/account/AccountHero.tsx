@@ -23,14 +23,14 @@ export function AccountHero({
         aria-hidden="true"
       />
       <div className="absolute inset-0 -z-10 bg-[linear-gradient(90deg,rgba(251,247,240,0.96)_0%,rgba(251,247,240,0.82)_34%,rgba(251,247,240,0.34)_72%,rgba(251,247,240,0.2)_100%)]" />
-      <div className="aevro-container flex min-h-[190px] items-center py-10 sm:min-h-[230px] lg:min-h-[250px]">
-        <div>
-          <h1 className="font-serif text-4xl font-light uppercase tracking-[0.12em] text-[#111111] sm:text-5xl lg:text-6xl">
+      <div className="aevro-container flex min-h-[150px] items-center py-7 sm:min-h-[210px] sm:py-10 lg:min-h-[250px]">
+        <div className="min-w-0">
+          <h1 className="break-words font-serif text-[2.15rem] font-light uppercase leading-tight tracking-[0.1em] text-[#111111] sm:text-5xl sm:tracking-[0.12em] lg:text-6xl">
             {title}
           </h1>
           <nav
             aria-label="Breadcrumb"
-            className="mt-5 flex items-center gap-4 text-sm text-[#6b6258]"
+            className="mt-4 flex flex-wrap items-center gap-3 text-sm text-[#6b6258] sm:mt-5 sm:gap-4"
           >
             {breadcrumb.map((item, index) => (
               <span key={`${item.label}-${index}`} className="flex items-center gap-4">

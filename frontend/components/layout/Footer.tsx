@@ -112,7 +112,7 @@ const footerGroups = [
 export function ServiceBenefitsPanel({ className = '' }: { className?: string }) {
   return (
     <div
-      className={`grid overflow-hidden rounded-[18px] border border-[#eadfd2] bg-[#fffaf3]/80 shadow-[0_24px_80px_rgba(49,37,26,0.05)] sm:grid-cols-2 lg:grid-cols-4 ${className}`}
+      className={`grid overflow-hidden rounded-[12px] border border-[#eadfd2] bg-[#fffaf3]/80 shadow-[0_16px_48px_rgba(49,37,26,0.04)] sm:grid-cols-2 lg:grid-cols-4 ${className}`}
     >
       {serviceItems.map((item, index) => {
         const mobileBorder = index < serviceItems.length - 1 ? 'border-b border-[#eadfd2]' : '';
@@ -123,14 +123,14 @@ export function ServiceBenefitsPanel({ className = '' }: { className?: string })
         return (
           <article
             key={item.title}
-            className={`flex min-h-[150px] flex-col items-center justify-center px-6 py-7 text-center sm:min-h-[165px] lg:min-h-[180px] lg:border-b-0 ${mobileBorder} ${tabletBorder} ${tabletBottom} ${desktopBorder}`}
+            className={`flex min-h-[104px] flex-col items-center justify-center px-4 py-5 text-center sm:min-h-[132px] sm:px-6 sm:py-6 lg:min-h-[150px] lg:border-b-0 ${mobileBorder} ${tabletBorder} ${tabletBottom} ${desktopBorder}`}
           >
             <div className="text-[#9b8970]">{item.icon}</div>
-            <h3 className="mt-5 font-serif text-base uppercase tracking-[0.32em] text-[#211d18] sm:text-lg">
+            <h3 className="mt-3 text-xs font-semibold uppercase tracking-[0.22em] text-[#211d18] sm:mt-4 sm:text-sm lg:font-serif lg:text-base lg:tracking-[0.28em]">
               {item.title}
             </h3>
-            <span className="mt-4 h-px w-10 bg-[#d6c0a5]" aria-hidden="true" />
-            <p className="mt-4 text-sm leading-6 text-[#62574c] sm:text-base">{item.detail}</p>
+            <span className="mt-3 h-px w-8 bg-[#d6c0a5]" aria-hidden="true" />
+            <p className="mt-3 text-xs leading-5 text-[#62574c] sm:text-sm">{item.detail}</p>
           </article>
         );
       })}
@@ -140,7 +140,7 @@ export function ServiceBenefitsPanel({ className = '' }: { className?: string })
 
 export function ServiceBenefitsStrip({ className = '' }: { className?: string }) {
   return (
-    <section className={`px-4 py-8 sm:px-6 sm:py-10 lg:px-10 lg:py-12 ${className}`}>
+    <section className={`px-4 py-5 sm:px-6 sm:py-8 lg:px-10 lg:py-10 ${className}`}>
       <ServiceBenefitsPanel className="mx-auto max-w-[1820px]" />
     </section>
   );
@@ -148,12 +148,12 @@ export function ServiceBenefitsStrip({ className = '' }: { className?: string })
 
 function CompactServiceStrip() {
   return (
-    <section className="border-y border-[#ddd4c8] bg-[#fffaf2] px-4 py-4">
-      <div className="mx-auto grid max-w-7xl gap-4 rounded-lg border border-[#ddd4c8] px-5 py-4 sm:grid-cols-2 lg:grid-cols-4">
+    <section className="border-y border-[#ddd4c8] bg-[#fffaf2] px-3 py-3 sm:px-4 sm:py-4">
+      <div className="mx-auto grid max-w-7xl gap-2 rounded-lg border border-[#ddd4c8] px-3 py-3 sm:grid-cols-2 sm:gap-4 sm:px-5 sm:py-4 lg:grid-cols-4">
         {compactServiceItems.map((item) => (
           <article
             key={item.title}
-            className="flex items-center gap-4 border-[#ddd4c8] py-1 lg:border-r lg:pr-8 lg:last:border-r-0"
+            className="flex min-w-0 items-center gap-3 border-[#ddd4c8] py-1 lg:border-r lg:pr-8 lg:last:border-r-0"
           >
             <span className="flex h-8 w-8 shrink-0 items-center justify-center border border-[#111111] text-[10px] uppercase tracking-[0.18em] text-[#111111]">
               {item.code}
@@ -162,7 +162,7 @@ function CompactServiceStrip() {
               <h3 className="text-xs font-semibold uppercase tracking-[0.18em] text-[#111111]">
                 {item.title}
               </h3>
-              <p className="mt-1 text-xs text-[#5f574f]">{item.detail}</p>
+              <p className="mt-1 break-words text-xs text-[#5f574f]">{item.detail}</p>
             </div>
           </article>
         ))}
@@ -239,7 +239,7 @@ export function Footer() {
       {shouldShowFooterServiceStrip(pathname) && <BenefitStrip />}
 
       <section className="border-t border-[#ddd4c8] bg-[#f3eadf]/55">
-        <div className="aevro-container grid gap-10 py-9 lg:grid-cols-[1.1fr_2fr_1fr]">
+        <div className="aevro-container grid gap-8 py-8 lg:grid-cols-[1.1fr_2fr_1fr] lg:py-9">
         <div>
           <Link href="/" className="inline-flex" aria-label="AEVRO home">
             <img
@@ -273,7 +273,7 @@ export function Footer() {
           </div>
         </div>
 
-        <div className="grid gap-8 sm:grid-cols-4">
+        <div className="grid grid-cols-2 gap-6 sm:grid-cols-4 sm:gap-8">
           {footerGroups.map((group) => (
             <div key={group.title}>
               <p className="text-xs font-medium uppercase tracking-[0.08em]">
@@ -301,7 +301,15 @@ export function Footer() {
           <p className="mt-4 text-sm leading-6 text-[#514c45]">
             Be the first to discover new collections, restocks, and exclusive releases.
           </p>
-          <NewsletterForm />
+          <div className="mt-6 flex min-w-0 border-b border-[#111111]">
+            <input
+              placeholder="Email address"
+              className="h-11 min-w-0 flex-1 bg-transparent text-sm outline-none"
+            />
+            <button className="px-2 text-xl" aria-label="Submit email">
+              →
+            </button>
+          </div>
         </div>
         </div>
       </section>

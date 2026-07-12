@@ -29,10 +29,10 @@ export function AddressCard({
   onSetDefault,
 }: AddressCardProps) {
   return (
-    <article className="border border-[#e1d8cc] bg-[#fffaf3]/80 p-5 transition hover:border-[#cfc1b1] sm:p-6">
+    <article className="border border-[#e1d8cc] bg-[#fffaf3]/80 p-4 transition hover:border-[#cfc1b1] sm:p-6">
       <div className="grid gap-5 md:grid-cols-[72px_minmax(0,1fr)_auto] md:items-center">
-        <div className="flex h-16 w-16 items-center justify-center rounded-full bg-[#f0e8de] text-[#211d18] sm:h-[74px] sm:w-[74px]">
-          <AccountIcon name={addressIcon(address)} className="h-8 w-8" />
+        <div className="flex h-14 w-14 items-center justify-center rounded-full bg-[#f0e8de] text-[#211d18] sm:h-[74px] sm:w-[74px]">
+          <AccountIcon name={addressIcon(address)} className="h-7 w-7 sm:h-8 sm:w-8" />
         </div>
 
         <div className="min-w-0">
@@ -60,12 +60,12 @@ export function AddressCard({
           </div>
         </div>
 
-        <div className="flex flex-wrap gap-2 md:w-32 md:flex-col">
+        <div className="grid gap-2 min-[390px]:grid-cols-2 md:w-32 md:grid-cols-1">
           {!address.isDefault && (
             <button
               type="button"
               onClick={() => onSetDefault(address)}
-              className="inline-flex h-10 items-center justify-center border border-[#ddd4c8] px-4 text-xs font-medium uppercase tracking-[0.08em] transition hover:border-[#111111] md:w-full"
+              className="inline-flex h-10 items-center justify-center border border-[#ddd4c8] px-3 text-xs font-medium uppercase tracking-[0.06em] transition hover:border-[#111111] min-[390px]:col-span-2 md:col-span-1 md:w-full md:px-4 md:tracking-[0.08em]"
             >
               Set Default
             </button>
@@ -73,7 +73,7 @@ export function AddressCard({
           <button
             type="button"
             onClick={() => onEdit(address)}
-            className="inline-flex h-10 items-center justify-center gap-2 border border-[#ddd4c8] px-4 text-xs font-medium uppercase tracking-[0.08em] transition hover:border-[#111111] md:w-full"
+            className="inline-flex h-10 items-center justify-center gap-2 border border-[#ddd4c8] px-3 text-xs font-medium uppercase tracking-[0.06em] transition hover:border-[#111111] md:w-full md:px-4 md:tracking-[0.08em]"
           >
             <AccountIcon name="edit" className="h-4 w-4" />
             Edit
@@ -81,7 +81,7 @@ export function AddressCard({
           <button
             type="button"
             onClick={() => onDelete(address)}
-            className="inline-flex h-10 items-center justify-center gap-2 border border-[#ddd4c8] px-4 text-xs font-medium uppercase tracking-[0.08em] transition hover:border-[#111111] md:w-full"
+            className="inline-flex h-10 items-center justify-center gap-2 border border-[#ddd4c8] px-3 text-xs font-medium uppercase tracking-[0.06em] transition hover:border-[#111111] md:w-full md:px-4 md:tracking-[0.08em]"
           >
             <AccountIcon name="delete" className="h-4 w-4" />
             Delete

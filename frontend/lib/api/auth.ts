@@ -8,8 +8,7 @@ import type {
   RegisterResult,
   VerifyLoginOtpPayload,
 } from '../../types/auth';
-
-const API_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8000/api/v1';
+import { buildApiUrl } from './base-url';
 
 export class AuthApiError extends Error {
   constructor(
@@ -41,7 +40,7 @@ async function requestAuthData(path: string, options: RequestInit = {}) {
     headers.set('Content-Type', 'application/json');
   }
 
-  const response = await fetch(`${API_URL}${path}`, {
+  const response = await fetch(buildApiUrl(path), {
     ...options,
     credentials: 'include',
     headers,
@@ -91,7 +90,7 @@ async function requestAuthAction<T>(path: string, options: RequestInit = {}) {
     headers.set('Content-Type', 'application/json');
   }
 
-  const response = await fetch(`${API_URL}${path}`, {
+  const response = await fetch(buildApiUrl(path), {
     ...options,
     credentials: 'include',
     headers,
@@ -186,7 +185,7 @@ export function resendEmailOtp(email: string) {
 }
 
 export async function logout() {
-  await fetch(`${API_URL}/auth/logout`, {
+  await fetch(buildApiUrl('/auth/logout'), {
     method: 'POST',
     credentials: 'include',
   });

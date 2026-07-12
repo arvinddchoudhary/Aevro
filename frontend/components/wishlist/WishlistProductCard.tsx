@@ -69,7 +69,7 @@ export function WishlistProductCard({
 
   return (
     <article
-      className={`border border-[#e1d8cc] bg-[#fffaf3]/82 p-3 transition hover:border-[#cfc1b1] ${
+      className={`min-w-0 border border-[#e1d8cc] bg-[#fffaf3]/82 p-2.5 transition hover:border-[#cfc1b1] sm:p-3 ${
         layout === 'list' ? 'grid gap-4 sm:grid-cols-[180px_1fr]' : ''
       }`}
     >
@@ -99,21 +99,21 @@ export function WishlistProductCard({
         </button>
       </div>
 
-      <div className="pt-4">
+      <div className="pt-3 sm:pt-4">
         <Link
           href={`/products/${item.product.slug}`}
-          className="block text-sm font-medium text-[#111111] underline-offset-4 hover:underline"
+          className="line-clamp-2 block text-xs font-medium leading-5 text-[#111111] underline-offset-4 hover:underline sm:text-sm"
         >
           {item.product.name}
         </Link>
-        <p className="mt-2 text-xs text-[#777067]">{subtitle}</p>
-        <p className="mt-3 text-sm font-semibold">{formatPrice(item.product.priceInPaise)}</p>
+        <p className="mt-1.5 truncate text-xs text-[#777067] sm:mt-2">{subtitle}</p>
+        <p className="mt-2 text-sm font-semibold sm:mt-3">{formatPrice(item.product.priceInPaise)}</p>
 
-        <div className="mt-4 grid gap-2">
+        <div className="mt-3 grid gap-2 sm:mt-4">
           <button
             type="button"
             onClick={moveToBag}
-            className="inline-flex h-10 items-center justify-center gap-2 border border-[#ddd4c8] px-4 text-xs font-medium uppercase tracking-[0.08em] transition hover:border-[#111111]"
+            className="inline-flex min-h-10 items-center justify-center gap-1.5 border border-[#ddd4c8] px-2 text-[0.64rem] font-medium uppercase tracking-[0.06em] transition hover:border-[#111111] sm:gap-2 sm:px-4 sm:text-xs sm:tracking-[0.08em]"
           >
             <AccountIcon name="bag" className="h-4 w-4" />
             Move to Bag
@@ -121,7 +121,7 @@ export function WishlistProductCard({
           <button
             type="button"
             onClick={() => onRemove(item)}
-            className="inline-flex h-9 items-center justify-center gap-2 text-xs text-[#625a51] transition hover:text-[#111111]"
+            className="inline-flex h-9 items-center justify-center gap-1.5 text-xs text-[#625a51] transition hover:text-[#111111] sm:gap-2"
           >
             <AccountIcon name="delete" className="h-4 w-4" />
             Remove

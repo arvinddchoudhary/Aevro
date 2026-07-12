@@ -22,16 +22,16 @@ export function CartPageContent() {
   }
 
   return (
-    <div className="grid gap-7 lg:grid-cols-[minmax(0,1fr)_360px] xl:grid-cols-[minmax(0,1fr)_390px]">
-      <section className="space-y-6">
+    <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_360px] xl:grid-cols-[minmax(0,1fr)_390px]">
+      <section className="space-y-4 sm:space-y-6">
         {items.map((item) => (
           <article
             key={item.itemKey}
-            className="grid gap-4 border-b border-[#ddd4c8] pb-6 sm:grid-cols-[150px_1fr] md:grid-cols-[170px_1fr]"
+            className="grid gap-4 border border-[#ddd4c8] bg-[#fffaf3]/72 p-3 sm:grid-cols-[150px_1fr] sm:border-x-0 sm:border-t-0 sm:bg-transparent sm:p-0 sm:pb-6 md:grid-cols-[170px_1fr]"
           >
             <Link
               href={`/products/${item.slug}`}
-              className="aspect-[1086/1448] w-full max-w-[150px] cursor-pointer overflow-hidden rounded-[4px] bg-[#eee8de] md:max-w-[170px]"
+              className="aspect-[1086/1448] w-full max-w-[124px] cursor-pointer overflow-hidden rounded-[4px] bg-[#eee8de] sm:max-w-[150px] md:max-w-[170px]"
             >
               {item.imageUrl ? (
                 <img
@@ -46,14 +46,14 @@ export function CartPageContent() {
               )}
             </Link>
 
-            <div className="flex flex-col justify-center gap-5 sm:flex-row sm:justify-between">
-              <div>
+            <div className="flex min-w-0 flex-col justify-center gap-5 sm:flex-row sm:justify-between">
+              <div className="min-w-0">
                 <p className="text-xs uppercase tracking-[0.12em] text-[#77716a]">
                   {item.categoryName ?? 'AEVRO'}
                 </p>
                 <Link
                   href={`/products/${item.slug}`}
-                className="mt-2 block cursor-pointer text-lg font-light uppercase leading-tight underline-offset-4 hover:underline sm:text-xl"
+                className="mt-2 block cursor-pointer break-words text-base font-light uppercase leading-tight underline-offset-4 hover:underline sm:text-xl"
                 >
                   {item.name}
                 </Link>
@@ -61,7 +61,7 @@ export function CartPageContent() {
                   {formatPrice(item.priceInPaise)}
                 </p>
                 {(item.selectedColor || item.selectedSize) && (
-                  <div className="mt-3 flex gap-3 text-sm text-[#514c45]">
+                  <div className="mt-3 flex flex-wrap gap-2 text-sm text-[#514c45] sm:gap-3">
                     {item.selectedColor && <p>{item.selectedColor}</p>}
                     {item.selectedColor && item.selectedSize && <span>/</span>}
                     {item.selectedSize && <p>Size: {item.selectedSize}</p>}
@@ -89,7 +89,7 @@ export function CartPageContent() {
                 </div>
               </div>
 
-              <div className="text-sm sm:text-right">
+              <div className="flex items-center justify-between gap-3 text-sm sm:block sm:text-right">
                 <p className="text-[#77716a]">Subtotal</p>
                 <p className="mt-1 font-medium">
                   {formatPrice(item.priceInPaise * item.quantity)}

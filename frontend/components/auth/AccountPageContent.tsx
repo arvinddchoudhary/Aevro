@@ -29,7 +29,7 @@ function formatDate(value: string) {
 
 function FieldRow({ label, value }: { label: string; value: string }) {
   return (
-    <div className="grid grid-cols-[120px_1fr] gap-4 text-sm sm:grid-cols-[150px_1fr]">
+    <div className="grid gap-1 text-sm min-[390px]:grid-cols-[116px_1fr] min-[390px]:gap-3 sm:grid-cols-[150px_1fr] sm:gap-4">
       <dt className="text-[#6e665d]">{label}</dt>
       <dd className="min-w-0 break-words text-[#211d18]">{value}</dd>
     </div>
@@ -229,7 +229,7 @@ export function AccountPageContent() {
                     <p className="text-sm text-[#6e665d]">No saved address yet.</p>
                     <Link
                       href="/account/addresses"
-                      className="mt-4 inline-flex h-10 items-center justify-center border border-[#111111] px-5 text-xs font-medium uppercase tracking-[0.08em] transition hover:bg-[#111111] hover:text-[#fffaf3]"
+                    className="mt-4 inline-flex h-10 w-full items-center justify-center border border-[#111111] px-5 text-xs font-medium uppercase tracking-[0.08em] transition hover:bg-[#111111] hover:text-[#fffaf3] sm:w-auto"
                     >
                       Add Address
                     </Link>
@@ -249,7 +249,7 @@ export function AccountPageContent() {
                         <Link
                           key={order.id}
                           href={`/account/orders/${order.id}`}
-                          className="grid grid-cols-[44px_minmax(0,1fr)_auto] items-center gap-3 border-b border-[#eee5da] pb-3 last:border-b-0 last:pb-0"
+                          className="grid grid-cols-[44px_minmax(0,1fr)] items-center gap-3 border-b border-[#eee5da] pb-3 last:border-b-0 last:pb-0 min-[390px]:grid-cols-[44px_minmax(0,1fr)_auto]"
                         >
                           <span className="block h-12 w-11 overflow-hidden bg-[#eee5da]">
                             {image ? (
@@ -272,7 +272,7 @@ export function AccountPageContent() {
                               {formatDate(order.createdAt)}
                             </span>
                           </span>
-                          <span className="text-right">
+                          <span className="col-span-2 flex items-center justify-between gap-3 text-left min-[390px]:col-span-1 min-[390px]:block min-[390px]:text-right">
                             <span className="block text-sm text-[#211d18]">
                               {formatPrice(order.totalInPaise)}
                             </span>
@@ -289,7 +289,7 @@ export function AccountPageContent() {
                     <p className="text-sm text-[#6e665d]">No orders yet.</p>
                     <Link
                       href="/products"
-                      className="mt-4 inline-flex h-10 items-center justify-center border border-[#111111] px-5 text-xs font-medium uppercase tracking-[0.08em] transition hover:bg-[#111111] hover:text-[#fffaf3]"
+                    className="mt-4 inline-flex h-10 w-full items-center justify-center border border-[#111111] px-5 text-xs font-medium uppercase tracking-[0.08em] transition hover:bg-[#111111] hover:text-[#fffaf3] sm:w-auto"
                     >
                       Start Shopping
                     </Link>
@@ -302,7 +302,7 @@ export function AccountPageContent() {
                   <p className="text-sm text-[#6e665d]">Loading saved pieces.</p>
                 ) : wishlistPreviewItems.length > 0 ? (
                   <div>
-                    <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+                    <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-4 sm:gap-3">
                       {wishlistPreviewItems.map((item) => {
                         const image = wishlistImage(item);
 
@@ -337,7 +337,7 @@ export function AccountPageContent() {
                     </div>
                     <Link
                       href="/account/wishlist"
-                      className="mt-5 inline-flex h-10 items-center justify-center border border-[#ddd4c8] px-5 text-xs font-medium uppercase tracking-[0.08em] transition hover:border-[#111111]"
+                      className="mt-5 inline-flex h-10 w-full items-center justify-center border border-[#ddd4c8] px-5 text-xs font-medium uppercase tracking-[0.08em] transition hover:border-[#111111] sm:w-auto"
                     >
                       View Wishlist
                     </Link>
@@ -350,7 +350,7 @@ export function AccountPageContent() {
                     </p>
                     <Link
                       href="/products"
-                      className="mt-4 inline-flex h-10 items-center justify-center border border-[#ddd4c8] px-5 text-xs font-medium uppercase tracking-[0.08em] transition hover:border-[#111111]"
+                      className="mt-4 inline-flex h-10 w-full items-center justify-center border border-[#ddd4c8] px-5 text-xs font-medium uppercase tracking-[0.08em] transition hover:border-[#111111] sm:w-auto"
                     >
                       Browse Collection
                     </Link>

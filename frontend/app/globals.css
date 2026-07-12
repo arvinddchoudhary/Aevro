@@ -30,6 +30,7 @@ body {
   font-family: Arial, Helvetica, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  overscroll-behavior-x: none;
 }
 
 a {
@@ -69,6 +70,15 @@ video {
   max-width: 100%;
 }
 
+main,
+section,
+article,
+aside,
+footer,
+header {
+  min-width: 0;
+}
+
 ::selection {
   background: #111111;
   color: #fffaf3;
@@ -85,8 +95,8 @@ video {
   margin-right: auto;
   width: 100%;
   max-width: 1600px;
-  padding-left: 1.25rem;
-  padding-right: 1.25rem;
+  padding-left: 1rem;
+  padding-right: 1rem;
 }
 
 @media (min-width: 640px) {

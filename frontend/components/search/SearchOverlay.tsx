@@ -154,7 +154,7 @@ export function SearchOverlay({ isOpen, onClose }: SearchOverlayProps) {
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-start justify-center bg-[#1b1510]/36 px-3 py-5 backdrop-blur-[7px] sm:px-5 sm:py-10 lg:py-[7vh]"
+      className="fixed inset-0 z-50 flex items-start justify-center bg-[#1b1510]/36 px-0 py-0 backdrop-blur-[7px] sm:px-5 sm:py-8 lg:py-[7vh]"
       role="dialog"
       aria-modal="true"
       aria-label="Search AEVRO products"
@@ -166,14 +166,14 @@ export function SearchOverlay({ isOpen, onClose }: SearchOverlayProps) {
     >
       <div
         ref={panelRef}
-        className="flex max-h-[calc(100vh-40px)] w-full max-w-[1080px] flex-col overflow-hidden rounded-[6px] border border-[#d8cfc2] bg-[#fbf7f0]/96 shadow-[0_34px_100px_rgba(20,15,10,0.24)] sm:max-h-[calc(100vh-80px)]"
+        className="flex h-full max-h-screen w-full max-w-[1080px] flex-col overflow-hidden border border-[#d8cfc2] bg-[#fbf7f0]/96 shadow-[0_34px_100px_rgba(20,15,10,0.24)] sm:h-auto sm:max-h-[calc(100vh-64px)] sm:rounded-[6px] lg:max-h-[calc(100vh-96px)]"
       >
-        <div className="flex items-start justify-between gap-4 px-6 pb-4 pt-6 sm:px-9 sm:pt-8">
-          <div>
+        <div className="flex items-start justify-between gap-4 px-4 pb-4 pt-5 sm:px-9 sm:pt-8">
+          <div className="min-w-0">
             <p className="text-[0.7rem] font-semibold uppercase tracking-[0.34em] text-[#8a5f36]">
               Search AEVRO
             </p>
-            <p className="mt-2 font-serif text-base text-[#6f665d]">
+            <p className="mt-2 font-serif text-sm leading-5 text-[#6f665d] sm:text-base">
               Discover refined trousers for every occasion.
             </p>
           </div>
@@ -190,7 +190,7 @@ export function SearchOverlay({ isOpen, onClose }: SearchOverlayProps) {
         </div>
 
         <form
-          className="border-b border-[#ddd4c8] px-6 pb-7 pt-3 sm:px-9"
+          className="border-b border-[#ddd4c8] px-4 pb-5 pt-2 sm:px-9 sm:pb-7 sm:pt-3"
           onSubmit={(event) => {
             event.preventDefault();
             goToSearch();
@@ -222,14 +222,14 @@ export function SearchOverlay({ isOpen, onClose }: SearchOverlayProps) {
                 value={query}
                 onChange={(event) => setQuery(event.target.value)}
                 placeholder="Search trousers, black trousers, pleated trousers..."
-                className="h-[72px] w-full border border-[#d8cfc2] bg-[#fffdf8]/72 pl-16 pr-4 font-serif text-2xl font-light text-[#111111] outline-none transition placeholder:text-[#82786f] focus:border-[#111111] sm:text-[1.8rem]"
+                className="h-14 w-full border border-[#a89078] bg-[#fffdf8]/72 pl-14 pr-4 font-serif text-lg font-light text-[#111111] outline-none transition placeholder:text-[#82786f] focus:border-[#111111] sm:h-[72px] sm:pl-16 sm:text-[1.8rem]"
                 aria-label="Search products"
               />
             </div>
             <button
               type="submit"
               disabled={!normalizedQuery}
-              className="h-[72px] cursor-pointer bg-[#111111] px-7 text-xs font-semibold uppercase tracking-[0.34em] text-[#fffaf3] transition hover:bg-[#2a2a2a] disabled:cursor-not-allowed disabled:bg-[#c3b8ab] disabled:text-[#8a8177]"
+              className="h-12 cursor-pointer bg-[#a39079] px-7 text-xs font-semibold uppercase tracking-[0.28em] text-[#fffaf3] transition hover:bg-[#8d7b66] disabled:cursor-not-allowed disabled:bg-[#c3b8ab] sm:h-[72px] sm:tracking-[0.34em]"
             >
               Search
             </button>
@@ -237,7 +237,7 @@ export function SearchOverlay({ isOpen, onClose }: SearchOverlayProps) {
         </form>
 
         <div className="grid min-h-0 gap-0 overflow-y-auto lg:grid-cols-[350px_1fr]">
-          <section className="border-b border-[#ddd4c8] p-6 sm:px-9 sm:py-7 lg:border-b-0 lg:border-r">
+          <section className="border-b border-[#ddd4c8] p-4 sm:px-9 sm:py-7 lg:border-b-0 lg:border-r">
             <p className="text-[0.66rem] font-semibold uppercase tracking-[0.34em] text-[#111111]">
               Suggestions
             </p>
@@ -247,7 +247,7 @@ export function SearchOverlay({ isOpen, onClose }: SearchOverlayProps) {
                   key={suggestion}
                   type="button"
                   onClick={() => goToSearch(suggestion)}
-                  className="flex h-[46px] cursor-pointer items-center justify-between border border-[#d8cfc2] bg-[#fbf7f0]/70 px-4 text-left text-[0.7rem] font-semibold uppercase tracking-[0.24em] text-[#3d3732] transition hover:border-[#111111] hover:bg-[#fffdf8]"
+                className="flex min-h-11 cursor-pointer items-center justify-between gap-3 border border-[#d8cfc2] bg-[#fbf7f0]/70 px-4 text-left text-[0.66rem] font-semibold uppercase tracking-[0.18em] text-[#3d3732] transition hover:border-[#111111] hover:bg-[#fffdf8] sm:h-[46px] sm:text-[0.7rem] sm:tracking-[0.24em]"
                 >
                   <span>{suggestion}</span>
                   <span aria-hidden="true" className="text-lg font-light text-[#8a8177]">
@@ -258,7 +258,7 @@ export function SearchOverlay({ isOpen, onClose }: SearchOverlayProps) {
             </div>
           </section>
 
-          <section className="p-6 sm:px-9 sm:py-7">
+          <section className="p-4 sm:px-9 sm:py-7">
             <div className="mb-4 flex items-center justify-between gap-3">
               <p className="text-[0.66rem] font-semibold uppercase tracking-[0.34em] text-[#111111]">
                 Top Matches
@@ -301,9 +301,9 @@ export function SearchOverlay({ isOpen, onClose }: SearchOverlayProps) {
                       key={product.id}
                       href={`/products/${product.slug}`}
                       onClick={onClose}
-                      className="group grid min-h-[90px] cursor-pointer grid-cols-[84px_1fr_auto] items-center gap-4 border border-[#e1d8cc] bg-[#fffaf3]/82 p-2.5 transition hover:border-[#111111]"
+                      className="group grid min-h-[86px] cursor-pointer grid-cols-[70px_minmax(0,1fr)_auto] items-center gap-3 border border-[#e1d8cc] bg-[#fffaf3]/82 p-2.5 transition hover:border-[#111111] sm:grid-cols-[84px_1fr_auto] sm:gap-4"
                     >
-                      <div className="h-[76px] w-[76px] overflow-hidden rounded-[4px] bg-[#eee5da]">
+                      <div className="h-[64px] w-[64px] overflow-hidden rounded-[4px] bg-[#eee5da] sm:h-[76px] sm:w-[76px]">
                         {image ? (
                           <img
                             src={image.url}
@@ -313,7 +313,7 @@ export function SearchOverlay({ isOpen, onClose }: SearchOverlayProps) {
                         ) : null}
                       </div>
                       <div className="min-w-0">
-                        <p className="truncate font-serif text-[1.05rem] uppercase tracking-[0.04em] text-[#111111]">
+                        <p className="truncate font-serif text-sm uppercase tracking-[0.04em] text-[#111111] sm:text-[1.05rem]">
                           {product.name}
                         </p>
                         <p className="mt-1 font-serif text-sm text-[#777067]">
@@ -323,7 +323,7 @@ export function SearchOverlay({ isOpen, onClose }: SearchOverlayProps) {
                           {formatPrice(product.priceInPaise)}
                         </p>
                       </div>
-                      <span aria-hidden="true" className="pr-4 text-3xl font-light text-[#8a8177]">
+                      <span aria-hidden="true" className="pr-1 text-2xl font-light text-[#8a8177] sm:pr-4 sm:text-3xl">
                         ›
                       </span>
                     </Link>

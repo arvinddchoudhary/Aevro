@@ -46,12 +46,12 @@ export function AddressFormModal({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-end bg-[#111111]/36 px-4 py-5 backdrop-blur-sm sm:items-center sm:justify-center"
+      className="fixed inset-0 z-50 flex items-end bg-[#111111]/36 px-0 py-0 backdrop-blur-sm sm:items-center sm:justify-center sm:px-4 sm:py-5"
       role="dialog"
       aria-modal="true"
       aria-labelledby="address-form-title"
     >
-      <div className="max-h-[92vh] w-full overflow-y-auto border border-[#ded4c8] bg-[#fffaf3] p-5 shadow-[0_32px_90px_rgba(17,17,17,0.2)] sm:max-w-3xl sm:p-7">
+      <div className="max-h-[100vh] w-full overflow-y-auto border border-[#ded4c8] bg-[#fffaf3] p-4 shadow-[0_32px_90px_rgba(17,17,17,0.2)] sm:max-h-[92vh] sm:max-w-3xl sm:p-7">
         <div className="flex flex-col gap-3 border-b border-[#e5dbcf] pb-5 sm:flex-row sm:items-start sm:justify-between">
           <div>
             <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#777067]">
