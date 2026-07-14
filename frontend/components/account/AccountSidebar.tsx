@@ -5,8 +5,10 @@ import { usePathname } from 'next/navigation';
 import { AccountIcon } from './AccountIcons';
 
 type AccountSidebarProps = {
+  className?: string;
   isLoggingOut: boolean;
   onLogout: () => void;
+  title?: string;
 };
 
 const linkedItems = [
@@ -19,14 +21,24 @@ const linkedItems = [
 
 const futureItems = [] as Array<{ label: string; icon: 'card' }>;
 
-export function AccountSidebar({ isLoggingOut, onLogout }: AccountSidebarProps) {
+export function AccountSidebar({
+  className = '',
+  isLoggingOut,
+  onLogout,
+  title,
+}: AccountSidebarProps) {
   const pathname = usePathname();
 
   return (
-    <aside className="h-fit border border-[#e1d8cc] bg-[#fffaf3]/78 p-2 shadow-[0_24px_70px_rgba(48,38,27,0.04)] lg:sticky lg:top-28">
+    <aside className={`h-fit overflow-hidden rounded-[8px] border border-[#e1d8cc] bg-[#fffaf3]/82 shadow-[0_18px_55px_rgba(48,38,27,0.04)] lg:sticky lg:top-28 lg:rounded-none lg:p-2 ${className}`}>
+      {title ? (
+        <p className="px-4 pb-2 pt-4 text-[0.68rem] font-semibold uppercase tracking-[0.2em] text-[#211d18] lg:hidden">
+          {title}
+        </p>
+      ) : null}
       <nav
         aria-label="Account navigation"
-        className="flex snap-x gap-2 overflow-x-auto pb-1 lg:block lg:overflow-visible lg:pb-0"
+        className="block lg:overflow-visible"
       >
         {linkedItems.map((item) => {
           const isActive =
@@ -37,12 +49,15 @@ export function AccountSidebar({ isLoggingOut, onLogout }: AccountSidebarProps) 
             <Link
               key={item.href}
               href={item.href}
-              className={`flex min-h-11 shrink-0 snap-start items-center gap-2.5 rounded-full px-4 text-sm transition hover:bg-[#f2eadf] lg:min-h-12 lg:w-full lg:rounded-none ${
-                isActive ? 'bg-[#eee5da] text-[#111111]' : 'text-[#2f2a25]'
+              className={`relative flex min-h-[52px] w-full items-center gap-3 border-b border-[#eee5da] px-4 text-sm transition last:border-b-0 hover:bg-[#f2eadf] lg:min-h-12 lg:rounded-none lg:border-b-0 ${
+                isActive
+                  ? 'bg-[#eee5da] text-[#111111] before:absolute before:inset-y-0 before:left-0 before:w-0.5 before:bg-[#544a3e] lg:before:hidden'
+                  : 'text-[#2f2a25]'
               }`}
             >
               <AccountIcon name={item.icon} className="h-[18px] w-[18px] shrink-0" />
-              <span>{item.label}</span>
+              <span className="min-w-0 flex-1">{item.label}</span>
+              <span aria-hidden="true" className="text-xl font-light leading-none lg:hidden">›</span>
             </Link>
           );
         })}
@@ -65,10 +80,11 @@ export function AccountSidebar({ isLoggingOut, onLogout }: AccountSidebarProps) 
           type="button"
           disabled={isLoggingOut}
           onClick={onLogout}
-          className="flex min-h-11 shrink-0 snap-start items-center gap-2.5 rounded-full px-4 text-sm text-[#2f2a25] transition hover:bg-[#f2eadf] disabled:cursor-not-allowed disabled:text-[#8a8177] lg:min-h-12 lg:w-full lg:rounded-none"
+          className="flex min-h-[52px] w-full items-center gap-3 px-4 text-sm text-[#2f2a25] transition hover:bg-[#f2eadf] disabled:cursor-not-allowed disabled:text-[#8a8177] lg:min-h-12"
         >
           <AccountIcon name="logout" className="h-[18px] w-[18px] shrink-0" />
-          <span>{isLoggingOut ? 'Logging out' : 'Logout'}</span>
+          <span className="min-w-0 flex-1 text-left">{isLoggingOut ? 'Logging out' : 'Logout'}</span>
+          <span aria-hidden="true" className="text-xl font-light leading-none lg:hidden">›</span>
         </button>
       </nav>
     </aside>

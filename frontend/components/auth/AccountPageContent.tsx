@@ -154,26 +154,35 @@ export function AccountPageContent() {
   return (
     <div className="bg-[#fbf7f0]">
       <AccountHero />
-      <section className="aevro-container py-6 sm:py-8 lg:py-10">
-        <div className="grid gap-6 lg:grid-cols-[280px_minmax(0,1fr)] xl:grid-cols-[315px_minmax(0,1fr)]">
-          <AccountSidebar isLoggingOut={isLoggingOut} onLogout={handleLogout} />
+      <section className="aevro-container py-3 sm:py-8 lg:py-10">
+        <div className="grid gap-3 sm:gap-6 lg:grid-cols-[280px_minmax(0,1fr)] xl:grid-cols-[315px_minmax(0,1fr)]">
+          <AccountSidebar
+            className="hidden lg:block"
+            isLoggingOut={isLoggingOut}
+            onLogout={handleLogout}
+          />
 
-          <div className="min-w-0 space-y-5 sm:space-y-6">
+          <div className="min-w-0 space-y-3 sm:space-y-6">
             <AccountSummaryCard user={user} />
 
             {user.role === 'ADMIN' && (
-              <div className="flex flex-col gap-4 border border-[#ddd4c8] bg-[#fffaf3] p-5 shadow-[0_18px_60px_rgba(44,34,24,0.035)] sm:flex-row sm:items-center sm:justify-between">
-                <div>
-                  <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[#a56f3c]">
-                    Admin access
-                  </p>
-                  <p className="mt-2 text-sm leading-6 text-[#625a51]">
-                    Manage AEVRO catalog, homepage content, and customer orders.
-                  </p>
+              <div className="flex flex-col gap-4 rounded-[8px] border border-[#ddd4c8] bg-[#fffaf3] p-4 shadow-[0_18px_60px_rgba(44,34,24,0.035)] min-[390px]:flex-row min-[390px]:items-center sm:justify-between sm:p-5 lg:rounded-none">
+                <div className="flex min-w-0 items-center gap-3">
+                  <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-[#f0e8de]">
+                    <AccountIcon name="shield" className="h-6 w-6" />
+                  </span>
+                  <div className="min-w-0">
+                    <p className="text-[0.68rem] font-semibold uppercase tracking-[0.18em] text-[#211d18]">
+                      Admin access
+                    </p>
+                    <p className="mt-1 text-xs leading-5 text-[#625a51] sm:text-sm sm:leading-6">
+                      Manage AEVRO catalog, homepage content, and customer orders.
+                    </p>
+                  </div>
                 </div>
                 <Link
                   href="/admin"
-                  className="inline-flex h-11 w-full cursor-pointer items-center justify-center bg-[#111111] px-6 text-sm font-medium uppercase tracking-[0.08em] text-[#fffaf3] transition hover:bg-[#2d2924] sm:w-auto"
+                  className="inline-flex h-11 w-full shrink-0 cursor-pointer items-center justify-center rounded-[3px] bg-[#111111] px-5 text-xs font-medium uppercase tracking-[0.1em] text-[#fffaf3] transition hover:bg-[#2d2924] min-[390px]:w-auto sm:px-6 sm:text-sm"
                   style={{ color: '#fffaf3' }}
                 >
                   Open Admin
@@ -187,7 +196,14 @@ export function AccountPageContent() {
               </p>
             )}
 
-            <div className="grid gap-5 xl:grid-cols-2">
+            <AccountSidebar
+              className="lg:hidden"
+              isLoggingOut={isLoggingOut}
+              onLogout={handleLogout}
+              title="Quick menu"
+            />
+
+            <div className="grid gap-3 sm:gap-5 xl:grid-cols-2">
               <AccountInfoCard
                 title="Personal Details"
                 href="/account/profile"

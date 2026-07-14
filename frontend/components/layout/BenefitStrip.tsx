@@ -14,8 +14,8 @@ const benefitItems = [
     ),
   },
   {
-    title: 'Easy returns',
-    detail: '14 days return policy',
+    title: 'Easy Exchange',
+    detail: '14 days Exchange policy',
     icon: (
       <svg viewBox="0 0 96 96" aria-hidden="true" className={iconClassName}>
         <path d="M25 22a34 34 0 0 1 47 4l6 7M78 20v13H65M71 74a34 34 0 0 1-47-4l-6-7M18 76V63h13" fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" />
@@ -34,7 +34,7 @@ const benefitItems = [
   },
   {
     title: 'Customer support',
-    detail: 'support@aevro.com',
+    detail: 'theaevro.official@gmail.com',
     icon: (
       <svg viewBox="0 0 96 96" aria-hidden="true" className={iconClassName}>
         <path d="M22 55v-9a26 26 0 0 1 52 0v9" fill="none" stroke="currentColor" strokeLinecap="round" strokeWidth="3" />

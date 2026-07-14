@@ -75,7 +75,7 @@ export class NotificationsService {
     this.supportEmail =
       configService.get<string>('AEVRO_SUPPORT_EMAIL') ??
       configService.get<string>('BREVO_REPLY_TO_EMAIL') ??
-      'support@aevro.com';
+      'theaevro.official@gmail.com';
     this.frontendUrl =
       configService.get<string>('FRONTEND_URL') ?? 'http://localhost:3000';
   }

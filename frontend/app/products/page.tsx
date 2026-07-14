@@ -102,6 +102,8 @@ export default async function ProductsPage({
   const params = (await searchParams) ?? {};
   const page = Math.max(getNumberParam(params, 'page') ?? 1, 1);
   const category = getStringParam(params, 'category');
+  const color = getStringParam(params, 'color');
+  const size = getStringParam(params, 'size');
   const search = getStringParam(params, 'search');
   const activeSearch = search?.trim();
   const minPrice = getNumberParam(params, 'minPrice');
@@ -117,6 +119,8 @@ export default async function ProductsPage({
       page,
       limit: 12,
       category,
+      color,
+      size,
       search,
       minPrice,
       maxPrice,
