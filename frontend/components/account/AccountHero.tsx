@@ -16,24 +16,24 @@ export function AccountHero({
   ],
 }: AccountHeroProps) {
   return (
-    <section className="relative isolate overflow-hidden border-b border-[#ddd4c8] bg-[#efe3d4]">
+    <section className="relative isolate h-[132px] overflow-hidden border-b border-[#ddd4c8] bg-[#efe3d4] sm:h-auto">
       <div
-        className="absolute inset-0 -z-10 bg-cover bg-[70%_center] sm:bg-center"
+        className="absolute inset-0 -z-10 bg-cover bg-[72%_center] sm:bg-center"
         style={{ backgroundImage: "url('/images/brand/atelier-band.webp')" }}
         aria-hidden="true"
       />
-      <div className="absolute inset-0 -z-10 bg-[linear-gradient(90deg,rgba(251,247,240,0.96)_0%,rgba(251,247,240,0.82)_34%,rgba(251,247,240,0.34)_72%,rgba(251,247,240,0.2)_100%)]" />
-      <div className="aevro-container flex min-h-[150px] items-center py-7 sm:min-h-[210px] sm:py-10 lg:min-h-[250px]">
+      <div className="absolute inset-0 -z-10 bg-[linear-gradient(90deg,rgba(251,247,240,0.98)_0%,rgba(251,247,240,0.9)_42%,rgba(251,247,240,0.28)_76%,rgba(251,247,240,0.12)_100%)]" />
+      <div className="aevro-container flex h-full items-center py-5 sm:min-h-[210px] sm:py-10 lg:min-h-[250px]">
         <div className="min-w-0">
-          <h1 className="break-words font-serif text-[2.15rem] font-light uppercase leading-tight tracking-[0.1em] text-[#111111] sm:text-5xl sm:tracking-[0.12em] lg:text-6xl">
+          <h1 className="max-w-[270px] break-words font-serif text-[1.72rem] font-light uppercase leading-[1.02] tracking-[0.08em] text-[#111111] sm:max-w-none sm:text-5xl sm:tracking-[0.12em] lg:text-6xl">
             {title}
           </h1>
           <nav
             aria-label="Breadcrumb"
-            className="mt-4 flex flex-wrap items-center gap-3 text-sm text-[#6b6258] sm:mt-5 sm:gap-4"
+            className="mt-3 flex max-w-[280px] flex-wrap items-center gap-2 text-[0.72rem] text-[#6b6258] sm:mt-5 sm:max-w-none sm:gap-4 sm:text-sm"
           >
             {breadcrumb.map((item, index) => (
-              <span key={`${item.label}-${index}`} className="flex items-center gap-4">
+              <span key={`${item.label}-${index}`} className="flex items-center gap-2 sm:gap-4">
                 {index > 0 && <span aria-hidden="true">/</span>}
                 {item.href ? (
                   <Link

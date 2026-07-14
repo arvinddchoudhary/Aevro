@@ -54,13 +54,13 @@ export function PaymentMethodsPageContent() {
         ]}
       />
 
-      <section className="aevro-container py-6 sm:py-8 lg:py-10">
-        <div className="grid gap-6 lg:grid-cols-[280px_minmax(0,1fr)] xl:grid-cols-[315px_minmax(0,1fr)]">
+      <section className="aevro-container py-3 sm:py-8 lg:py-10">
+        <div className="grid gap-3 sm:gap-6 lg:grid-cols-[280px_minmax(0,1fr)] xl:grid-cols-[315px_minmax(0,1fr)]">
           <AccountSidebar isLoggingOut={isLoggingOut} onLogout={handleLogout} />
 
-          <div className="min-w-0 space-y-5">
-            <section className="border border-[#e1d8cc] bg-[#fffaf3]/82 p-5 shadow-[0_26px_80px_rgba(48,38,27,0.04)] sm:p-7">
-              <div className="flex flex-col gap-5 border-b border-[#e5dbcf] pb-6 lg:flex-row lg:items-start lg:justify-between">
+          <div className="min-w-0 space-y-3 sm:space-y-5">
+            <section className="rounded-[8px] border border-[#e1d8cc] bg-[#fffaf3]/82 p-4 shadow-[0_20px_60px_rgba(48,38,27,0.04)] sm:p-7 lg:rounded-none">
+              <div className="flex flex-col gap-4 border-b border-[#e5dbcf] pb-5 lg:flex-row lg:items-start lg:justify-between lg:pb-6">
                 <div>
                   <h1 className="font-serif text-2xl font-light text-[#111111] sm:text-3xl">
                     Saved Payment Methods
@@ -72,7 +72,7 @@ export function PaymentMethodsPageContent() {
                 <button
                   type="button"
                   onClick={() => openNotice('Add New Card')}
-                  className="inline-flex h-12 w-full items-center justify-center gap-2 bg-[#111111] px-6 text-sm font-medium uppercase tracking-[0.08em] text-[#fffaf3] transition hover:bg-[#2d2924] sm:w-auto"
+                    className="inline-flex h-11 w-full items-center justify-center gap-2 rounded-[3px] bg-[#111111] px-5 text-xs font-medium uppercase tracking-[0.1em] text-[#fffaf3] transition hover:bg-[#2d2924] sm:h-12 sm:w-auto sm:px-6 sm:text-sm"
                   style={{ color: '#fffaf3' }}
                 >
                   <AccountIcon name="plus" className="h-4 w-4" />
@@ -80,7 +80,7 @@ export function PaymentMethodsPageContent() {
                 </button>
               </div>
 
-              <div className="mt-6 border border-[#e5dbcf] bg-[#fffdf8] p-8 text-center sm:p-10">
+              <div className="mt-5 rounded-[6px] border border-[#e5dbcf] bg-[#fffdf8] p-6 text-center sm:mt-6 sm:p-10">
                 <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-[#f0e8de] text-[#211d18]">
                   <AccountIcon name="card" className="h-8 w-8" />
                 </div>
@@ -94,7 +94,7 @@ export function PaymentMethodsPageContent() {
                 <button
                   type="button"
                   onClick={() => openNotice('Saved Cards Coming Soon')}
-                  className="mt-6 inline-flex h-12 w-full items-center justify-center bg-[#111111] px-6 text-sm font-medium uppercase tracking-[0.08em] text-[#fffaf3] transition hover:bg-[#2d2924] sm:w-auto"
+                    className="mt-5 inline-flex h-11 w-full items-center justify-center rounded-[3px] bg-[#111111] px-5 text-xs font-medium uppercase tracking-[0.1em] text-[#fffaf3] transition hover:bg-[#2d2924] sm:mt-6 sm:h-12 sm:w-auto sm:px-6 sm:text-sm"
                   style={{ color: '#fffaf3' }}
                 >
                   Learn More
@@ -102,7 +102,7 @@ export function PaymentMethodsPageContent() {
               </div>
             </section>
 
-            <section className="rounded-[8px] border border-[#e1d8cc] bg-[#fffaf3]/82 px-6 py-8 shadow-[0_26px_80px_rgba(48,38,27,0.035)] sm:px-9 sm:py-10">
+            <section className="rounded-[8px] border border-[#e1d8cc] bg-[#fffaf3]/82 px-4 py-6 shadow-[0_20px_60px_rgba(48,38,27,0.035)] sm:px-9 sm:py-10">
               <div>
                 <h2 className="font-serif text-3xl font-light leading-tight text-[#111111] sm:text-4xl">
                   More Payment Options

@@ -147,12 +147,12 @@ export function AccountOrdersPageContent() {
         ]}
       />
 
-      <section className="aevro-container py-6 sm:py-8 lg:py-10">
-        <div className="grid gap-6 lg:grid-cols-[280px_minmax(0,1fr)] xl:grid-cols-[315px_minmax(0,1fr)]">
+      <section className="aevro-container py-3 sm:py-8 lg:py-10">
+        <div className="grid gap-3 sm:gap-6 lg:grid-cols-[280px_minmax(0,1fr)] xl:grid-cols-[315px_minmax(0,1fr)]">
           <AccountSidebar isLoggingOut={isLoggingOut} onLogout={handleLogout} />
 
-          <section className="min-w-0 border border-[#e1d8cc] bg-[#fffaf3]/82 shadow-[0_26px_80px_rgba(48,38,27,0.04)]">
-            <div className="grid gap-5 border-b border-[#e5dbcf] p-4 sm:p-7 lg:grid-cols-[1fr_minmax(260px,360px)] lg:items-center">
+          <section className="min-w-0 overflow-hidden rounded-[8px] border border-[#e1d8cc] bg-[#fffaf3]/82 shadow-[0_20px_60px_rgba(48,38,27,0.04)] lg:rounded-none">
+            <div className="grid gap-4 border-b border-[#e5dbcf] p-4 sm:gap-5 sm:p-7 lg:grid-cols-[1fr_minmax(260px,360px)] lg:items-center">
               <div className="flex items-center gap-4 sm:gap-5">
                 <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-[#f0e8de] text-[#211d18] sm:h-16 sm:w-16">
                   <AccountIcon name="bag" className="h-6 w-6 sm:h-8 sm:w-8" />
@@ -180,14 +180,14 @@ export function AccountOrdersPageContent() {
               </label>
             </div>
 
-            <div className="grid gap-4 border-b border-[#e5dbcf] p-4 sm:p-7 xl:grid-cols-[1fr_180px] xl:items-center">
-              <div className="flex gap-2 overflow-x-auto pb-1">
+            <div className="grid gap-3 border-b border-[#e5dbcf] p-4 sm:gap-4 sm:p-7 xl:grid-cols-[1fr_180px] xl:items-center">
+              <div className="grid grid-cols-2 gap-2 min-[390px]:grid-cols-4 sm:flex sm:flex-wrap">
                 {filterItems.map((item) => (
                   <button
                     key={item.value}
                     type="button"
                     onClick={() => setActiveFilter(item.value)}
-                    className={`h-10 shrink-0 rounded-full border px-4 text-xs font-medium transition sm:rounded-none ${
+                    className={`h-10 min-w-0 border px-2 text-xs font-medium transition sm:shrink-0 sm:px-4 ${
                       activeFilter === item.value
                         ? 'border-[#eee5da] bg-[#eee5da] text-[#111111]'
                         : 'border-[#ddd4c8] bg-[#fffdf8] text-[#2f2a25] hover:border-[#111111]'
@@ -218,7 +218,7 @@ export function AccountOrdersPageContent() {
               {isLoading && <LoadingRows />}
 
               {error && !isLoading && (
-                <div className="border border-[#e5dbcf] bg-[#fffdf8] p-8 text-center sm:p-10">
+                <div className="rounded-[6px] border border-[#e5dbcf] bg-[#fffdf8] p-6 text-center sm:p-10">
                   <h2 className="font-serif text-2xl font-light text-[#111111]">
                     We could not load your orders.
                   </h2>
@@ -249,7 +249,7 @@ export function AccountOrdersPageContent() {
                   </p>
                   <Link
                     href="/products"
-                    className="mt-6 inline-flex h-12 w-full items-center justify-center bg-[#111111] px-6 text-sm font-medium uppercase tracking-[0.08em] text-[#fffaf3] transition hover:bg-[#2d2924] sm:w-auto"
+                    className="mt-5 inline-flex h-11 w-full items-center justify-center rounded-[3px] bg-[#111111] px-5 text-xs font-medium uppercase tracking-[0.1em] text-[#fffaf3] transition hover:bg-[#2d2924] sm:mt-6 sm:h-12 sm:w-auto sm:px-6 sm:text-sm"
                     style={{ color: '#fffaf3' }}
                   >
                     Start Shopping

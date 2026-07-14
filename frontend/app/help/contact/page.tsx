@@ -35,10 +35,12 @@ export default function ContactPage() {
               </h2>
               <p className="mt-4 text-sm leading-7 text-[#3f3932]">
                 <a
-                  href="mailto:support@aevro.com"
+                  href="mailto:theaevro.official@gmail.com
+"
                   className="underline underline-offset-4"
                 >
-                  support@aevro.com
+                  theaevro.official@gmail.com
+
                 </a>
               </p>
               <p className="mt-2 text-sm leading-7 text-[#514c45]">

@@ -52,10 +52,10 @@ export default function ReturnsPolicyPage() {
                 <p>
                   To initiate a return, contact us at{' '}
                   <a
-                    href="mailto:support@aevro.com"
+                    href="mailto:theaevro.official@gmail.com"
                     className="underline underline-offset-4"
                   >
-                    support@aevro.com
+                      theaevro.official@gmail.com
                   </a>{' '}
                   with your order number and reason for return. A return shipping
                   label will be provided within 24 hours.

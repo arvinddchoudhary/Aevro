@@ -158,12 +158,12 @@ export function WishlistPageContent() {
         ]}
       />
 
-      <section className="aevro-container py-6 sm:py-8 lg:py-10">
-        <div className="grid gap-6 lg:grid-cols-[280px_minmax(0,1fr)] xl:grid-cols-[315px_minmax(0,1fr)]">
+      <section className="aevro-container py-3 sm:py-8 lg:py-10">
+        <div className="grid gap-3 sm:gap-6 lg:grid-cols-[280px_minmax(0,1fr)] xl:grid-cols-[315px_minmax(0,1fr)]">
           <AccountSidebar isLoggingOut={isLoggingOut} onLogout={handleLogout} />
 
-          <section className="min-w-0 border border-[#e1d8cc] bg-[#fffaf3]/82 shadow-[0_26px_80px_rgba(48,38,27,0.04)]">
-            <div className="grid gap-5 border-b border-[#e5dbcf] p-4 sm:p-7 xl:grid-cols-[1fr_auto] xl:items-center">
+          <section className="min-w-0 overflow-hidden rounded-[8px] border border-[#e1d8cc] bg-[#fffaf3]/82 shadow-[0_20px_60px_rgba(48,38,27,0.04)] lg:rounded-none">
+            <div className="grid gap-4 border-b border-[#e5dbcf] p-4 sm:gap-5 sm:p-7 xl:grid-cols-[1fr_auto] xl:items-center">
               <div>
                 <h1 className="font-serif text-2xl font-light text-[#111111] sm:text-3xl">
                   My Wishlist
@@ -171,13 +171,13 @@ export function WishlistPageContent() {
                 <p className="mt-2 text-sm text-[#625a51]">{itemCountLabel(items.length)}</p>
               </div>
 
-              <div className="grid gap-3 sm:grid-cols-[minmax(0,190px)_minmax(0,190px)_auto]">
+              <div className="grid grid-cols-[minmax(0,1fr)_minmax(0,1fr)_auto] gap-2 sm:grid-cols-[minmax(0,190px)_minmax(0,190px)_auto] sm:gap-3">
                 <label>
                   <span className="sr-only">Filter by category</span>
                   <select
                     value={activeCategory}
                     onChange={(event) => setActiveCategory(event.target.value)}
-                    className="h-11 w-full border border-[#ddd4c8] bg-[#fffdf8] px-4 text-sm outline-none transition focus:border-[#111111]"
+                    className="h-11 w-full min-w-0 border border-[#ddd4c8] bg-[#fffdf8] px-2 text-xs outline-none transition focus:border-[#111111] sm:px-4 sm:text-sm"
                   >
                     <option value="all">All Categories</option>
                     {categories.map((category) => (
@@ -192,7 +192,7 @@ export function WishlistPageContent() {
                   <select
                     value={sort}
                     onChange={(event) => setSort(event.target.value as SortOption)}
-                    className="h-11 w-full border border-[#ddd4c8] bg-[#fffdf8] px-4 text-sm outline-none transition focus:border-[#111111]"
+                    className="h-11 w-full min-w-0 border border-[#ddd4c8] bg-[#fffdf8] px-2 text-xs outline-none transition focus:border-[#111111] sm:px-4 sm:text-sm"
                   >
                     <option value="recent">Recently Added</option>
                     <option value="price_asc">Price: Low to High</option>
@@ -205,7 +205,7 @@ export function WishlistPageContent() {
                       key={option}
                       type="button"
                       onClick={() => setLayout(option)}
-                      className={`h-11 px-4 text-xs uppercase tracking-[0.08em] ${
+                      className={`h-11 px-2 text-[0.6rem] uppercase tracking-[0.06em] sm:px-4 sm:text-xs sm:tracking-[0.08em] ${
                         layout === option ? 'bg-[#eee5da]' : 'bg-[#fffdf8]'
                       }`}
                     >
@@ -226,7 +226,7 @@ export function WishlistPageContent() {
               {isLoading && <WishlistSkeleton />}
 
               {error && !isLoading && (
-                <div className="border border-[#e5dbcf] bg-[#fffdf8] p-8 text-center sm:p-10">
+                <div className="rounded-[6px] border border-[#e5dbcf] bg-[#fffdf8] p-6 text-center sm:p-10">
                   <h2 className="font-serif text-2xl font-light text-[#111111]">
                     We could not load your wishlist.
                   </h2>
@@ -254,7 +254,7 @@ export function WishlistPageContent() {
                   </p>
                   <Link
                     href="/products"
-                    className="mt-6 inline-flex h-12 w-full items-center justify-center bg-[#111111] px-6 text-sm font-medium uppercase tracking-[0.08em] text-[#fffaf3] transition hover:bg-[#2d2924] sm:w-auto"
+                    className="mt-5 inline-flex h-11 w-full items-center justify-center rounded-[3px] bg-[#111111] px-5 text-xs font-medium uppercase tracking-[0.1em] text-[#fffaf3] transition hover:bg-[#2d2924] sm:mt-6 sm:h-12 sm:w-auto sm:px-6 sm:text-sm"
                     style={{ color: '#fffaf3' }}
                   >
                     Start Shopping

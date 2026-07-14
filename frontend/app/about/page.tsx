@@ -55,8 +55,118 @@ const values = [
 
 export default function AboutPage() {
   return (
-    <main className="px-4 py-6 sm:px-6 lg:px-8">
-      <div className="mx-auto max-w-[1500px] overflow-hidden rounded-[12px] border border-[#ddd4c8] bg-[#fbf7f0] shadow-[0_22px_70px_rgba(17,17,17,0.08)]">
+    <main className="bg-[#fbf7f0] md:px-4 md:py-6 lg:px-8">
+      <div className="pb-8 md:hidden">
+        <section className="relative h-[430px] overflow-hidden border-b border-[#ddd4c8] bg-[#fbf7f0]">
+          <div className="absolute inset-0">
+            <img
+              src="/images/brand/About-Top-Image.webp"
+              alt="Folded AEVRO trousers in a calm studio setting"
+              className="h-full w-full object-cover object-[68%_center]"
+            />
+          </div>
+          <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(251,247,240,0.99)_0%,rgba(251,247,240,0.97)_46%,rgba(251,247,240,0.72)_58%,rgba(251,247,240,0.08)_76%)]" />
+          <div className="relative flex h-full w-[56%] flex-col justify-center px-5 py-7 min-[390px]:px-6">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-[#4d473f]">
+              Our story
+            </p>
+            <h1 className="mt-4 font-serif text-[1.65rem] font-light uppercase leading-[1.02] tracking-normal text-[#111111] min-[390px]:text-[1.8rem]">
+              Built on simplicity. Driven by purpose.
+            </h1>
+            <div className="mt-4 text-[12px] leading-[1.55] text-[#3f3932]">
+              <p>
+                AEVRO was created with a simple idea: everyday clothing should feel thoughtfully
+                designed. We begin with the pleated trouser: a timeless silhouette built with
+                structure, ease, and versatility.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <section className="grid grid-cols-2 gap-2 px-3 py-4">
+          {values.map((value) => (
+            <article
+              key={value.title}
+              className="min-h-[134px] rounded-[8px] border border-[#ddd4c8] bg-[#fffaf3]/70 px-3 py-4 text-center"
+            >
+              <span className="mx-auto block h-7 w-7 text-[#111111] [&_svg]:h-full [&_svg]:w-full [&_svg]:fill-none [&_svg]:stroke-current [&_svg]:stroke-[1.15]">
+                {value.icon}
+              </span>
+              <h2 className="mt-3 text-[10px] font-semibold uppercase leading-4 tracking-[0.15em]">
+                {value.title}
+              </h2>
+              <p className="mt-2 text-[12px] leading-[1.45] text-[#514c45]">{value.copy}</p>
+            </article>
+          ))}
+        </section>
+
+        <section className="space-y-3 px-3 pb-7">
+          <article className="relative h-[300px] overflow-hidden rounded-[10px] border border-[#ddd4c8] bg-[#fbf7f0]">
+            <div className="absolute inset-0 bg-[#111111]">
+              <img
+                src="/images/brand/fabric-detail.webp"
+                alt="AEVRO tailoring craftsmanship"
+                className="h-full w-full object-cover object-[58%_top]"
+              />
+            </div>
+            <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(10,10,10,0.98)_0%,rgba(10,10,10,0.94)_48%,rgba(10,10,10,0.6)_60%,rgba(10,10,10,0.08)_78%)]" />
+            <div className="relative flex h-full w-[55%] flex-col justify-center px-4 py-5 text-[#fbf7f0] min-[390px]:px-5">
+              <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-[#d8cec0]">
+                Craftsmanship
+              </p>
+              <h2 className="mt-3 font-serif text-[1.02rem] font-light uppercase leading-[1.14] tracking-normal min-[390px]:text-[1.08rem]">
+                <span className="block">Expert tailoring.</span>
+                <span className="block">Premium fabrics.</span>
+                <span className="block">Timeless design.</span>
+              </h2>
+              <p className="mt-3 text-[11px] leading-[1.5] text-[#ebe1d4]">
+                Every garment begins with careful material selection, precise construction, and
+                close attention to finishing details.
+              </p>
+              <Link
+                href="/products"
+                className="mt-4 inline-flex w-fit items-center gap-2 border-b border-[#fbf7f0] pb-1 text-[9px] font-semibold uppercase tracking-[0.1em]"
+              >
+                Explore our collections
+                <span aria-hidden="true">→</span>
+              </Link>
+            </div>
+          </article>
+
+          <article className="relative h-[340px] overflow-hidden rounded-[10px] border border-[#ddd4c8] bg-[#fbf7f0]">
+            <div className="absolute inset-0">
+              <img
+                src="/images/brand/hero-trousers.webp"
+                alt="AEVRO trousers styled in a calm studio"
+                className="h-full w-full object-cover object-[68%_center]"
+              />
+            </div>
+            <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(251,247,240,0.99)_0%,rgba(251,247,240,0.96)_46%,rgba(251,247,240,0.68)_59%,rgba(251,247,240,0.05)_78%)]" />
+            <div className="relative flex h-full w-[55%] flex-col justify-center px-4 py-5 min-[390px]:px-5">
+              <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-[#514c45]">
+                Sustainability
+              </p>
+              <h2 className="mt-3 font-serif text-[1.12rem] font-light uppercase leading-[1.08] tracking-normal text-[#111111] min-[390px]:text-[1.2rem]">
+                <span className="block">Better choices.</span>
+                <span className="block">Greater impact.</span>
+              </h2>
+              <p className="mt-3 text-[11px] leading-[1.5] text-[#514c45]">
+                Responsible fashion starts with thoughtful design, timeless garments, and pieces
+                made to last beyond trends.
+              </p>
+              <Link
+                href="/lookbook"
+                className="mt-4 inline-flex w-fit items-center gap-2 border-b border-[#111111] pb-1 text-[9px] font-semibold uppercase tracking-[0.12em]"
+              >
+                Our commitment
+                <span aria-hidden="true">→</span>
+              </Link>
+            </div>
+          </article>
+        </section>
+      </div>
+
+      <div className="mx-auto hidden max-w-[1500px] overflow-hidden rounded-[12px] border border-[#ddd4c8] bg-[#fbf7f0] shadow-[0_22px_70px_rgba(17,17,17,0.08)] md:block">
         <section className="border-b border-[#ddd4c8]">
           <div className="relative h-[540px] overflow-hidden md:h-auto md:aspect-[2029/775]">
             <img
