@@ -3,8 +3,6 @@
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { AccountBenefitBar } from '../account/AccountBenefitBar';
-import { AccountHero } from '../account/AccountHero';
 import { AccountIcon } from '../account/AccountIcons';
 import { AccountSidebar } from '../account/AccountSidebar';
 import { getMyOrders } from '../../lib/api/orders';
@@ -139,19 +137,34 @@ export function AccountOrdersPageContent() {
 
   return (
     <div className="bg-[#fbf7f0]">
-      <AccountHero
-        title="My Orders"
-        breadcrumb={[
-          { label: 'Home', href: '/' },
-          { label: 'Orders' },
-        ]}
-      />
+      <section className="aevro-container py-4 sm:py-8 lg:py-10">
+        <div className="grid gap-4 sm:gap-6 lg:grid-cols-[280px_minmax(0,1fr)] xl:grid-cols-[315px_minmax(0,1fr)]">
+          <div className="space-y-5">
+            <AccountSidebar isLoggingOut={isLoggingOut} onLogout={handleLogout} />
+            <aside className="relative hidden h-[326px] overflow-hidden border border-[#e1d8cc] bg-[#e8d7c4] lg:block">
+              <img
+                src="/images/brand/About-Top-Image.webp"
+                alt="AEVRO ivory tailored trousers"
+                className="h-full w-full object-cover object-[72%_center]"
+              />
+              <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(246,237,226,0.2)_0%,rgba(226,204,181,0.78)_100%)]" />
+              <div className="absolute inset-x-0 top-0 p-7 text-[#211d18]">
+                <p className="font-serif text-xl leading-7">
+                  Timeless style.
+                  <br />
+                  Thoughtfully made.
+                </p>
+                <Link
+                  href="/products"
+                  className="mt-6 inline-flex border-b border-[#211d18] pb-1 text-xs font-medium uppercase tracking-[0.12em]"
+                >
+                  Explore collections
+                </Link>
+              </div>
+            </aside>
+          </div>
 
-      <section className="aevro-container py-3 sm:py-8 lg:py-10">
-        <div className="grid gap-3 sm:gap-6 lg:grid-cols-[280px_minmax(0,1fr)] xl:grid-cols-[315px_minmax(0,1fr)]">
-          <AccountSidebar isLoggingOut={isLoggingOut} onLogout={handleLogout} />
-
-          <section className="min-w-0 overflow-hidden rounded-[8px] border border-[#e1d8cc] bg-[#fffaf3]/82 shadow-[0_20px_60px_rgba(48,38,27,0.04)] lg:rounded-none">
+          <section className="min-w-0 overflow-hidden">
             <div className="grid gap-4 border-b border-[#e5dbcf] p-4 sm:gap-5 sm:p-7 lg:grid-cols-[1fr_minmax(260px,360px)] lg:items-center">
               <div className="flex items-center gap-4 sm:gap-5">
                 <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-[#f0e8de] text-[#211d18] sm:h-16 sm:w-16">
@@ -269,7 +282,7 @@ export function AccountOrdersPageContent() {
               )}
 
               {!isLoading && !error && visibleOrders.length > 0 && (
-                <div className="space-y-3">
+                <div className="overflow-hidden rounded-[7px] border border-[#e1d8cc]">
                   {visibleOrders.map((order) => (
                     <OrderRow key={order.id} order={order} />
                   ))}
@@ -279,8 +292,6 @@ export function AccountOrdersPageContent() {
           </section>
         </div>
       </section>
-
-      <AccountBenefitBar />
     </div>
   );
 }
