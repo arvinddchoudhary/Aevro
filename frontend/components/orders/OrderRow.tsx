@@ -60,8 +60,8 @@ export function OrderRow({ order }: OrderRowProps) {
 
   return (
     <article className="border border-[#e1d8cc] bg-[#fffaf3]/80 p-3 transition hover:border-[#cfc1b1] sm:p-5">
-      <div className="grid gap-4 sm:gap-5 xl:grid-cols-[190px_minmax(180px,1fr)_120px_120px_145px_24px] xl:items-center">
-        <div className="flex min-w-0 items-center gap-2 overflow-x-auto pb-1 xl:overflow-visible xl:pb-0">
+      <div className="grid gap-4 sm:gap-5 min-[1500px]:grid-cols-[180px_minmax(160px,1fr)_90px_100px_110px_150px_20px] min-[1500px]:items-center min-[1500px]:gap-4">
+        <div className="flex min-w-0 items-center gap-2 overflow-x-auto pb-1 min-[1500px]:pb-0">
           {images.length > 0 ? (
             images.map((image) => (
               <span
@@ -90,36 +90,45 @@ export function OrderRow({ order }: OrderRowProps) {
           <p className="mt-1 text-sm text-[#625a51]">{formatOrderDate(order.createdAt)}</p>
         </div>
 
-        <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 xl:contents">
-        <div>
-          <p className="text-xs uppercase tracking-[0.14em] text-[#777067]">Total</p>
-          <p className="mt-1 text-sm font-medium text-[#111111]">
-            {formatPrice(order.totalInPaise)}
-          </p>
+        <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 min-[1500px]:contents">
+          <div>
+            <p className="text-xs uppercase tracking-[0.14em] text-[#777067]">
+              Total
+            </p>
+            <p className="mt-1 text-sm font-medium text-[#111111]">
+              {formatPrice(order.totalInPaise)}
+            </p>
+          </div>
+
+          <div>
+            <p className="text-xs uppercase tracking-[0.14em] text-[#777067]">
+              Payment
+            </p>
+            <p className={`mt-1 flex items-center gap-2 text-sm ${paymentClass}`}>
+              <span
+                className="h-1.5 w-1.5 rounded-full bg-current"
+                aria-hidden="true"
+              />
+              {displayStatus(paymentStatus)}
+            </p>
+          </div>
+
+          <div>
+            <p className="text-xs uppercase tracking-[0.14em] text-[#777067]">
+              Status
+            </p>
+            <span
+              className={`mt-1 inline-flex px-3 py-1 text-xs ${orderStatusStyles[order.status]}`}
+            >
+              {displayStatus(order.status)}
+            </span>
+          </div>
         </div>
 
-        <div>
-          <p className="text-xs uppercase tracking-[0.14em] text-[#777067]">Payment</p>
-          <p className={`mt-1 flex items-center gap-2 text-sm ${paymentClass}`}>
-            <span className="h-1.5 w-1.5 rounded-full bg-current" aria-hidden="true" />
-            {displayStatus(paymentStatus)}
-          </p>
-        </div>
-
-        <div>
-          <p className="text-xs uppercase tracking-[0.14em] text-[#777067]">Status</p>
-          <span
-            className={`mt-1 inline-flex px-3 py-1 text-xs ${orderStatusStyles[order.status]}`}
-          >
-            {displayStatus(order.status)}
-          </span>
-        </div>
-        </div>
-
-        <div className="grid gap-2 sm:grid-cols-2 xl:grid-cols-1">
+        <div className="grid gap-2 sm:grid-cols-2 min-[1500px]:grid-cols-1">
           <Link
             href={`/account/orders/${order.id}`}
-            className="inline-flex h-10 items-center justify-center bg-[#111111] px-5 text-xs font-medium uppercase tracking-[0.08em] text-[#fffaf3] transition hover:bg-[#2d2924]"
+            className="inline-flex h-10 items-center justify-center whitespace-nowrap bg-[#111111] px-5 text-xs font-medium uppercase tracking-[0.08em] text-[#fffaf3] transition hover:bg-[#2d2924]"
             style={{ color: '#fffaf3' }}
           >
             View Order
@@ -128,13 +137,16 @@ export function OrderRow({ order }: OrderRowProps) {
             type="button"
             disabled
             title="Tracking is not available yet"
-            className="inline-flex h-10 cursor-not-allowed items-center justify-center border border-[#ddd4c8] px-5 text-xs font-medium uppercase tracking-[0.08em] text-[#8a8177]"
+            className="inline-flex h-10 cursor-not-allowed items-center justify-center whitespace-nowrap border border-[#ddd4c8] px-5 text-xs font-medium uppercase tracking-[0.08em] text-[#8a8177]"
           >
             Track Package
           </button>
         </div>
 
-        <AccountIcon name="chevron" className="hidden h-5 w-5 text-[#111111] xl:block" />
+        <AccountIcon
+          name="chevron"
+          className="hidden h-5 w-5 text-[#111111] min-[1500px]:block"
+        />
       </div>
     </article>
   );
