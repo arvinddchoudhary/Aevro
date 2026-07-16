@@ -250,8 +250,10 @@ export function CheckoutPageContent() {
             });
 
             clearCart();
+            setPendingOrderId(null);
+            setIsSubmitting(false);
             setPaymentIdempotencyKey(createPaymentIdempotencyKey());
-            router.push(`/checkout/confirmation/${orderId}`);
+            router.replace(`/checkout/confirmation/${orderId}`);
           } catch (error) {
             setIsSubmitting(false);
             setSubmitLabel('Retry payment');
