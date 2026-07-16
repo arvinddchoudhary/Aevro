@@ -48,7 +48,12 @@ async function bootstrap() {
     origin: corsOrigins,
     credentials: true,
     methods: ['GET', 'HEAD', 'PUT', 'PATCH', 'POST', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization', 'X-Razorpay-Signature'],
+    allowedHeaders: [
+      'Content-Type',
+      'Authorization',
+      'X-Razorpay-Signature',
+      'X-API-Key',
+    ],
   });
   app.useGlobalFilters(new HttpExceptionFilter());
   app.useGlobalPipes(

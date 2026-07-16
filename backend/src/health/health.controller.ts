@@ -1,6 +1,7 @@
 import {
   Controller,
   Get,
+  Head,
   Inject,
   Logger,
   ServiceUnavailableException,
@@ -20,6 +21,11 @@ export class HealthController {
       service: 'aevro-api',
       stack: 'nestjs',
     };
+  }
+
+  @Head()
+  headHealth() {
+    return;
   }
 
   @Get('database')

@@ -59,6 +59,7 @@ Never commit real `.env` files or production secrets.
 
 - Deploy `frontend/` to Vercel.
 - Deploy `backend/` to Render.
+- Use the root `render.yaml` Blueprint to configure the Render backend safely.
 - Use Neon for PostgreSQL and set `DATABASE_URL` on Render.
 - Use Cloudinary credentials only on the backend.
 - Use Razorpay secret key only on the backend.

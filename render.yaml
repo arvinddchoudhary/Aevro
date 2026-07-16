@@ -1,0 +1,108 @@
+services:
+  - type: web
+    name: aevro-api
+    runtime: node
+    plan: free
+    rootDir: backend
+    buildCommand: npm ci && npm run prisma:generate && npm run build && npm run prisma:deploy
+    startCommand: npm run start:prod
+    healthCheckPath: /api/v1/health
+    autoDeployTrigger: commit
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: DATABASE_URL
+        sync: false
+      - key: DIRECT_URL
+        sync: false
+      - key: FRONTEND_URL
+        sync: false
+      - key: CORS_ORIGINS
+        sync: false
+      - key: BACKEND_URL
+        sync: false
+      - key: JWT_ACCESS_SECRET
+        generateValue: true
+      - key: JWT_REFRESH_SECRET
+        generateValue: true
+      - key: JWT_ACCESS_EXPIRES_IN
+        value: 15m
+      - key: JWT_REFRESH_EXPIRES_IN
+        value: 30d
+      - key: GOOGLE_CLIENT_ID
+        sync: false
+      - key: COOKIE_DOMAIN
+        value: ""
+      - key: CLOUDINARY_CLOUD_NAME
+        sync: false
+      - key: CLOUDINARY_API_KEY
+        sync: false
+      - key: CLOUDINARY_API_SECRET
+        sync: false
+      - key: RAZORPAY_KEY_ID
+        sync: false
+      - key: RAZORPAY_KEY_SECRET
+        sync: false
+      - key: RAZORPAY_WEBHOOK_SECRET
+        sync: false
+      - key: BREVO_API_KEY
+        sync: false
+      - key: BREVO_SENDER_EMAIL
+        sync: false
+      - key: BREVO_SENDER_NAME
+        value: AEVRO
+      - key: BREVO_REPLY_TO_EMAIL
+        sync: false
+      - key: BREVO_REPLY_TO_NAME
+        value: AEVRO Support
+      - key: BREVO_TEMPLATE_ORDER_CONFIRMED_CUSTOMER
+        sync: false
+      - key: BREVO_TEMPLATE_ORDER_CONFIRMED_ADMIN
+        sync: false
+      - key: BREVO_ORDER_PROCESSING_TEMPLATE_ID
+        sync: false
+      - key: BREVO_TEMPLATE_ORDER_PROCESSING
+        sync: false
+      - key: BREVO_ORDER_SHIPPED_TEMPLATE_ID
+        sync: false
+      - key: BREVO_TEMPLATE_ORDER_SHIPPED
+        sync: false
+      - key: BREVO_ORDER_DELIVERED_TEMPLATE_ID
+        sync: false
+      - key: BREVO_TEMPLATE_ORDER_DELIVERED
+        sync: false
+      - key: BREVO_ORDER_CANCELLED_TEMPLATE_ID
+        sync: false
+      - key: BREVO_TEMPLATE_ORDER_CANCELLED
+        sync: false
+      - key: BREVO_TEMPLATE_PAYMENT_FAILED
+        sync: false
+      - key: BREVO_TEMPLATE_EMAIL_VERIFICATION_OTP
+        sync: false
+      - key: AEVRO_ADMIN_EMAIL
+        sync: false
+      - key: ADMIN_ORDER_NOTIFICATION_EMAIL
+        sync: false
+      - key: AEVRO_SUPPORT_EMAIL
+        sync: false
+      - key: SHIPROCKET_BASE_URL
+        value: https://apiv2.shiprocket.in/v1/external
+      - key: SHIPROCKET_EMAIL
+        sync: false
+      - key: SHIPROCKET_PASSWORD
+        sync: false
+      - key: SHIPROCKET_PICKUP_LOCATION
+        sync: false
+      - key: SHIPROCKET_WEBHOOK_SECRET
+        sync: false
+      - key: SHIPROCKET_DEFAULT_WEIGHT_KG
+        value: "0.5"
+      - key: SHIPROCKET_DEFAULT_LENGTH_CM
+        value: "30"
+      - key: SHIPROCKET_DEFAULT_BREADTH_CM
+        value: "25"
+      - key: SHIPROCKET_DEFAULT_HEIGHT_CM
+        value: "5"
+      - key: SHIPROCKET_ENABLED
+        value: "false"
+

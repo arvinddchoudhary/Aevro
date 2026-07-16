@@ -10,6 +10,7 @@ import { formatPrice } from '../../../lib/format';
 import type { AdminOrder, AdminOrderStatus } from '../../../types/admin/orders';
 import { EmptyState } from '../../ui/EmptyState';
 import { ErrorState } from '../../ui/ErrorState';
+import { AdminShipmentPanel } from './AdminShipmentPanel';
 
 const orderStatuses: AdminOrderStatus[] = [
   'PENDING',
@@ -66,6 +67,12 @@ export function AdminOrderDetailPageContent({ orderId }: { orderId: string }) {
     } finally {
       setIsSaving(false);
     }
+  };
+
+  const reloadOrder = async () => {
+    const nextOrder = await getAdminOrder(orderId);
+    setOrder(nextOrder);
+    setSelectedStatus(nextOrder.status);
   };
 
   if (isLoading) {
@@ -165,6 +172,7 @@ export function AdminOrderDetailPageContent({ orderId }: { orderId: string }) {
               </p>
             </div>
           </div>
+          <AdminShipmentPanel order={order} onOrderChanged={reloadOrder} />
         </section>
 
         <aside className="h-fit border border-[#ddd4c8] p-4 sm:p-5 lg:sticky lg:top-24">

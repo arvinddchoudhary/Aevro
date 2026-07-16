@@ -13,7 +13,11 @@ import {
 } from '../../auth/auth.constants';
 
 const SAFE_METHODS = new Set(['GET', 'HEAD', 'OPTIONS']);
-const WEBHOOK_PATHS = ['/api/v1/webhooks/razorpay', '/api/v1/webhooks/brevo'];
+const WEBHOOK_PATHS = [
+  '/api/v1/webhooks/razorpay',
+  '/api/v1/webhooks/brevo',
+  '/api/v1/webhooks/shiprocket',
+];
 
 @Injectable()
 export class OriginProtectionGuard implements CanActivate {

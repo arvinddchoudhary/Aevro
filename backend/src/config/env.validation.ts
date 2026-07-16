@@ -1,7 +1,9 @@
 import { plainToInstance, Transform } from 'class-transformer';
 import {
+  IsBoolean,
   IsEnum,
   IsInt,
+  IsNumber,
   IsOptional,
   IsString,
   IsUrl,
@@ -166,6 +168,55 @@ class EnvironmentVariables {
   @IsString()
   @IsOptional()
   AEVRO_SUPPORT_EMAIL?: string;
+
+  @IsUrl({ require_tld: false })
+  @IsOptional()
+  SHIPROCKET_BASE_URL = 'https://apiv2.shiprocket.in/v1/external';
+
+  @IsString()
+  @IsOptional()
+  SHIPROCKET_EMAIL?: string;
+
+  @IsString()
+  @IsOptional()
+  SHIPROCKET_PASSWORD?: string;
+
+  @IsString()
+  @IsOptional()
+  SHIPROCKET_PICKUP_LOCATION?: string;
+
+  @IsString()
+  @IsOptional()
+  SHIPROCKET_WEBHOOK_SECRET?: string;
+
+  @Transform(({ value }) => Number(value))
+  @IsNumber()
+  @Min(0.01)
+  @IsOptional()
+  SHIPROCKET_DEFAULT_WEIGHT_KG = 0.5;
+
+  @Transform(({ value }) => Number(value))
+  @IsNumber()
+  @Min(0.1)
+  @IsOptional()
+  SHIPROCKET_DEFAULT_LENGTH_CM = 30;
+
+  @Transform(({ value }) => Number(value))
+  @IsNumber()
+  @Min(0.1)
+  @IsOptional()
+  SHIPROCKET_DEFAULT_BREADTH_CM = 25;
+
+  @Transform(({ value }) => Number(value))
+  @IsNumber()
+  @Min(0.1)
+  @IsOptional()
+  SHIPROCKET_DEFAULT_HEIGHT_CM = 5;
+
+  @Transform(({ value }) => value === true || value === 'true')
+  @IsBoolean()
+  @IsOptional()
+  SHIPROCKET_ENABLED = false;
 }
 
 export function validateEnvironment(config: Record<string, unknown>) {

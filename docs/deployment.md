@@ -11,7 +11,24 @@ AEVRO is deployed as two separate services:
 
 Do not commit real secrets. Configure production values in the hosting dashboards.
 
+The repository includes a root-level `render.yaml` Blueprint for the backend.
+It declares all supported backend environment-variable names. Secret values use
+`sync: false`, so Render asks for them during initial Blueprint creation instead
+of storing them in Git. Render does not import a developer's local `.env` file.
+
 ## Frontend: Vercel
+
+### Vercel deployment steps
+
+1. Push the repository to GitHub or GitLab.
+2. In Vercel, select **Add New > Project** and import the repository.
+3. Set **Root Directory** to `frontend`.
+4. Keep the framework preset as **Next.js**.
+5. Add the frontend environment variables shown below for Production. Add them
+   to Preview as well if preview deployments should call the production API.
+6. Deploy. Copy the final `https://...vercel.app` URL.
+7. Set that exact URL in Render as both `FRONTEND_URL` and `CORS_ORIGINS`, then
+   redeploy or restart the backend.
 
 Set the project root to:
 
@@ -37,6 +54,24 @@ NEXT_PUBLIC_GOOGLE_CLIENT_ID=your-google-web-client-id.apps.googleusercontent.co
 
 ## Backend: Render
 
+### Render Blueprint deployment steps
+
+1. Create the Neon database and copy its pooled and direct connection strings.
+2. Push `render.yaml` to the repository's deployment branch.
+3. In Render, select **New > Blueprint** and connect the repository.
+4. Render detects the root `render.yaml` and creates the `aevro-api` web service.
+5. Enter every value requested for a `sync: false` variable. Use the Neon pooled
+   URL for `DATABASE_URL` and direct URL for `DIRECT_URL`.
+6. Use the intended Vercel URL for `FRONTEND_URL` and `CORS_ORIGINS`. Correct
+   both after Vercel provides its final URL if necessary.
+7. Keep `SHIPROCKET_ENABLED=false` until Shiprocket credentials, pickup location,
+   webhook secret, and staging tests are complete.
+8. Deploy and verify `/api/v1/health` and `/api/v1/health/database`.
+
+Render prompts for `sync: false` values only when creating a Blueprint for the
+first time. If the service already exists, add or update those variables from
+**Service > Environment**. Never copy real values into `render.yaml`.
+
 Set the service root to:
 
 ```bash
@@ -46,15 +81,21 @@ backend
 Recommended Render settings:
 
 - Runtime: Node
-- Build command: `npm install && npm run build && npm run prisma:generate`
-- Start command: `npm run start`
+- Build command: `npm ci && npm run prisma:generate && npm run build && npm run prisma:deploy`
+- Start command: `npm run start:prod`
 - Health check path: `/api/v1/health`
+
+The free plan does not support Render's pre-deploy command, so the Blueprint
+runs the idempotent Prisma migration deployment during the build. On a paid
+service, move `npm run prisma:deploy` to `preDeployCommand`.
 
 Backend environment variables:
 
 ```bash
 DATABASE_URL=postgresql://...
+DIRECT_URL=postgresql://...
 FRONTEND_URL=https://your-vercel-app.vercel.app
+CORS_ORIGINS=https://your-vercel-app.vercel.app
 BACKEND_URL=https://your-render-api.onrender.com
 JWT_ACCESS_SECRET=replace-with-strong-secret
 JWT_REFRESH_SECRET=replace-with-strong-secret
@@ -214,10 +255,29 @@ Frontend authenticated requests must use credentials/include.
 
 ## Health Checks
 
+The API supports both methods:
+
+```bash
+curl https://your-render-api.onrender.com/api/v1/health
+curl -I https://your-render-api.onrender.com/api/v1/health
+```
+
+The frontend performs one best-effort `GET` when a visible browser session
+opens. While the same tab remains visible, it performs a lightweight `HEAD`
+every 10 minutes. Hidden tabs do not ping. Errors are ignored so a cold backend
+does not break storefront rendering.
+
+This reduces cold starts for an actively browsing customer, but it does not
+guarantee continuous uptime. Render free services still spin down after 15
+minutes without incoming traffic, and Render explicitly positions free services
+for testing/hobby use rather than production. Use a paid instance for reliable
+always-on production availability.
+
 After deployment, verify:
 
 ```bash
 curl https://your-render-api.onrender.com/api/v1/health
+curl -I https://your-render-api.onrender.com/api/v1/health
 curl https://your-render-api.onrender.com/api/v1/health/database
 ```
 

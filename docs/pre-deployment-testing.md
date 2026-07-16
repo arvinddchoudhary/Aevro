@@ -114,6 +114,31 @@ These require running local services and real browser interaction.
 - No horizontal overflow on public, account, checkout, and admin pages.
 - No major browser console errors or failed normal-load API calls.
 
+## Shiprocket Pre-Deployment Checklist
+
+- Apply migration `000015_shiprocket_shipments` before enabling Shiprocket.
+- Confirm `SHIPROCKET_ENABLED=false` returns a clear safe admin error.
+- Confirm a paid `CONFIRMED` order can create exactly one shipment.
+- Confirm unpaid, cancelled, refunded, and pending orders cannot create shipments.
+- Repeat Create Shipment and confirm duplicate provider shipment creation is blocked.
+- Confirm missing phone, address, or delivery pincode fails before a provider call.
+- Confirm an invalid pickup location returns a safe admin message.
+- Load prepaid courier rates and confirm serviceability uses `cod=0`.
+- Assign an AWB using an explicitly selected courier.
+- Repeat AWB assignment and confirm the existing AWB is returned.
+- Schedule pickup and repeat the request to confirm idempotent local behavior.
+- Refresh tracking and confirm shipment/order status mapping is conservative.
+- Confirm customer order detail displays AWB, courier, tracking link, and timeline.
+- Confirm a customer cannot access another customer's tracking endpoint.
+- Confirm an admin can access any order's shipment/tracking data.
+- Send the same verified webhook twice and confirm no duplicate status side effects.
+- Send a webhook with a wrong/missing `X-API-Key` and confirm it returns forbidden.
+- Confirm Shiprocket webhook is not blocked by browser Origin protection.
+- Confirm cancellation never automatically refunds or cancels the AEVRO order.
+- Confirm RTO/undelivered updates stay in shipment state for admin handling.
+- Confirm provider timeout/4xx/5xx does not corrupt payment, stock, or order data.
+- Confirm logs and API responses contain no password, bearer token, or raw provider payload.
+
 ## Known Issues / Deployment Notes
 
 - Automated end-to-end tests are not present. Manual browser testing is still required before production.
