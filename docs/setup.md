@@ -159,6 +159,16 @@ BREVO_TEMPLATE_PAYMENT_FAILED=7
 BREVO_TEMPLATE_EMAIL_VERIFICATION_OTP=8
 AEVRO_ADMIN_EMAIL=orders@aevro.com
 AEVRO_SUPPORT_EMAIL=support@aevro.com
+SHIPROCKET_BASE_URL=https://apiv2.shiprocket.in/v1/external
+SHIPROCKET_EMAIL=
+SHIPROCKET_PASSWORD=
+SHIPROCKET_PICKUP_LOCATION=
+SHIPROCKET_WEBHOOK_SECRET=
+SHIPROCKET_DEFAULT_WEIGHT_KG=0.5
+SHIPROCKET_DEFAULT_LENGTH_CM=30
+SHIPROCKET_DEFAULT_BREADTH_CM=25
+SHIPROCKET_DEFAULT_HEIGHT_CM=5
+SHIPROCKET_ENABLED=false
 ```
 
 ## Neon + Prisma Setup
@@ -278,6 +288,34 @@ Recommended template variables:
 - `orderUrl`
 - `supportEmail`
 - `customerEmail`
+
+## Shiprocket Setup
+
+1. Create a Shiprocket account/API user according to the official Shiprocket
+   API onboarding documentation. Use a dedicated API credential where the
+   account supports one; do not use frontend environment variables.
+2. Add and verify the warehouse/pickup address in Shiprocket. Copy its exact
+   pickup-location name to `SHIPROCKET_PICKUP_LOCATION`.
+3. Set the backend-only email, password, pickup location, package defaults, and
+   a long random webhook secret. Keep `SHIPROCKET_ENABLED=false` until staging
+   verification is ready.
+4. Deploy migration `000015_shiprocket_shipments`, restart the backend, then set
+   `SHIPROCKET_ENABLED=true`.
+5. Configure Shiprocket tracking webhook URL as:
+
+```txt
+https://your-render-api.onrender.com/api/v1/webhooks/shiprocket
+```
+
+Configure its custom token/header as `X-API-Key` using the exact value in
+`SHIPROCKET_WEBHOOK_SECRET`. If the account UI cannot send this configured
+header, keep Shiprocket disabled until a verified gateway/header strategy is in
+place; do not expose an unverified webhook publicly.
+
+For local webhook testing, use a secure tunnel and a non-production Shiprocket
+account. Never paste Shiprocket credentials into curl history or frontend files.
+Local builds do not contact Shiprocket. Provider calls occur only from explicit
+admin shipment actions while the integration is enabled.
 - `customerPhone`
 - `customerPhoneText`
 - `paymentMethod`

@@ -5,6 +5,11 @@ import type {
   AdminOrdersResponse,
   AdminOrderStatus,
 } from '../../types/admin/orders';
+import type {
+  AdminShipment,
+  AdminShipmentState,
+  ShiprocketCourierRate,
+} from '../../types/shipping';
 import { authenticatedFetch } from './authenticated-request';
 
 class AdminOrdersApiError extends Error {
@@ -110,4 +115,62 @@ export async function updateAdminOrderStatus(
   }
 
   return response.data;
+}
+
+type ShipmentResponse<T> = {
+  success: true;
+  data: T;
+};
+
+function shipmentPath(id: string, suffix = '') {
+  return `/admin/orders/${encodeURIComponent(id)}/shipment${suffix}`;
+}
+
+export async function getAdminShipment(id: string) {
+  const response = await adminOrderRequest<ShipmentResponse<AdminShipmentState>>(
+    shipmentPath(id),
+  );
+  return response.data;
+}
+
+export async function getShiprocketRates(id: string) {
+  const response = await adminOrderRequest<ShipmentResponse<ShiprocketCourierRate[]>>(
+    shipmentPath(id, '/shiprocket/rates'),
+  );
+  return response.data;
+}
+
+async function shipmentMutation(
+  id: string,
+  action: string,
+  body?: Record<string, unknown>,
+) {
+  const response = await adminOrderRequest<ShipmentResponse<AdminShipment>>(
+    shipmentPath(id, `/shiprocket/${action}`),
+    {
+      method: 'POST',
+      body: body ? JSON.stringify(body) : undefined,
+    },
+  );
+  return response.data;
+}
+
+export function createShiprocketShipment(id: string) {
+  return shipmentMutation(id, 'create');
+}
+
+export function assignShiprocketAwb(id: string, courierId: number) {
+  return shipmentMutation(id, 'assign-awb', { courierId });
+}
+
+export function scheduleShiprocketPickup(id: string, pickupDate?: string) {
+  return shipmentMutation(id, 'pickup', pickupDate ? { pickupDate } : {});
+}
+
+export function cancelShiprocketShipment(id: string) {
+  return shipmentMutation(id, 'cancel');
+}
+
+export function refreshShiprocketTracking(id: string) {
+  return shipmentMutation(id, 'refresh-tracking');
 }

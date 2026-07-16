@@ -85,3 +85,35 @@ Initial enums:
 - Login/register
 - User orders
 - Admin dashboard
+
+## Shipping Architecture
+
+Shiprocket is isolated in `backend/src/shiprocket`. The controller handles HTTP
+contracts, `ShiprocketService` owns eligibility, idempotency, mapping, and state
+transitions, and `ShiprocketClient` owns authenticated provider HTTP calls and
+token caching. Orders retain their simple commercial lifecycle while `Shipment`
+stores the detailed fulfilment lifecycle.
+
+Version 1 is deliberately manual:
+
+```txt
+Razorpay verified -> Order CONFIRMED -> admin creates shipment
+-> admin selects courier/AWB -> admin schedules pickup
+-> webhook or manual refresh updates tracking -> customer sees sanitized status
+```
+
+The payment service does not import or invoke Shiprocket. Provider failure
+therefore cannot roll back payment verification, stock deduction, or order
+confirmation. A unique one-to-one `Shipment.orderId` and unique provider IDs
+prevent accidental duplicates. Webhook event hashes make repeated updates
+idempotent. Raw provider payloads remain backend-only and no token or password is
+stored in PostgreSQL.
+
+Order status mapping is intentionally conservative: created/AWB/pickup moves a
+confirmed order to `PROCESSING`; pickup/in-transit/out-for-delivery moves it to
+`SHIPPED`; delivery moves it to `DELIVERED`. Shipment cancellation, failure, and
+RTO do not automatically cancel or refund an order.
+
+A later version may auto-create shipments after stable staging/production
+operation, but it must reuse this service and idempotency boundary rather than
+adding provider calls to payment verification.

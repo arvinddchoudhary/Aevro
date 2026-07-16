@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { SiteChrome } from '../components/layout/SiteChrome';
+import { BackendActivityPing } from '../components/system/BackendActivityPing';
 import { AuthProvider } from '../lib/auth';
 import { CartProvider } from '../lib/cart';
 import {
@@ -76,6 +77,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className="aevro-shell">
+        <BackendActivityPing />
         <AuthProvider>
           <CartProvider>
             <SiteChrome>{children}</SiteChrome>

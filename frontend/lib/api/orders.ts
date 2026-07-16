@@ -3,6 +3,7 @@ import type {
   OrderResponse,
   OrdersResponse,
 } from '../../types/orders';
+import type { OrderTracking } from '../../types/shipping';
 import { authenticatedFetch } from './authenticated-request';
 
 class OrdersApiError extends Error {
@@ -142,4 +143,29 @@ export async function getOrder(
       message: 'Unable to load order.',
     };
   }
+}
+
+export async function getOrderTracking(id: string): Promise<OrderTracking | null> {
+  const response = await authenticatedFetch(
+    `/orders/${encodeURIComponent(id)}/tracking`,
+    { cache: 'no-store' },
+  );
+
+  if (!response.ok) {
+    throw new OrdersApiError(await parseErrorMessage(response), response.status);
+  }
+
+  const result = (await response.json()) as {
+    success: boolean;
+    data?: OrderTracking | null;
+    message?: string | string[];
+  };
+
+  if (!result.success) {
+    throw new OrdersApiError(
+      Array.isArray(result.message) ? result.message.join(' ') : result.message ?? 'Tracking request failed.',
+    );
+  }
+
+  return result.data ?? null;
 }

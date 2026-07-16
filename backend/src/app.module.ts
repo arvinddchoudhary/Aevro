@@ -13,6 +13,7 @@ import { NotificationsModule } from './notifications/notifications.module';
 import { OrdersModule } from './orders/orders.module';
 import { PaymentsModule } from './payments/payments.module';
 import { ProductsModule } from './products/products.module';
+import { ShiprocketModule } from './shiprocket/shiprocket.module';
 import { UsersApiModule } from './users/users-api.module';
 import { UsersModule } from './users/users.module';
 
@@ -33,6 +34,7 @@ import { UsersModule } from './users/users.module';
     ProductsModule,
     OrdersModule,
     PaymentsModule,
+    ShiprocketModule,
   ],
   providers: [
     {

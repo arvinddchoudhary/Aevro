@@ -3,18 +3,21 @@
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { getMyOrder } from '../../lib/api/orders';
+import { getMyOrder, getOrderTracking } from '../../lib/api/orders';
 import { useAuth } from '../../lib/auth';
 import { formatPrice } from '../../lib/format';
 import type { Order } from '../../types/orders';
+import type { OrderTracking } from '../../types/shipping';
 import { EmptyState } from '../ui/EmptyState';
 import { ErrorState } from '../ui/ErrorState';
 import { OrderStatusPill } from './OrderStatusPill';
+import { OrderTrackingPanel } from './OrderTrackingPanel';
 
 export function AccountOrderDetailsPageContent({ id }: { id: string }) {
   const router = useRouter();
   const { status } = useAuth();
   const [order, setOrder] = useState<Order | null>(null);
+  const [tracking, setTracking] = useState<OrderTracking | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -33,7 +36,10 @@ export function AccountOrderDetailsPageContent({ id }: { id: string }) {
       setIsLoading(true);
       setError(null);
 
-      const response = await getMyOrder(id);
+      const [response, trackingResult] = await Promise.all([
+        getMyOrder(id),
+        getOrderTracking(id).catch(() => null),
+      ]);
 
       if (!response.success) {
         setError(
@@ -46,6 +52,7 @@ export function AccountOrderDetailsPageContent({ id }: { id: string }) {
       }
 
       setOrder(response.data);
+      setTracking(trackingResult);
       setIsLoading(false);
     }
 
@@ -137,6 +144,7 @@ export function AccountOrderDetailsPageContent({ id }: { id: string }) {
             );
           })}
         </div>
+        <OrderTrackingPanel tracking={tracking} />
       </section>
 
       <aside className="h-fit border border-[#ddd4c8] p-6">

@@ -37,6 +37,26 @@ enum PaymentProvider {
   RAZORPAY
 }
 
+enum ShipmentProvider {
+  SHIPROCKET
+}
+
+enum ShipmentStatus {
+  PENDING
+  CREATED
+  AWB_ASSIGNED
+  PICKUP_SCHEDULED
+  PICKED_UP
+  IN_TRANSIT
+  OUT_FOR_DELIVERY
+  DELIVERED
+  UNDELIVERED
+  RTO_INITIATED
+  RTO_DELIVERED
+  CANCELLED
+  FAILED
+}
+
 enum PaymentAttemptStatus {
   CREATED
   CAPTURED
@@ -348,6 +368,7 @@ model Order {
   idempotencyKey     String?             @unique
   items              OrderItem[]
   payment            Payment?
+  shipment           Shipment?
   emailNotifications EmailNotification[]
   createdAt          DateTime            @default(now())
   updatedAt          DateTime            @updatedAt
@@ -355,6 +376,62 @@ model Order {
   @@index([userId])
   @@index([status])
   @@map("orders")
+}
+
+model Shipment {
+  id                    String                 @id @default(cuid())
+  orderId               String                 @unique
+  order                 Order                  @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  provider              ShipmentProvider       @default(SHIPROCKET)
+  providerOrderId       String?                @unique
+  providerShipmentId    String?                @unique
+  awbCode               String?                @unique
+  courierCompanyId      String?
+  courierCompanyName    String?
+  pickupLocation        String
+  trackingUrl           String?
+  status                ShipmentStatus         @default(PENDING)
+  statusLabel           String?
+  statusHistory         Json                   @default("[]")
+  weightKg              Float
+  lengthCm              Float
+  breadthCm             Float
+  heightCm              Float
+  shippingChargeInPaise Int?
+  estimatedDeliveryDate DateTime?
+  pickupScheduledAt     DateTime?
+  shippedAt             DateTime?
+  deliveredAt           DateTime?
+  cancelledAt           DateTime?
+  lastSyncedAt          DateTime?
+  rawProviderResponse   Json?
+  webhookEvents         ShipmentWebhookEvent[]
+  createdAt             DateTime               @default(now())
+  updatedAt             DateTime               @updatedAt
+
+  @@index([provider, status])
+  @@index([lastSyncedAt])
+  @@map("shipments")
+}
+
+model ShipmentWebhookEvent {
+  id           String             @id @default(cuid())
+  shipmentId   String?
+  shipment     Shipment?          @relation(fields: [shipmentId], references: [id], onDelete: SetNull)
+  provider     ShipmentProvider   @default(SHIPROCKET)
+  eventKey     String             @unique
+  eventType    String
+  payload      Json
+  status       WebhookEventStatus @default(RECEIVED)
+  processedAt  DateTime?
+  errorMessage String?
+  createdAt    DateTime           @default(now())
+  updatedAt    DateTime           @updatedAt
+
+  @@index([shipmentId])
+  @@index([provider, eventType])
+  @@index([status])
+  @@map("shipment_webhook_events")
 }
 
 model OrderItem {

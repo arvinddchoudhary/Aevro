@@ -6,6 +6,7 @@ The NestJS backend currently exposes these public routes:
 
 ```txt
 GET /api/v1/health
+HEAD /api/v1/health
 GET /api/v1/health/database
 POST /api/v1/auth/register
 POST /api/v1/auth/login
@@ -58,9 +59,54 @@ POST /api/v1/payments/razorpay/order
 POST /api/v1/payments/razorpay/verify
 POST /api/v1/webhooks/razorpay
 POST /api/v1/webhooks/brevo
+GET /api/v1/admin/orders/:orderId/shipment
+GET /api/v1/admin/orders/:orderId/shipment/shiprocket/rates
+POST /api/v1/admin/orders/:orderId/shipment/shiprocket/create
+POST /api/v1/admin/orders/:orderId/shipment/shiprocket/assign-awb
+POST /api/v1/admin/orders/:orderId/shipment/shiprocket/pickup
+POST /api/v1/admin/orders/:orderId/shipment/shiprocket/cancel
+POST /api/v1/admin/orders/:orderId/shipment/shiprocket/refresh-tracking
+GET /api/v1/orders/:orderId/tracking
+POST /api/v1/webhooks/shiprocket
 ```
 
 `GET /api/v1/health/database` verifies Prisma can connect to PostgreSQL.
+
+## Shiprocket Shipping API
+
+Shiprocket v1 is prepaid-only and admin controlled. Shipment creation is never
+called from payment verification. All admin shipment routes require the normal
+httpOnly admin session, `JwtAuthGuard`, `RolesGuard`, and the `ADMIN` role.
+
+### Admin workflow
+
+1. `POST .../shiprocket/create` creates one provider shipment for a paid,
+   confirmed order. The unique `Shipment.orderId` prevents duplicates.
+2. `GET .../shiprocket/rates` returns sanitized prepaid courier options.
+3. `POST .../shiprocket/assign-awb` accepts `{ "courierId": 10 }`.
+4. `POST .../shiprocket/pickup` accepts an optional
+   `{ "pickupDate": "2026-07-15" }`.
+5. `POST .../shiprocket/refresh-tracking` refreshes state by AWB.
+6. `POST .../shiprocket/cancel` cancels only an eligible shipment. It does not
+   cancel or refund the AEVRO order.
+
+`GET /api/v1/admin/orders/:orderId/shipment` returns configuration state and a
+sanitized admin shipment. Raw provider responses and credentials are omitted.
+
+### Customer tracking
+
+`GET /api/v1/orders/:orderId/tracking` requires authentication and enforces
+order ownership unless the current user is an admin. It returns status, label,
+AWB, courier, tracking URL, estimated delivery date, and timeline. It returns
+`data: null` before a shipment exists.
+
+### Shiprocket webhook
+
+`POST /api/v1/webhooks/shiprocket` is exempt from browser Origin/CSRF checks but
+requires `X-API-Key` to exactly match `SHIPROCKET_WEBHOOK_SECRET`. Configure the
+same token in the Shiprocket webhook settings. Duplicate payload transitions are
+deduplicated before order status or notification changes. The endpoint never
+uses browser cookies and never trusts an unverified request.
 
 ## Phase 11 Auth API
 
