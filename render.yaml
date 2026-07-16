@@ -61,27 +61,17 @@ services:
         sync: false
       - key: BREVO_ORDER_PROCESSING_TEMPLATE_ID
         sync: false
-      - key: BREVO_TEMPLATE_ORDER_PROCESSING
-        sync: false
-      - key: BREVO_ORDER_SHIPPED_TEMPLATE_ID
-        sync: false
       - key: BREVO_TEMPLATE_ORDER_SHIPPED
-        sync: false
-      - key: BREVO_ORDER_DELIVERED_TEMPLATE_ID
         sync: false
       - key: BREVO_TEMPLATE_ORDER_DELIVERED
         sync: false
       - key: BREVO_ORDER_CANCELLED_TEMPLATE_ID
-        sync: false
-      - key: BREVO_TEMPLATE_ORDER_CANCELLED
         sync: false
       - key: BREVO_TEMPLATE_PAYMENT_FAILED
         sync: false
       - key: BREVO_TEMPLATE_EMAIL_VERIFICATION_OTP
         sync: false
       - key: AEVRO_ADMIN_EMAIL
-        sync: false
-      - key: ADMIN_ORDER_NOTIFICATION_EMAIL
         sync: false
       - key: AEVRO_SUPPORT_EMAIL
         sync: false
@@ -105,4 +95,3 @@ services:
         value: "5"
       - key: SHIPROCKET_ENABLED
         value: "false"
-
