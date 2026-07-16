@@ -47,50 +47,51 @@ function orderImages(order: Order) {
       url: item.product?.images[0]?.url,
     }))
     .filter((image): image is { alt: string; url: string } => Boolean(image.url))
-    .slice(0, 3);
+    .slice(0, 1);
 }
 
 export function OrderRow({ order }: OrderRowProps) {
   const images = orderImages(order);
-  const hiddenItemCount = Math.max(order.items.length - images.length, 0);
+  const hiddenItemCount = Math.max(order.items.length - 1, 0);
   const paymentStatus = order.payment?.status ?? 'UNPAID';
   const paymentClass =
     paymentStatusStyles[paymentStatus as keyof typeof paymentStatusStyles] ??
     paymentStatusStyles.UNPAID;
 
   return (
-    <article className="border border-[#e1d8cc] bg-[#fffaf3]/80 p-3 transition hover:border-[#cfc1b1] sm:p-5">
-      <div className="grid gap-4 sm:gap-5 min-[1500px]:grid-cols-[180px_minmax(160px,1fr)_90px_100px_110px_150px_20px] min-[1500px]:items-center min-[1500px]:gap-4">
-        <div className="flex min-w-0 items-center gap-2 overflow-x-auto pb-1 min-[1500px]:pb-0">
-          {images.length > 0 ? (
-            images.map((image) => (
-              <span
-                key={`${order.id}-${image.url}`}
-                className="block h-14 w-14 shrink-0 overflow-hidden bg-[#eee5da] sm:h-16 sm:w-16"
-              >
-                <img src={image.url} alt={image.alt} className="h-full w-full object-cover" />
+    <article className="border-b border-[#e1d8cc] bg-[#fffdf8] p-4 transition last:border-b-0 hover:bg-[#fffaf3] sm:p-5">
+      <div className="grid gap-4 min-[1440px]:grid-cols-[72px_minmax(180px,1fr)_90px_100px_110px_140px_44px] min-[1440px]:items-center min-[1440px]:gap-4">
+        <div className="grid min-w-0 grid-cols-[72px_minmax(0,1fr)] items-center gap-4 min-[1440px]:contents">
+          <div className="relative h-[76px] w-[72px] overflow-hidden bg-[#eee5da]">
+            {images.length > 0 ? (
+              <img
+                src={images[0].url}
+                alt={images[0].alt}
+                className="h-full w-full object-cover"
+              />
+            ) : (
+              <span className="flex h-full w-full items-center justify-center text-[#7f7468]">
+                <AccountIcon name="bag" className="h-7 w-7" />
               </span>
-            ))
-          ) : (
-            <span className="flex h-16 w-16 shrink-0 items-center justify-center bg-[#eee5da] text-[#7f7468]">
-              <AccountIcon name="bag" className="h-7 w-7" />
-            </span>
-          )}
-          {hiddenItemCount > 0 && (
-            <span className="flex h-7 min-w-7 items-center justify-center rounded-full bg-[#111111] px-2 text-xs font-semibold text-[#fffaf3]">
-              {hiddenItemCount}
-            </span>
-          )}
+            )}
+            {hiddenItemCount > 0 && (
+              <span className="absolute bottom-1 right-1 flex h-6 min-w-6 items-center justify-center rounded-full bg-[#111111] px-1.5 text-[10px] font-semibold text-[#fffaf3]">
+                +{hiddenItemCount}
+              </span>
+            )}
+          </div>
+
+          <div className="min-w-0">
+            <h3 className="truncate font-serif text-lg text-[#111111]">
+              Order {order.orderNumber}
+            </h3>
+            <p className="mt-1 text-sm text-[#625a51]">
+              {formatOrderDate(order.createdAt)}
+            </p>
+          </div>
         </div>
 
-        <div className="min-w-0">
-          <h3 className="break-words text-base text-[#111111] sm:truncate sm:text-lg">
-            Order {order.orderNumber}
-          </h3>
-          <p className="mt-1 text-sm text-[#625a51]">{formatOrderDate(order.createdAt)}</p>
-        </div>
-
-        <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 min-[1500px]:contents">
+        <div className="grid grid-cols-2 gap-4 min-[390px]:grid-cols-3 min-[1440px]:contents">
           <div>
             <p className="text-xs uppercase tracking-[0.14em] text-[#777067]">
               Total
@@ -125,28 +126,22 @@ export function OrderRow({ order }: OrderRowProps) {
           </div>
         </div>
 
-        <div className="grid gap-2 sm:grid-cols-2 min-[1500px]:grid-cols-1">
+        <div className="grid grid-cols-[minmax(0,1fr)_44px] gap-2 min-[1440px]:contents">
           <Link
             href={`/account/orders/${order.id}`}
-            className="inline-flex h-10 items-center justify-center whitespace-nowrap bg-[#111111] px-5 text-xs font-medium uppercase tracking-[0.08em] text-[#fffaf3] transition hover:bg-[#2d2924]"
+            className="inline-flex h-11 items-center justify-center whitespace-nowrap bg-[#111111] px-5 font-serif text-sm text-[#fffaf3] transition hover:bg-[#2d2924]"
             style={{ color: '#fffaf3' }}
           >
             View Order
           </Link>
-          <button
-            type="button"
-            disabled
-            title="Tracking is not available yet"
-            className="inline-flex h-10 cursor-not-allowed items-center justify-center whitespace-nowrap border border-[#ddd4c8] px-5 text-xs font-medium uppercase tracking-[0.08em] text-[#8a8177]"
+          <Link
+            href={`/account/orders/${order.id}`}
+            aria-label={`View order ${order.orderNumber}`}
+            className="inline-flex h-11 w-11 items-center justify-center border border-[#ddd4c8] bg-[#fffdf8] text-[#111111] transition hover:border-[#111111]"
           >
-            Track Package
-          </button>
+            <AccountIcon name="chevron" className="h-4 w-4" />
+          </Link>
         </div>
-
-        <AccountIcon
-          name="chevron"
-          className="hidden h-5 w-5 text-[#111111] min-[1500px]:block"
-        />
       </div>
     </article>
   );
