@@ -39,6 +39,7 @@ POST /api/v1/admin/uploads/homepage-image
 GET /api/v1/homepage
 GET /api/v1/categories
 GET /api/v1/products
+GET /api/v1/products/suggestions?q=tro&limit=8
 GET /api/v1/products/:identifier
 GET /api/v1/users/me
 PATCH /api/v1/users/me
@@ -71,6 +72,44 @@ POST /api/v1/webhooks/shiprocket
 ```
 
 `GET /api/v1/health/database` verifies Prisma can connect to PostgreSQL.
+
+## Product Search and Catalog Filters
+
+```txt
+GET /api/v1/products
+```
+
+Supported query parameters:
+
+| Parameter | Description |
+| --- | --- |
+| `search` | Normalized full-text/trigram search, maximum 80 characters. |
+| `category` | One or more category slugs, comma-separated. |
+| `color` | One or more variant color slugs, comma-separated. |
+| `size` | One or more variant sizes, comma-separated. |
+| `minPrice` / `maxPrice` | Customer-facing price in INR. |
+| `inStock` | `true` limits results to available product or variant stock. |
+| `sort` | `relevance`, `featured`, `newest`, `price_asc`, or `price_desc`. |
+| `page` / `limit` | 1-based pagination; limit is capped at 100. |
+
+Example:
+
+```txt
+/api/v1/products?search=black%20trousers&color=black,beige&size=30,32&minPrice=1000&maxPrice=2500&inStock=true&sort=relevance&page=1&limit=24
+```
+
+Values are OR-ed within a facet and AND-ed across facets. Products are unique
+even when multiple variants match. The response retains legacy `meta` and also
+returns `pagination`, `appliedFilters`, and dynamic `facets` containing
+categories, colors, sizes, and price range. Fit, style, and material facets are
+empty because those fields do not exist in the current Prisma schema.
+
+Suggestions are returned by `GET /api/v1/products/suggestions?q=tro&limit=8`.
+They require at least two normalized characters, are deduplicated, and are
+ranked from active product names and indexed catalog text.
+
+Migration `000016_catalog_search` enables `pg_trgm`, creates the full-text and
+trigram indexes, and backfills the product search documents.
 
 ## Shiprocket Shipping API
 

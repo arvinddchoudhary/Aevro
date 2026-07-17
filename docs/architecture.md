@@ -8,8 +8,8 @@ The repository currently contains the production stack foundation:
 - `backend/`: NestJS + TypeScript REST API skeleton
 - `docs/`: Architecture, API, setup, and deployment notes
 
-Phase 2 adds the Prisma + Neon PostgreSQL foundation. Product, payment, upload,
-and auth business logic is not implemented yet.
+The repository now includes the Prisma + Neon PostgreSQL foundation and the
+implemented product, payment, upload, auth, order, and shipping modules.
 
 The backend foundation now includes:
 
@@ -117,3 +117,32 @@ RTO do not automatically cancel or refund an order.
 A later version may auto-create shipments after stable staging/production
 operation, but it must reuse this service and idempotency boundary rather than
 adding provider calls to payment verification.
+
+## Catalog Search Architecture
+
+Catalog search is implemented inside PostgreSQL rather than through an external
+search service. `ProductSearchDocument` stores denormalized searchable product,
+category, SKU, variant, color, and size text. Migration `000016_catalog_search`
+backfills existing products, and admin product writes synchronize the document
+inside their existing transactions.
+
+The migration enables `pg_trgm` once and creates a GIN index on the weighted
+`tsvector`, GIN trigram indexes on combined/name/category text, and a B-tree
+index on variant size. Queries use `websearch_to_tsquery('simple', ...)` for
+safe word matching and `similarity`/`%` for partial and typo-tolerant matching.
+Ranking favors exact product names, category matches, weighted full-text
+relevance, attribute matches, and then trigram similarity.
+
+The product service applies filters in SQL, with OR semantics inside a facet and
+AND semantics between facets. Fixed aggregate queries calculate current-context
+facet counts without one query per option. Products are paginated before
+serialization and variant joins are deduplicated by product ID.
+
+The current schema does not contain fit, style, material, or tag attributes, so
+those facets are intentionally empty. They should be added only with a formal
+catalog schema extension. The frontend keeps search, filters, sorting, and
+pagination in the URL; desktop uses a sidebar and mobile uses filter/sort sheets.
+
+A future OpenSearch/Elasticsearch migration is appropriate only if catalog scale,
+language support, analytics, or cross-entity search requirements exceed
+PostgreSQL's indexed capabilities.

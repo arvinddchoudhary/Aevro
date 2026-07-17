@@ -1,6 +1,7 @@
 import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
+import { ProductSearchIndexService } from '../products/search/product-search-index.service';
 import { CreateAdminCategoryDto } from './dto/admin-category.dto';
 import {
   AdminProductVariantDto,
@@ -13,7 +14,11 @@ import {
 export class AdminProductsService {
   private readonly lowStockThreshold = 5;
 
-  constructor(@Inject(PrismaService) private readonly prisma: PrismaService) {}
+  constructor(
+    @Inject(PrismaService) private readonly prisma: PrismaService,
+    @Inject(ProductSearchIndexService)
+    private readonly productSearchIndex: ProductSearchIndexService,
+  ) {}
 
   async listCategories() {
     return this.prisma.category.findMany({
@@ -65,6 +70,7 @@ export class AdminProductsService {
       });
 
       await this.createVariants(tx, createdProduct.id, dto.variants);
+      await this.productSearchIndex.syncProduct(createdProduct.id, tx);
 
       return this.findProductOrThrow(tx, createdProduct.id);
     });
@@ -115,6 +121,8 @@ export class AdminProductsService {
         await this.createVariants(tx, id, variantData);
       }
 
+      await this.productSearchIndex.syncProduct(id, tx);
+
     }, {
       maxWait: 10000,
       timeout: 20000,
@@ -134,12 +142,17 @@ export class AdminProductsService {
 
   async updateProductStatus(id: string, dto: UpdateAdminProductStatusDto) {
     await this.ensureProductExists(id);
-    const product = await this.prisma.product.update({
-      where: { id },
-      data: {
-        status: dto.status,
-      },
-      include: this.productInclude(),
+    const product = await this.prisma.$transaction(async (tx) => {
+      const updatedProduct = await tx.product.update({
+        where: { id },
+        data: {
+          status: dto.status,
+        },
+        include: this.productInclude(),
+      });
+
+      await this.productSearchIndex.syncProduct(id, tx);
+      return updatedProduct;
     });
 
     return this.serializeProduct(product);
