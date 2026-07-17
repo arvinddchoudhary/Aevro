@@ -1,18 +1,37 @@
 import { ProductStatus } from '@prisma/client';
 import { Transform } from 'class-transformer';
 import {
+  ArrayMaxSize,
+  IsArray,
+  IsBoolean,
   IsEnum,
   IsInt,
   IsOptional,
   IsString,
+  MaxLength,
   Max,
   Min,
 } from 'class-validator';
 
 export enum ProductSort {
+  Relevance = 'relevance',
+  Featured = 'featured',
   Newest = 'newest',
   PriceAsc = 'price_asc',
   PriceDesc = 'price_desc',
+}
+
+function parseMultiValue(value: unknown) {
+  if (value === undefined || value === null || value === '') {
+    return undefined;
+  }
+
+  const values = Array.isArray(value) ? value : [value];
+
+  return values
+    .flatMap((item) => String(item).split(','))
+    .map((item) => item.trim().toLowerCase())
+    .filter(Boolean);
 }
 
 export class ListProductsQueryDto {
@@ -29,21 +48,31 @@ export class ListProductsQueryDto {
   @IsOptional()
   limit = 12;
 
-  @IsString()
+  @Transform(({ value }) => parseMultiValue(value))
+  @IsArray()
+  @ArrayMaxSize(20)
+  @IsString({ each: true })
   @IsOptional()
-  category?: string;
+  category?: string[];
 
   @IsString()
+  @MaxLength(80)
   @IsOptional()
   search?: string;
 
-  @IsString()
+  @Transform(({ value }) => parseMultiValue(value))
+  @IsArray()
+  @ArrayMaxSize(20)
+  @IsString({ each: true })
   @IsOptional()
-  color?: string;
+  color?: string[];
 
-  @IsString()
+  @Transform(({ value }) => parseMultiValue(value))
+  @IsArray()
+  @ArrayMaxSize(20)
+  @IsString({ each: true })
   @IsOptional()
-  size?: string;
+  size?: string[];
 
   @IsEnum(ProductStatus)
   @IsOptional()
@@ -61,7 +90,26 @@ export class ListProductsQueryDto {
   @IsOptional()
   maxPrice?: number;
 
+  @Transform(({ value }) => {
+    if (value === undefined || value === '') {
+      return undefined;
+    }
+
+    if (value === true || value === 'true') {
+      return true;
+    }
+
+    if (value === false || value === 'false') {
+      return false;
+    }
+
+    return value;
+  })
+  @IsBoolean()
+  @IsOptional()
+  inStock?: boolean;
+
   @IsEnum(ProductSort)
   @IsOptional()
-  sort: ProductSort = ProductSort.Newest;
+  sort?: ProductSort;
 }

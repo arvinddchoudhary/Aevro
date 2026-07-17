@@ -1,5 +1,10 @@
 export type ProductStatus = 'DRAFT' | 'ACTIVE' | 'ARCHIVED';
-export type ProductSort = 'newest' | 'price_asc' | 'price_desc';
+export type ProductSort =
+  | 'relevance'
+  | 'featured'
+  | 'newest'
+  | 'price_asc'
+  | 'price_desc';
 
 export type Category = {
   id: string;
@@ -71,14 +76,47 @@ export type Product = {
 export type ProductListQuery = {
   page?: number;
   limit?: number;
-  category?: string;
+  category?: string | string[];
   search?: string;
-  color?: string;
-  size?: string;
+  color?: string | string[];
+  size?: string | string[];
   status?: ProductStatus;
   minPrice?: number;
   maxPrice?: number;
+  inStock?: boolean;
   sort?: ProductSort;
+};
+
+export type FacetOption = {
+  value: string;
+  label: string;
+  count: number;
+  hex?: string | null;
+};
+
+export type ProductFacets = {
+  categories: FacetOption[];
+  colors: FacetOption[];
+  sizes: FacetOption[];
+  fits: FacetOption[];
+  styles: FacetOption[];
+  materials: FacetOption[];
+  priceRange: {
+    min: number | null;
+    max: number | null;
+  };
+};
+
+export type AppliedProductFilters = {
+  search: string | null;
+  category: string[];
+  color: string[];
+  size: string[];
+  minPrice: number | null;
+  maxPrice: number | null;
+  inStock: boolean;
+  status: ProductStatus;
+  sort: ProductSort;
 };
 
 export type PaginationMeta = {
@@ -94,6 +132,9 @@ export type ApiCollectionResponse<T> = {
   success: true;
   data: T[];
   meta?: PaginationMeta;
+  pagination?: PaginationMeta;
+  appliedFilters?: AppliedProductFilters;
+  facets?: ProductFacets;
 };
 
 export type ApiItemResponse<T> =

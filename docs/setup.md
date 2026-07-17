@@ -201,6 +201,12 @@ backend/prisma/migrations/000007_homepage_cms/migration.sql
 backend/prisma/migrations/000008_razorpay_reliability_hardening/migration.sql
 backend/prisma/migrations/000009_brevo_email_notifications/migration.sql
 backend/prisma/migrations/000010_email_otp_address_label/migration.sql
+backend/prisma/migrations/000011_pending_registration_otp_gate/migration.sql
+backend/prisma/migrations/000012_email_otp_login/migration.sql
+backend/prisma/migrations/000013_wishlist/migration.sql
+backend/prisma/migrations/000014_order_status_email_events/migration.sql
+backend/prisma/migrations/000015_shiprocket_shipments/migration.sql
+backend/prisma/migrations/000016_catalog_search/migration.sql
 ```
 
 For deployed environments, use:
@@ -209,6 +215,24 @@ For deployed environments, use:
 cd backend
 npm run prisma:deploy
 ```
+
+### PostgreSQL Search Extension
+
+Catalog search uses PostgreSQL full-text search and `pg_trgm`. Migration
+`000016_catalog_search` runs `CREATE EXTENSION IF NOT EXISTS pg_trgm;` once and
+creates the search-document indexes. The Neon database role must be allowed to
+create extensions. If Neon rejects the migration, enable `pg_trgm` from the
+Neon SQL editor with an owner role, then rerun:
+
+```bash
+cd backend
+npm run prisma:generate
+npm run prisma:deploy
+```
+
+Do not execute the extension statement from an application request. Product
+price filters accept customer-facing INR values; the backend converts them to
+the stored `priceInPaise` representation.
 
 Open Prisma Studio locally:
 

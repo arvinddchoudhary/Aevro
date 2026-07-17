@@ -14,6 +14,11 @@ export class ProductsController {
     return this.productsService.listProducts(query);
   }
 
+  @Get('suggestions')
+  async getSuggestions(@Query('q') query?: string, @Query('limit') limit?: string) {
+    return this.productsService.getSuggestions(query, Number(limit ?? 8));
+  }
+
   @Get(':identifier')
   async getProduct(@Param('identifier') identifier: string) {
     const product = await this.productsService.getPublicProduct(identifier);

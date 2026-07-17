@@ -3,6 +3,7 @@ import { AuthModule } from '../auth/auth.module';
 import { HomepageModule } from '../homepage/homepage.module';
 import { NotificationsModule } from '../notifications/notifications.module';
 import { PrismaModule } from '../prisma/prisma.module';
+import { ProductsModule } from '../products/products.module';
 import { UploadsModule } from '../uploads/uploads.module';
 import { AdminController } from './admin.controller';
 import { AdminHomepageController } from './admin-homepage.controller';
@@ -16,6 +17,7 @@ import { AdminUploadsController } from './admin-uploads.controller';
   imports: [
     AuthModule,
     PrismaModule,
+    ProductsModule,
     UploadsModule,
     HomepageModule,
     NotificationsModule,

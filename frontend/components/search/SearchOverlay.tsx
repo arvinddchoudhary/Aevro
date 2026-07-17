@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { getProducts } from '../../lib/api/catalog';
+import { getProductSuggestions, getProducts } from '../../lib/api/catalog';
 import { formatPrice } from '../../lib/format';
 import type { Product } from '../../types/catalog';
 
@@ -53,6 +53,9 @@ export function SearchOverlay({ isOpen, onClose }: SearchOverlayProps) {
   const [query, setQuery] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [results, setResults] = useState<Product[]>([]);
+  const [backendSuggestions, setBackendSuggestions] = useState<string[]>([]);
+  const [activeSuggestion, setActiveSuggestion] = useState(-1);
+  const [isSuggestionLoading, setIsSuggestionLoading] = useState(false);
   const [error, setError] = useState('');
 
   const normalizedQuery = normalizeQuery(query);
@@ -71,8 +74,8 @@ export function SearchOverlay({ isOpen, onClose }: SearchOverlayProps) {
       suggestion.toLowerCase().includes(lowered),
     );
 
-    return Array.from(new Set([...mappedSuggestions, ...matchingSuggestions])).slice(0, 8);
-  }, [normalizedQuery]);
+    return Array.from(new Set([...backendSuggestions, ...mappedSuggestions, ...matchingSuggestions])).slice(0, 8);
+  }, [backendSuggestions, normalizedQuery]);
 
   const goToSearch = (term = normalizedQuery) => {
     const nextQuery = normalizeQuery(term);
@@ -125,7 +128,7 @@ export function SearchOverlay({ isOpen, onClose }: SearchOverlayProps) {
         const response = await getProducts({
           search: normalizedQuery,
           limit: 6,
-        });
+        }, { signal: controller.signal });
 
         if (!controller.signal.aborted) {
           setResults(response.data);
@@ -141,6 +144,39 @@ export function SearchOverlay({ isOpen, onClose }: SearchOverlayProps) {
         }
       }
     }, 300);
+
+    return () => {
+      controller.abort();
+      window.clearTimeout(timeoutId);
+    };
+  }, [isOpen, normalizedQuery]);
+
+  useEffect(() => {
+    if (!isOpen || normalizedQuery.length < 2) {
+      setBackendSuggestions([]);
+      setIsSuggestionLoading(false);
+      setActiveSuggestion(-1);
+      return;
+    }
+
+    const controller = new AbortController();
+    const timeoutId = window.setTimeout(async () => {
+      try {
+        setIsSuggestionLoading(true);
+        const response = await getProductSuggestions(normalizedQuery, {
+          limit: 8,
+          signal: controller.signal,
+        });
+
+        if (!controller.signal.aborted) {
+          setBackendSuggestions(response.data.map((suggestion) => suggestion.label));
+        }
+      } catch {
+        if (!controller.signal.aborted) setBackendSuggestions([]);
+      } finally {
+        if (!controller.signal.aborted) setIsSuggestionLoading(false);
+      }
+    }, 250);
 
     return () => {
       controller.abort();
@@ -221,6 +257,21 @@ export function SearchOverlay({ isOpen, onClose }: SearchOverlayProps) {
                 id="aevro-search-input"
                 value={query}
                 onChange={(event) => setQuery(event.target.value)}
+                onKeyDown={(event) => {
+                  if (event.key === 'ArrowDown') {
+                    event.preventDefault();
+                    setActiveSuggestion((current) => Math.min(current + 1, smartSuggestions.length - 1));
+                  }
+                  if (event.key === 'ArrowUp') {
+                    event.preventDefault();
+                    setActiveSuggestion((current) => Math.max(current - 1, -1));
+                  }
+                  if (event.key === 'Enter' && activeSuggestion >= 0) {
+                    event.preventDefault();
+                    goToSearch(smartSuggestions[activeSuggestion]);
+                  }
+                  if (event.key === 'Escape') onClose();
+                }}
                 placeholder="Search trousers, black trousers, pleated trousers..."
                 className="h-14 w-full border border-[#a89078] bg-[#fffdf8]/72 pl-14 pr-4 font-serif text-lg font-light text-[#111111] outline-none transition placeholder:text-[#82786f] focus:border-[#111111] sm:h-[72px] sm:pl-16 sm:text-[1.8rem]"
                 aria-label="Search products"
@@ -242,12 +293,15 @@ export function SearchOverlay({ isOpen, onClose }: SearchOverlayProps) {
               Suggestions
             </p>
             <div className="mt-4 grid gap-1.5">
-              {smartSuggestions.map((suggestion) => (
+              {isSuggestionLoading && normalizedQuery.length >= 2 ? (
+                <p className="px-2 text-xs uppercase tracking-[0.12em] text-[#77716a]">Finding matches...</p>
+              ) : null}
+              {smartSuggestions.map((suggestion, index) => (
                 <button
                   key={suggestion}
                   type="button"
                   onClick={() => goToSearch(suggestion)}
-                className="flex min-h-11 cursor-pointer items-center justify-between gap-3 border border-[#d8cfc2] bg-[#fbf7f0]/70 px-4 text-left text-[0.66rem] font-semibold uppercase tracking-[0.18em] text-[#3d3732] transition hover:border-[#111111] hover:bg-[#fffdf8] sm:h-[46px] sm:text-[0.7rem] sm:tracking-[0.24em]"
+                  className={`flex min-h-11 cursor-pointer items-center justify-between gap-3 border border-[#d8cfc2] bg-[#fbf7f0]/70 px-4 text-left text-[0.66rem] font-semibold uppercase tracking-[0.18em] text-[#3d3732] transition hover:border-[#111111] hover:bg-[#fffdf8] sm:h-[46px] sm:text-[0.7rem] sm:tracking-[0.24em] ${activeSuggestion === index ? 'border-[#111111] bg-[#fffdf8]' : ''}`}
                 >
                   <span>{suggestion}</span>
                   <span aria-hidden="true" className="text-lg font-light text-[#8a8177]">
@@ -333,7 +387,7 @@ export function SearchOverlay({ isOpen, onClose }: SearchOverlayProps) {
             ) : (
               <div className="border border-[#e1d8cc] bg-[#fffaf3]/72 p-6">
                 <h2 className="font-serif text-2xl font-light text-[#111111]">
-                  No exact matches found.
+                  No products match this search.
                 </h2>
                 <p className="mt-2 text-sm leading-6 text-[#625a51]">
                   Try trousers, wide leg trousers, black trousers, or formal trousers.

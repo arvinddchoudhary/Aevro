@@ -151,3 +151,21 @@ These require running local services and real browser interaction.
 Build/typecheck readiness: Passed.
 
 Production readiness: Conditionally ready after completing the manual browser checklist against local/staging services, especially Razorpay, Brevo, Google login, and checkout.
+
+## Catalog Search and Filter Checklist
+
+- Apply migration `000016_catalog_search` on staging and confirm `pg_trgm` and its indexes exist.
+- Search `trousers` and confirm trouser-category products are returned.
+- Search `TROUSERS` and confirm case-insensitive results.
+- Search a close typo such as `trouserz` and confirm suitable trigram matches.
+- Search `black trousers` and confirm products matching both terms rank first.
+- Search `wide leg trousers`, `pleated trousers`, and `formal trousers`.
+- Filter by one category, multiple colors, multiple sizes, and `inStock=true`.
+- Confirm variant-aware filters never duplicate a product card.
+- Confirm `minPrice` and `maxPrice` use INR values and invalid ranges return HTTP 400.
+- Confirm relevance, featured, newest, low-price, and high-price sorting.
+- Confirm facet counts are dynamic and no unavailable hardcoded options appear.
+- Confirm suggestions debounce, cancel stale requests, deduplicate, and support keyboard selection.
+- Confirm empty results show clear filters and do not claim valid trousers do not exist.
+- Confirm search, filters, sorting, pagination, reload, and browser back/forward preserve URL state.
+- Confirm 360px, 390px, 430px, 768px, and desktop catalog layouts have no horizontal overflow.

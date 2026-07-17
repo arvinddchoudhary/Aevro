@@ -9,7 +9,8 @@ import type {
 const API_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8000/api/v1';
 
 type RequestOptions = {
-  params?: Record<string, string | number | boolean | undefined>;
+  params?: Record<string, string | string[] | number | boolean | undefined>;
+  signal?: AbortSignal;
 };
 
 class ApiError extends Error {
@@ -26,7 +27,11 @@ function buildUrl(path: string, params?: RequestOptions['params']) {
 
   Object.entries(params ?? {}).forEach(([key, value]) => {
     if (value !== undefined && value !== '') {
-      url.searchParams.set(key, String(value));
+      const normalized = Array.isArray(value) ? value.filter(Boolean).join(',') : String(value);
+
+      if (normalized) {
+        url.searchParams.set(key, normalized);
+      }
     }
   });
 
@@ -36,6 +41,7 @@ function buildUrl(path: string, params?: RequestOptions['params']) {
 async function request<T>(path: string, options: RequestOptions = {}): Promise<T> {
   const response = await fetch(buildUrl(path, options.params), {
     cache: 'no-store',
+    signal: options.signal,
   });
 
   if (!response.ok) {
@@ -53,9 +59,26 @@ export async function getCategories(options?: { includeEmpty?: boolean }) {
   return response.data;
 }
 
-export async function getProducts(query: ProductListQuery = {}) {
+export async function getProducts(
+  query: ProductListQuery = {},
+  options?: { signal?: AbortSignal },
+) {
   return request<ApiCollectionResponse<Product>>('/products', {
     params: query,
+    signal: options?.signal,
+  });
+}
+
+export async function getProductSuggestions(
+  query: string,
+  options?: { limit?: number; signal?: AbortSignal },
+) {
+  return request<{
+    success: true;
+    data: { label: string; type: string; slug: string | null }[];
+  }>('/products/suggestions', {
+    params: { q: query, limit: options?.limit },
+    signal: options?.signal,
   });
 }
 
