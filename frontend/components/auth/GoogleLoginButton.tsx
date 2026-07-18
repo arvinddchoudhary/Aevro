@@ -1,8 +1,8 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
-import { requestGoogleIdToken } from '../../lib/google';
+import { useEffect, useRef, useState } from 'react';
+import { renderGoogleSignInButton } from '../../lib/google';
 import { useAuth } from '../../lib/auth';
 
 type GoogleLoginButtonProps = {
@@ -16,40 +16,81 @@ export function GoogleLoginButton({
 }: GoogleLoginButtonProps) {
   const router = useRouter();
   const { googleLogin } = useAuth();
+  const buttonContainerRef = useRef<HTMLDivElement>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [isReady, setIsReady] = useState(false);
   const googleClientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
 
-  const handleGoogleLogin = async () => {
-    if (!googleClientId) {
-      onError('Google login is not configured.');
+  useEffect(() => {
+    const container = buttonContainerRef.current;
+
+    if (!googleClientId || !container) {
+      if (!googleClientId) {
+        onError('Google login is not configured.');
+      }
       return;
     }
 
-    setIsLoading(true);
+    let cancelled = false;
 
-    try {
-      const idToken = await requestGoogleIdToken(googleClientId);
-      await googleLogin({ idToken });
-      router.push(redirectTo);
-      router.refresh();
-    } catch (error) {
-      onError(error instanceof Error ? error.message : 'Google login failed.');
-    } finally {
-      setIsLoading(false);
-    }
-  };
+    const handleCredential = async (idToken: string) => {
+      if (cancelled) {
+        return;
+      }
+
+      setIsLoading(true);
+      try {
+        await googleLogin({ idToken });
+        router.push(redirectTo);
+        router.refresh();
+      } catch (error) {
+        onError(error instanceof Error ? error.message : 'Google login failed.');
+      } finally {
+        if (!cancelled) {
+          setIsLoading(false);
+        }
+      }
+    };
+
+    void renderGoogleSignInButton({
+      clientId: googleClientId,
+      container,
+      onCredential: handleCredential,
+    })
+      .then(() => {
+        if (!cancelled) {
+          setIsReady(true);
+        }
+      })
+      .catch((error) => {
+        if (!cancelled) {
+          onError(error instanceof Error ? error.message : 'Unable to load Google login.');
+        }
+      });
+
+    return () => {
+      cancelled = true;
+      container.replaceChildren();
+    };
+  }, [googleClientId, googleLogin, onError, redirectTo, router]);
 
   return (
-    <button
-      type="button"
-      disabled={isLoading}
-      onClick={handleGoogleLogin}
-      className="flex h-14 w-full items-center justify-center gap-3 border border-[#cfc7bc] bg-transparent text-xs font-semibold uppercase tracking-[0.16em] transition hover:border-[#111111] hover:bg-[#fffaf3] disabled:cursor-not-allowed disabled:text-[#777777]"
-    >
-      <span className="text-lg font-bold normal-case tracking-normal text-[#4285f4]">
-        G
-      </span>
-      {isLoading ? 'Opening Google' : 'Continue with Google'}
-    </button>
+    <div className="relative min-h-14">
+      <div
+        ref={buttonContainerRef}
+        className="flex min-h-14 w-full items-center justify-center"
+        aria-label="Continue with Google"
+      />
+      {!isReady && (
+        <div className="absolute inset-0 flex items-center justify-center border border-[#cfc7bc] bg-[#fffaf3] text-xs font-semibold uppercase tracking-[0.16em] text-[#777777]">
+          Loading Google
+        </div>
+      )}
+      {isLoading && (
+        <div className="absolute inset-0 flex items-center justify-center bg-[#111111] text-xs font-semibold uppercase tracking-[0.16em] text-white">
+          Signing in
+        </div>
+      )}
+    </div>
   );
 }

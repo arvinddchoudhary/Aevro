@@ -9,7 +9,18 @@ type GoogleAccountsId = {
     client_id: string;
     callback: (response: GoogleCredentialResponse) => void;
   }) => void;
-  prompt: () => void;
+  renderButton: (
+    element: HTMLElement,
+    options: {
+      type: 'standard';
+      theme: 'outline';
+      size: 'large';
+      text: 'continue_with';
+      shape: 'rectangular';
+      width: number;
+      logo_alignment: 'left';
+    },
+  ) => void;
 };
 
 declare global {
@@ -50,28 +61,40 @@ export function loadGoogleIdentityScript() {
   return googleScriptPromise;
 }
 
-export async function requestGoogleIdToken(clientId: string) {
+export async function renderGoogleSignInButton({
+  clientId,
+  container,
+  onCredential,
+}: {
+  clientId: string;
+  container: HTMLElement;
+  onCredential: (idToken: string) => void;
+}) {
   await loadGoogleIdentityScript();
 
-  return new Promise<string>((resolve, reject) => {
-    const googleId = window.google?.accounts?.id;
+  const googleId = window.google?.accounts?.id;
 
-    if (!googleId) {
-      reject(new Error('Google login is not available.'));
-      return;
-    }
+  if (!googleId) {
+    throw new Error('Google login is not available.');
+  }
 
-    googleId.initialize({
-      client_id: clientId,
-      callback: (response) => {
-        if (response.credential) {
-          resolve(response.credential);
-          return;
-        }
+  googleId.initialize({
+    client_id: clientId,
+    callback: (response) => {
+      if (response.credential) {
+        onCredential(response.credential);
+      }
+    },
+  });
 
-        reject(new Error('Google did not return an ID token.'));
-      },
-    });
-    googleId.prompt();
+  container.replaceChildren();
+  googleId.renderButton(container, {
+    type: 'standard',
+    theme: 'outline',
+    size: 'large',
+    text: 'continue_with',
+    shape: 'rectangular',
+    width: Math.max(280, Math.floor(container.getBoundingClientRect().width)),
+    logo_alignment: 'left',
   });
 }
