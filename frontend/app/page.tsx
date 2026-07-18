@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import type { Metadata } from 'next';
+import { LandingHeroSlider } from '../components/home/LandingHeroSlider';
 import { ProductCard } from '../components/products/ProductCard';
 import { EmptyState } from '../components/ui/EmptyState';
 import { ErrorState } from '../components/ui/ErrorState';
@@ -41,77 +42,7 @@ export default async function HomePage() {
 
   return (
     <main className="text-[#111111]">
-      <section className="border-b border-[#ddd4c8] md:hidden">
-        <div className="relative h-[300px] overflow-hidden bg-[#fbf7f0] min-[390px]:h-[310px] min-[430px]:h-[320px]">
-          <img
-            src="/images/brand/hero-trousers.webp"
-            alt="AEVRO tailored ivory trousers"
-            className="absolute inset-0 h-full w-full object-cover object-[64%_center]"
-          />
-          <div className="absolute inset-0 bg-[linear-gradient(90deg,#fbf7f0_0%,rgba(251,247,240,0.97)_38%,rgba(251,247,240,0.72)_57%,rgba(251,247,240,0.08)_82%,rgba(251,247,240,0)_100%)]" />
-          <div className="relative z-10 flex h-full items-start px-5 pb-10 pt-6 min-[390px]:px-6 min-[390px]:pt-7">
-            <div className="max-w-[220px] min-w-0">
-              <p className="max-w-[9rem] text-[9px] font-semibold uppercase leading-[0.95rem] tracking-[0.08em]">
-                <span className="block">Timeless form.</span>
-                <span className="block">Modern presence.</span>
-              </p>
-              <h1 className="mt-2.5 max-w-[220px] text-[32px] font-light uppercase leading-[0.95] tracking-normal min-[390px]:text-[34px]">
-                <span className="block">Tailored</span>
-                <span className="block">to define.</span>
-              </h1>
-              <p className="mt-2.5 max-w-[190px] text-[11px] leading-[1.5] text-[#514c45] min-[390px]:text-[12px]">
-                Refined trousers and elevated essentials crafted for the way you
-                live and dress.
-              </p>
-              <Link
-                href="/products"
-                className="group mt-3 inline-flex h-11 w-[160px] items-center justify-center gap-2.5 rounded-[3px] border border-[#111111] bg-[#111111] px-3 text-[10px] font-semibold uppercase tracking-[0.08em] text-[#fffaf3] shadow-[0_10px_22px_rgba(17,17,17,0.12)] transition duration-300 hover:bg-[#fffaf3] hover:text-[#111111]"
-              >
-                <span className="text-[#fffaf3] group-hover:text-[#111111]">Shop trousers</span>
-                <span className="text-[#fffaf3] group-hover:text-[#111111]" aria-hidden="true">→</span>
-              </Link>
-            </div>
-          </div>
-          <div className="absolute bottom-2.5 left-1/2 z-10 flex -translate-x-1/2 items-center gap-1.5" aria-hidden="true">
-            <span className="h-1.5 w-1.5 rounded-full bg-[#111111]" />
-            <span className="h-1.5 w-1.5 rounded-full bg-[#fffaf3]" />
-            <span className="h-1.5 w-1.5 rounded-full bg-[#fffaf3]" />
-          </div>
-        </div>
-      </section>
-      <section className="hidden border-b border-[#ddd4c8] md:block">
-        <div className="relative h-[500px] overflow-hidden lg:aspect-[2880/1100] lg:h-auto lg:min-h-0">
-          <img
-            src="/images/brand/hero-trousers.webp"
-            alt="AEVRO tailored ivory trousers"
-            className="absolute inset-0 h-full w-full object-cover object-center"
-          />
-          <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(251,247,240,0.82)_0%,rgba(251,247,240,0.72)_28%,rgba(251,247,240,0.2)_52%,rgba(251,247,240,0)_76%)]" />
-          <div className="relative flex h-full items-center px-12 py-12 lg:min-h-full lg:px-20 xl:px-28">
-            <div className="max-w-[520px] lg:max-w-2xl">
-              <p className="text-xs font-semibold uppercase leading-5 tracking-[0.08em]">
-                <span className="block">Timeless form.</span>
-                <span className="block">Modern presence.</span>
-              </p>
-              <h1 className="mt-5 max-w-[430px] text-6xl font-light uppercase leading-[0.98] tracking-normal xl:text-8xl">
-                <span className="block">Tailored</span>
-                <span className="block">to define.</span>
-              </h1>
-              <p className="mt-5 max-w-sm text-sm leading-7 text-[#514c45] lg:mt-6 lg:max-w-md">
-                Refined trousers and elevated essentials crafted for the way you
-                live and dress.
-              </p>
-              <Link
-                href="/products"
-                className="group mt-6 inline-flex min-h-[3.25rem] min-w-44 items-center justify-center gap-4 rounded-[4px] border border-[#111111] bg-[#111111] px-7 py-3.5 text-xs font-semibold uppercase tracking-[0.08em] text-[#fffaf3] shadow-[0_12px_28px_rgba(17,17,17,0.13)] transition duration-300 hover:bg-[#fffaf3] hover:text-[#111111] lg:mt-8 lg:px-8 lg:py-4 lg:text-sm"
-              >
-                <span className="text-[#fffaf3] group-hover:text-[#111111]">Shop trousers</span>
-                <span className="text-[#fffaf3] group-hover:text-[#111111]" aria-hidden="true">→</span>
-              </Link>
-            </div>
-          </div>
-        </div>
-      </section>
+      <LandingHeroSlider />
       <MobileHomeBenefits />
 
       <section className="aevro-container py-6 sm:py-14">
@@ -422,84 +353,12 @@ function renderHomepageSection(
   if (section.type === 'HERO') {
     return (
       <div key={section.id}>
-      <section className="border-b border-[#ddd4c8] md:hidden">
-        <div className="relative h-[300px] overflow-hidden bg-[#fbf7f0] min-[390px]:h-[310px] min-[430px]:h-[320px]">
-          <img
-            src={section.imageUrl ?? '/images/brand/hero-trousers.webp'}
-            alt={section.title ?? 'AEVRO homepage hero'}
-            className="absolute inset-0 h-full w-full object-cover object-[64%_center]"
-          />
-          <div className="absolute inset-0 bg-[linear-gradient(90deg,#fbf7f0_0%,rgba(251,247,240,0.97)_38%,rgba(251,247,240,0.72)_57%,rgba(251,247,240,0.08)_82%,rgba(251,247,240,0)_100%)]" />
-          <div className="relative z-10 flex h-full items-start px-5 pb-10 pt-6 min-[390px]:px-6 min-[390px]:pt-7">
-            <div className="max-w-[220px] min-w-0">
-              <p className="max-w-[9rem] text-[9px] font-semibold uppercase leading-[0.95rem] tracking-[0.08em]">
-                <span className="block">Timeless form.</span>
-                <span className="block">Modern presence.</span>
-              </p>
-              <h1 className="mt-2.5 max-w-[220px] text-[32px] font-light uppercase leading-[0.95] tracking-normal min-[390px]:text-[34px]">
-                <span className="block">Tailored</span>
-                <span className="block">to define.</span>
-              </h1>
-              {section.description ? (
-                <p className="mt-2.5 max-w-[190px] text-[11px] leading-[1.5] text-[#514c45] min-[390px]:text-[12px]">
-                  {section.description}
-                </p>
-              ) : null}
-              <Link
-                href={section.ctaHref ?? '/products'}
-                className="group mt-3 inline-flex h-11 w-[160px] items-center justify-center gap-2.5 rounded-[3px] border border-[#111111] bg-[#111111] px-3 text-[10px] font-semibold uppercase tracking-[0.08em] text-[#fffaf3] shadow-[0_10px_22px_rgba(17,17,17,0.12)] transition duration-300 hover:bg-[#fffaf3] hover:text-[#111111]"
-              >
-                <span className="text-[#fffaf3] group-hover:text-[#111111]">
-                  {section.ctaLabel?.trim() || 'Shop trousers'}
-                </span>
-                <span aria-hidden="true">→</span>
-              </Link>
-            </div>
-          </div>
-          <div className="absolute bottom-2.5 left-1/2 z-10 flex -translate-x-1/2 items-center gap-1.5" aria-hidden="true">
-            <span className="h-1.5 w-1.5 rounded-full bg-[#111111]" />
-            <span className="h-1.5 w-1.5 rounded-full bg-[#fffaf3]" />
-            <span className="h-1.5 w-1.5 rounded-full bg-[#fffaf3]" />
-          </div>
-        </div>
-      </section>
-      <section className="hidden border-b border-[#ddd4c8] md:block">
-        <div className="relative h-[500px] overflow-hidden lg:aspect-[2880/1100] lg:h-auto lg:min-h-0">
-          <img
-            src={section.imageUrl ?? '/images/brand/hero-trousers.webp'}
-            alt={section.title ?? 'AEVRO homepage hero'}
-            className="absolute inset-0 h-full w-full object-cover object-center"
-          />
-          <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(251,247,240,0.82)_0%,rgba(251,247,240,0.72)_28%,rgba(251,247,240,0.2)_52%,rgba(251,247,240,0)_76%)]" />
-          <div className="relative flex h-full items-center px-12 py-12 lg:min-h-full lg:px-20 xl:px-28">
-            <div className="max-w-[520px] lg:max-w-2xl">
-              <p className="text-xs font-semibold uppercase leading-5 tracking-[0.08em]">
-                <span className="block">Timeless form.</span>
-                <span className="block">Modern presence.</span>
-              </p>
-              <h1 className="mt-5 max-w-[430px] text-6xl font-light uppercase leading-[0.98] tracking-normal xl:text-8xl">
-                <span className="block">Tailored</span>
-                <span className="block">to define.</span>
-              </h1>
-              {section.description ? (
-                <p className="mt-5 max-w-sm text-sm leading-7 text-[#514c45] lg:mt-6 lg:max-w-md">
-                  {section.description}
-                </p>
-              ) : null}
-              <Link
-                href={section.ctaHref ?? '/products'}
-                className="group mt-6 inline-flex min-h-[3.25rem] min-w-44 items-center justify-center gap-4 rounded-[4px] border border-[#111111] bg-[#111111] px-7 py-3.5 text-xs font-semibold uppercase tracking-[0.08em] text-[#fffaf3] shadow-[0_12px_28px_rgba(17,17,17,0.13)] transition duration-300 hover:bg-[#fffaf3] hover:text-[#111111] lg:mt-8 lg:px-8 lg:py-4 lg:text-sm"
-              >
-                <span className="text-[#fffaf3] group-hover:text-[#111111]">
-                  {section.ctaLabel?.trim() || 'Shop trousers'}
-                </span>
-                <span aria-hidden="true">→</span>
-              </Link>
-            </div>
-          </div>
-        </div>
-      </section>
-      <MobileHomeBenefits />
+        <LandingHeroSlider
+          description={section.description}
+          ctaHref={section.ctaHref}
+          ctaLabel={section.ctaLabel}
+        />
+        <MobileHomeBenefits />
       </div>
     );
   }
