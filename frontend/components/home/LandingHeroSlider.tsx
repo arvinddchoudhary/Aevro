@@ -55,9 +55,9 @@ export function LandingHeroSlider({
               <span className="block">Timeless form.</span>
               <span className="block">Modern presence.</span>
             </p>
-            <h1 className="mt-2.5 max-w-[220px] text-[32px] font-light uppercase leading-[0.95] tracking-normal min-[390px]:text-[34px] md:mt-5 md:max-w-[430px] md:text-6xl md:leading-[0.98] xl:text-8xl">
+            <h1 className="mt-2.5 max-w-[240px] text-[32px] font-light uppercase leading-[0.95] tracking-normal min-[390px]:text-[34px] md:mt-5 md:max-w-none md:text-[clamp(64px,7vw,96px)]">
               <span className="block">Tailored</span>
-              <span className="block">to define.</span>
+              <span className="block whitespace-nowrap">to define.</span>
             </h1>
             <p className="mt-2.5 max-w-[190px] text-[11px] leading-[1.5] text-[#514c45] min-[390px]:text-[12px] md:mt-5 md:max-w-sm md:text-sm md:leading-7 lg:mt-6 lg:max-w-md">
               {descriptionText}
