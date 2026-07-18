@@ -215,6 +215,7 @@ model AuthAccount {
   updatedAt         DateTime     @updatedAt
 
   @@unique([provider, providerAccountId])
+  @@unique([userId, provider])
   @@index([userId])
   @@map("auth_accounts")
 }

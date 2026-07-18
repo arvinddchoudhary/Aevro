@@ -207,11 +207,14 @@ export function Header() {
 
   const handleLogout = async () => {
     setIsLoggingOut(true);
-    await logout();
-    setIsLoggingOut(false);
-    closeMenu();
-    router.push('/');
-    router.refresh();
+    try {
+      await logout();
+      closeMenu();
+      router.push('/');
+      router.refresh();
+    } finally {
+      setIsLoggingOut(false);
+    }
   };
 
   const mobileLinks = [
