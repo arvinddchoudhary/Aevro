@@ -143,26 +143,27 @@ export default async function ProductsPage({
 
   return (
     <main>
-      <section className="border-b border-[#ddd4c8] lg:hidden">
-        <div className="relative h-[200px] overflow-hidden bg-[#d8bea0] min-[390px]:h-[220px]">
+      <section className="relative h-[270px] overflow-hidden border-b border-[#ddd4c8] bg-[#a98861] min-[390px]:h-[290px] lg:hidden">
+        <div className="absolute inset-0">
           <Image
-            src="/images/brand/Shop-Page-Hero.webp"
+            src="/images/brand/hero-trousers.webp"
             alt="AEVRO trouser collection"
             fill
             priority
             unoptimized
             sizes="100vw"
-            className="object-contain object-right"
+            className="object-cover object-[78%_center]"
           />
         </div>
-        <div className="bg-[#fbf7f0] px-5 py-7 min-[390px]:px-6">
-          <p className="text-[10px] font-semibold uppercase tracking-[0.08em]">
+        <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(34,23,14,0.72)_0%,rgba(34,23,14,0.52)_42%,rgba(34,23,14,0.14)_67%,rgba(34,23,14,0)_100%)]" />
+        <div className="relative flex h-full w-[58%] min-w-0 flex-col justify-center px-5 py-6 text-[#fffaf3] min-[390px]:px-6">
+          <p className="text-[8px] font-semibold uppercase leading-3 tracking-[0.08em] min-[390px]:text-[9px]">
             Home / <span className="font-bold">Trousers</span>
           </p>
-          <h1 className="mt-3 text-[2rem] font-light uppercase leading-none min-[390px]:text-[2.15rem]">
+          <h1 className="mt-2 text-[1.6rem] font-light uppercase leading-none min-[390px]:text-[1.75rem]">
             Trousers
           </h1>
-          <p className="mt-4 max-w-[22rem] text-[12px] leading-[1.65] text-[#3f3933] min-[390px]:text-[13px]">
+          <p className="mt-3 text-[11px] leading-[1.55] text-[#fffaf3]/90 min-[390px]:text-[12px]">
             Refined silhouettes. Timeless style. Explore our collection of trousers crafted for comfort, versatility, and effortless elegance.
           </p>
         </div>
