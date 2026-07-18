@@ -144,23 +144,17 @@ function DesktopAction({
   href,
   label,
   icon,
-  boxed = false,
   count,
 }: {
   href: string;
   label: string;
   icon: ReactNode;
-  boxed?: boolean;
   count?: number;
 }) {
   return (
     <Link
       href={href}
-      className={`relative inline-flex min-h-12 cursor-pointer items-center justify-center gap-2.5 px-3 text-[0.66rem] font-semibold uppercase tracking-[0.18em] text-[#111111] transition hover:bg-[#efe8df]/70 ${
-        boxed
-          ? 'rounded-[6px] border border-[#cfc4b6] bg-[#fbf7f0]/62 px-4 shadow-[0_8px_24px_rgba(49,37,26,0.03)]'
-          : ''
-      }`}
+      className="relative inline-flex min-h-12 cursor-pointer items-center justify-center gap-2.5 px-3 text-[0.66rem] font-semibold uppercase tracking-[0.18em] text-[#111111] transition hover:bg-[#efe8df]/70"
       aria-label={label}
     >
       <span className="text-[#111111]">{icon}</span>
@@ -276,7 +270,6 @@ export function Header() {
             href="/account/wishlist"
             label="WISHLIST"
             icon={<HeartIcon />}
-            boxed
           />
           <DesktopAction href="/cart" label="BAG" icon={<BagIcon />} count={itemCount} />
         </div>

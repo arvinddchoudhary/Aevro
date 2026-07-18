@@ -325,9 +325,10 @@ export function CheckoutPageContent() {
           <div className="mt-6 flex flex-col gap-3 sm:flex-row">
             <Link
               href="/login?redirect=%2Fcheckout"
-              className="inline-flex h-11 items-center justify-center bg-[#111111] px-6 text-xs font-semibold uppercase tracking-[0.12em] text-[#fffaf3] hover:bg-[#2a2825]"
+              className="inline-flex h-11 shrink-0 items-center justify-center whitespace-nowrap bg-[#111111] px-6 text-xs font-semibold uppercase tracking-[0.12em] text-[#fffaf3] hover:bg-[#2a2825]"
+              style={{ color: '#fffaf3' }}
             >
-              Login
+              <span className="text-[#fffaf3]">Login</span>
             </Link>
             <Link
               href="/register?redirect=%2Fcheckout"
