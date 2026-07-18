@@ -65,7 +65,18 @@ These require running local services and real browser interaction.
 - Login with password.
 - Login with OTP.
 - Google login with configured Google OAuth client.
+- Google login succeeds from `https://theaevro.com` and
+  `https://www.theaevro.com`; `GOOGLE_CLIENT_ID` and
+  `NEXT_PUBLIC_GOOGLE_CLIENT_ID` are the same Web Client ID.
+- Invalid, expired, wrong-audience, and unverified-email Google credentials
+  return safe authentication errors without token data in logs.
+- A password user signing in through Google is linked without changing their
+  password or role; concurrent first Google callbacks do not duplicate users.
+- A matching pending signup registration is removed after successful Google
+  login and cannot later overwrite account credentials through OTP verification.
 - Logout.
+- Simulate a logout API failure and confirm the UI remains authenticated,
+  reports a safe retryable error to the caller, and re-enables logout controls.
 - Refresh session after page reload.
 - Confirm `/api/v1/auth/me` works after login.
 - Confirm no JWTs appear in localStorage/sessionStorage.

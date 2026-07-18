@@ -195,10 +195,13 @@ export function AddressesPageContent() {
 
   const handleLogout = async () => {
     setIsLoggingOut(true);
-    await logout();
-    setIsLoggingOut(false);
-    router.replace('/login');
-    router.refresh();
+    try {
+      await logout();
+      router.replace('/login');
+      router.refresh();
+    } finally {
+      setIsLoggingOut(false);
+    }
   };
 
   if (status === 'loading') {

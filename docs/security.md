@@ -115,6 +115,32 @@ Logout behavior:
 - Logout clears both auth cookies.
 - Already-issued access tokens remain valid until their short expiry; logout
   prevents future refresh with the revoked refresh token.
+- The frontend clears authenticated user state only after the logout endpoint
+  confirms success. A failed request leaves the current client state intact and
+  returns a safe retryable error.
+
+### Google Identity Services Login
+
+- The browser receives a Google Identity Services credential and sends only
+  `{ idToken }` to `POST /api/v1/auth/google`.
+- The backend verifies the credential for `GOOGLE_CLIENT_ID`; invalid,
+  expired, wrong-audience, wrong-issuer, malformed, and invalid-signature
+  credentials return a safe `401` response.
+- Google login requires the `email_verified` claim. A matching existing Google
+  provider identity is used first; otherwise a matching normalized email is
+  linked atomically without changing an existing password hash or role.
+- A successful verified Google login deletes a matching `PendingRegistration`
+  inside the same database transaction, preventing a later signup OTP from
+  creating conflicting credentials.
+- `AuthAccount` is unique for both `(provider, providerAccountId)` and
+  `(userId, provider)`. Before applying migration
+  `000017_auth_account_provider_per_user_uniqueness`, check for duplicate
+  `(userId, provider)` rows and resolve each deliberately; no rows were found
+  in the configured database during implementation.
+- Production authorized JavaScript origins are exactly
+  `https://theaevro.com` and `https://www.theaevro.com`. The current GIS
+  credential callback does not need redirect URIs. The frontend and backend
+  must use the same Google Web Client ID.
 
 ### Origin / CSRF Protection
 

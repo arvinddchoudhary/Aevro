@@ -185,10 +185,28 @@ export function resendEmailOtp(email: string) {
 }
 
 export async function logout() {
-  await fetch(buildApiUrl('/auth/logout'), {
+  const response = await fetch(buildApiUrl('/auth/logout'), {
     method: 'POST',
     credentials: 'include',
   });
+
+  if (!response.ok) {
+    throw new AuthApiError('Unable to end your secure session. Please try again.', response.status);
+  }
+
+  try {
+    const payload = (await response.json()) as AuthActionResponse<{ loggedOut: boolean }>;
+
+    if (!payload.success || !payload.data.loggedOut) {
+      throw new AuthApiError('Unable to end your secure session. Please try again.');
+    }
+  } catch (error) {
+    if (error instanceof AuthApiError) {
+      throw error;
+    }
+
+    throw new AuthApiError('Unable to confirm that your secure session was ended. Please try again.');
+  }
 }
 
 export async function getCurrentUser() {

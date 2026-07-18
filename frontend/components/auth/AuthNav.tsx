@@ -12,10 +12,13 @@ export function AuthNav() {
 
   const handleLogout = async () => {
     setIsLoggingOut(true);
-    await logout();
-    setIsLoggingOut(false);
-    router.push('/');
-    router.refresh();
+    try {
+      await logout();
+      router.push('/');
+      router.refresh();
+    } finally {
+      setIsLoggingOut(false);
+    }
   };
 
   if (status === 'loading') {

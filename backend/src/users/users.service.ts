@@ -323,47 +323,97 @@ export class UsersService {
   }
 
   async upsertGoogleUser(input: UpsertGoogleUserInput) {
-    const email = input.email.toLowerCase();
-    const account = await this.prisma.authAccount.findUnique({
-      where: {
-        provider_providerAccountId: {
-          provider: AuthProvider.GOOGLE,
-          providerAccountId: input.providerAccountId,
-        },
-      },
-      include: {
-        user: true,
-      },
-    });
+    const normalizedInput = {
+      ...input,
+      email: input.email.trim().toLowerCase(),
+    };
 
-    if (account) {
-      return account.user;
+    // A unique conflict can occur when two first-time callbacks arrive together.
+    // Retry once after the winner has committed, then return the same linked user.
+    for (let attempt = 0; attempt < 2; attempt += 1) {
+      try {
+        return await this.prisma.$transaction((tx) =>
+          this.upsertGoogleUserInTransaction(tx, normalizedInput),
+        );
+      } catch (error) {
+        if (!this.isUniqueConstraintError(error) || attempt === 1) {
+          throw error;
+        }
+
+        const linkedAccount = await this.findGoogleAccount(
+          normalizedInput.providerAccountId,
+        );
+
+        if (linkedAccount) {
+          await this.prisma.pendingRegistration.deleteMany({
+            where: { email: normalizedInput.email },
+          });
+          return linkedAccount.user;
+        }
+      }
     }
 
-    const existingUser = await this.findByEmail(email);
+    throw new ConflictException('Unable to link the Google account. Please try again.');
+  }
+
+  private async upsertGoogleUserInTransaction(
+    tx: Prisma.TransactionClient,
+    input: UpsertGoogleUserInput,
+  ) {
+    const linkedAccount = await this.findGoogleAccount(input.providerAccountId, tx);
+
+    if (linkedAccount) {
+      await tx.pendingRegistration.deleteMany({ where: { email: input.email } });
+      return linkedAccount.user;
+    }
+
+    const existingUser = await tx.user.findUnique({
+      where: { email: input.email },
+    });
 
     if (existingUser) {
-      return this.prisma.user.update({
+      const existingGoogleAccount = await tx.authAccount.findUnique({
         where: {
-          id: existingUser.id,
-        },
-        data: {
-          name: existingUser.name || input.name,
-          emailVerified: existingUser.emailVerified || input.emailVerified,
-          authAccounts: {
-            create: {
-              provider: AuthProvider.GOOGLE,
-              providerAccountId: input.providerAccountId,
-            },
+          userId_provider: {
+            userId: existingUser.id,
+            provider: AuthProvider.GOOGLE,
           },
         },
       });
+
+      if (existingGoogleAccount) {
+        throw new ConflictException('This email is already linked to another Google account.');
+      }
+
+      await tx.authAccount.create({
+        data: {
+          userId: existingUser.id,
+          provider: AuthProvider.GOOGLE,
+          providerAccountId: input.providerAccountId,
+        },
+      });
+
+      const user =
+        !existingUser.name.trim() || (!existingUser.emailVerified && input.emailVerified)
+          ? await tx.user.update({
+              where: { id: existingUser.id },
+              data: {
+                ...(existingUser.name.trim() ? {} : { name: input.name }),
+                ...(existingUser.emailVerified || !input.emailVerified
+                  ? {}
+                  : { emailVerified: true }),
+              },
+            })
+          : existingUser;
+
+      await tx.pendingRegistration.deleteMany({ where: { email: input.email } });
+      return user;
     }
 
-    return this.prisma.user.create({
+    const user = await tx.user.create({
       data: {
         name: input.name,
-        email,
+        email: input.email,
         role: UserRole.CUSTOMER,
         emailVerified: input.emailVerified,
         authAccounts: {
@@ -374,6 +424,34 @@ export class UsersService {
         },
       },
     });
+
+    await tx.pendingRegistration.deleteMany({ where: { email: input.email } });
+    return user;
+  }
+
+  private findGoogleAccount(
+    providerAccountId: string,
+    client: Pick<Prisma.TransactionClient, 'authAccount'> = this.prisma,
+  ) {
+    return client.authAccount.findUnique({
+      where: {
+        provider_providerAccountId: {
+          provider: AuthProvider.GOOGLE,
+          providerAccountId,
+        },
+      },
+      include: { user: true },
+    });
+  }
+
+  private isUniqueConstraintError(error: unknown) {
+    return (
+      error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2002'
+    ) ||
+      (typeof error === 'object' &&
+        error !== null &&
+        'code' in error &&
+        error.code === 'P2002');
   }
 
   serializeUser(user: User) {

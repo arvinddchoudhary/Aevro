@@ -9,7 +9,7 @@ import {
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { AuthProvider, User, UserRole } from '@prisma/client';
-import { OAuth2Client } from 'google-auth-library';
+import { OAuth2Client, TokenPayload } from 'google-auth-library';
 import {
   createHmac,
   randomBytes,
@@ -304,14 +304,23 @@ export class AuthService {
       throw new ServiceUnavailableException('Google login is not configured.');
     }
 
-    const ticket = await this.googleClient.verifyIdToken({
-      idToken: dto.idToken,
-      audience: this.googleClientId,
-    });
-    const payload = ticket.getPayload();
+    let payload: TokenPayload | undefined;
+
+    try {
+      const ticket = await this.googleClient.verifyIdToken({
+        idToken: dto.idToken,
+        audience: this.googleClientId,
+      });
+      payload = ticket.getPayload();
+    } catch {
+      // Never log a credential, decoded claims, or the provider error object.
+      this.logger.warn('Google credential verification failed: verification_rejected');
+      throw new UnauthorizedException('Invalid or expired Google credential.');
+    }
 
     if (!payload?.sub || !payload.email) {
-      throw new UnauthorizedException('Invalid Google token.');
+      this.logger.warn('Google credential verification failed: required_claims_missing');
+      throw new UnauthorizedException('Invalid or expired Google credential.');
     }
 
     if (!payload.email_verified) {

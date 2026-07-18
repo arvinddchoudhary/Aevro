@@ -449,10 +449,13 @@ Subscribe the webhook to:
 2. Create or select a project.
 3. Configure the OAuth consent screen.
 4. Create an OAuth 2.0 Client ID for a web application.
-5. Add local frontend origin, for example:
+5. Add authorized JavaScript origins for every frontend that will render the
+   Google Identity Services button:
 
 ```txt
 http://localhost:3000
+https://theaevro.com
+https://www.theaevro.com
 ```
 
 6. Copy the client id into `backend/.env`:
@@ -475,6 +478,16 @@ POST http://localhost:8000/api/v1/auth/google
 
 The backend verifies the ID token and creates the same httpOnly cookie session
 used by email/password login.
+
+AEVRO uses the Google Identity Services credential callback, not a
+redirect-based OAuth flow. No authorized redirect URI is required for the
+current implementation. Add one only if the implementation changes to a
+redirect-based Google OAuth flow. `GOOGLE_CLIENT_ID` and
+`NEXT_PUBLIC_GOOGLE_CLIENT_ID` must contain the same Google Web Client ID.
+
+Before production release, verify that Google login succeeds at both production
+origins, rejects an unverified Google email, and does not place Google or AEVRO
+session tokens in browser storage.
 
 ## Cloudinary Product Image Setup
 

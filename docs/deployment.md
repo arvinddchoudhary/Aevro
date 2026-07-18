@@ -236,11 +236,16 @@ Use the same Google OAuth web client id in:
 Google Console authorized JavaScript origins:
 
 ```text
-https://your-vercel-app.vercel.app
 http://localhost:3000
+https://theaevro.com
+https://www.theaevro.com
 ```
 
-If using a custom domain, add that domain too.
+AEVRO uses Google Identity Services' credential callback. The current flow does
+not require an authorized redirect URI; add redirect URIs only if a future
+implementation switches to redirect-based OAuth. `GOOGLE_CLIENT_ID` on Render
+and `NEXT_PUBLIC_GOOGLE_CLIENT_ID` on Vercel must be the same Google Web Client
+ID.
 
 ## Production Cookies And CORS
 
@@ -301,7 +306,12 @@ Expected:
 - Brevo API key and template IDs added only to backend.
 - Brevo webhook points to `/api/v1/webhooks/brevo`.
 - Brevo sender domain has DKIM, DMARC, and SPF configured.
-- Google OAuth origins configured for localhost and deployed frontend.
+- Google OAuth origins configured for `http://localhost:3000`,
+  `https://theaevro.com`, and `https://www.theaevro.com`.
+- Render `GOOGLE_CLIENT_ID` and Vercel `NEXT_PUBLIC_GOOGLE_CLIENT_ID` reference
+  the same Web Client ID.
+- Google credential callback verified on both production origins; invalid and
+  unverified-email credentials are rejected safely.
 - `FRONTEND_URL` matches deployed frontend URL exactly.
 - CORS credentials enabled.
 - Auth cookies set correctly cross-domain.
