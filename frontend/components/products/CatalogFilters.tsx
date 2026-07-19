@@ -48,12 +48,10 @@ function OptionList({
   options,
   selected,
   onToggle,
-  showSwatch = false,
 }: {
   options: FacetOption[];
   selected: string[];
   onToggle: (value: string) => void;
-  showSwatch?: boolean;
 }) {
   if (options.length === 0) {
     return <p className="text-sm text-[#77716a]">No matching options.</p>;
@@ -70,13 +68,6 @@ function OptionList({
             className={`flex min-h-10 cursor-pointer items-center justify-between gap-3 border px-3 text-sm ${checked ? 'border-[#111111] bg-[#eee5da]' : 'border-[#ddd4c8] bg-[#fffaf3]'}`}
           >
             <span className="flex min-w-0 items-center gap-2">
-              {showSwatch ? (
-                <span
-                  aria-hidden="true"
-                  className="h-4 w-4 shrink-0 rounded-full border border-[#111111]/25"
-                  style={{ backgroundColor: option.hex ?? '#d8cfc2' }}
-                />
-              ) : null}
               <span className="truncate">{option.label}</span>
             </span>
             <span className="shrink-0 text-xs text-[#77716a]">{option.count}</span>
@@ -115,23 +106,6 @@ function FilterFields({
           options={facets.categories}
           selected={draft.category}
           onToggle={(value) => update('category', toggleValue(draft.category, value))}
-        />
-      </fieldset>
-      <fieldset>
-        <legend className="mb-3 text-xs font-semibold uppercase tracking-[0.12em]">Color</legend>
-        <OptionList
-          options={facets.colors}
-          selected={draft.color}
-          showSwatch
-          onToggle={(value) => update('color', toggleValue(draft.color, value))}
-        />
-      </fieldset>
-      <fieldset>
-        <legend className="mb-3 text-xs font-semibold uppercase tracking-[0.12em]">Size</legend>
-        <OptionList
-          options={facets.sizes}
-          selected={draft.size}
-          onToggle={(value) => update('size', toggleValue(draft.size, value))}
         />
       </fieldset>
       <fieldset>
@@ -213,12 +187,6 @@ export function CatalogFilters({ facets, current, total }: CatalogFiltersProps) 
       <div className="mb-5 flex flex-wrap items-center gap-2 text-xs uppercase tracking-[0.08em] lg:hidden">
         {current.category.map((value) => (
           <button key={`category-${value}`} type="button" onClick={() => remove('category', value)} className="border border-[#d8cfc2] bg-[#fffaf3] px-3 py-2">{facets.categories.find((item) => item.value === value)?.label ?? value} ×</button>
-        ))}
-        {current.color.map((value) => (
-          <button key={`color-${value}`} type="button" onClick={() => remove('color', value)} className="border border-[#d8cfc2] bg-[#fffaf3] px-3 py-2">{facets.colors.find((item) => item.value === value)?.label ?? value} ×</button>
-        ))}
-        {current.size.map((value) => (
-          <button key={`size-${value}`} type="button" onClick={() => remove('size', value)} className="border border-[#d8cfc2] bg-[#fffaf3] px-3 py-2">Size {value} ×</button>
         ))}
         {current.minPrice !== undefined || current.maxPrice !== undefined ? (
           <button type="button" onClick={() => apply({ ...current, minPrice: undefined, maxPrice: undefined })} className="border border-[#d8cfc2] bg-[#fffaf3] px-3 py-2">
