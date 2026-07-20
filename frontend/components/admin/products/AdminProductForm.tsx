@@ -120,6 +120,14 @@ function validateImageFiles(files: File[], existingCount: number) {
   return null;
 }
 
+function normalizeImageOrder(images: UploadedProductImage[]) {
+  return images.map((image, sortOrder) => ({
+    ...image,
+    sortOrder,
+    isPrimary: sortOrder === 0,
+  }));
+}
+
 function FieldLabel({ children }: { children: string }) {
   return (
     <span className="mb-2 block text-xs font-medium uppercase tracking-[0.16em] text-[#625a51]">
@@ -202,13 +210,15 @@ function productToVariants(product?: AdminProduct): VariantForm[] {
     size: variant.size,
     stock: String(variant.stock),
     sku: variant.sku ?? '',
-    images: variant.images.map((image, index) => ({
-      url: image.url,
-      publicId: image.publicId,
-      altText: image.altText ?? undefined,
-      sortOrder: image.sortOrder ?? index,
-      isPrimary: image.isPrimary ?? index === 0,
-    })),
+    images: normalizeImageOrder(
+      variant.images.map((image, index) => ({
+        url: image.url,
+        publicId: image.publicId,
+        altText: image.altText ?? undefined,
+        sortOrder: image.sortOrder ?? index,
+        isPrimary: image.isPrimary ?? index === 0,
+      })),
+    ),
   }));
 }
 
@@ -238,6 +248,10 @@ export function AdminProductForm({ product }: AdminProductFormProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isCreatingCategory, setIsCreatingCategory] = useState(false);
   const [uploadingIndex, setUploadingIndex] = useState<number | null>(null);
+  const [draggedImage, setDraggedImage] = useState<{
+    variantIndex: number;
+    imageIndex: number;
+  } | null>(null);
 
   useEffect(() => {
     async function loadCategories() {
@@ -281,12 +295,40 @@ export function AdminProductForm({ product }: AdminProductFormProps) {
         index === variantIndex
           ? {
               ...variant,
-              images: variant.images.filter(
-                (image) => (image.publicId ?? image.url) !== imageKey,
+              images: normalizeImageOrder(
+                variant.images.filter(
+                  (image) => (image.publicId ?? image.url) !== imageKey,
+                ),
               ),
             }
           : variant,
       ),
+    );
+  };
+
+  const moveVariantImage = (
+    variantIndex: number,
+    fromIndex: number,
+    toIndex: number,
+  ) => {
+    setVariants((current) =>
+      current.map((variant, index) => {
+        if (
+          index !== variantIndex ||
+          fromIndex === toIndex ||
+          fromIndex < 0 ||
+          toIndex < 0 ||
+          fromIndex >= variant.images.length ||
+          toIndex >= variant.images.length
+        ) {
+          return variant;
+        }
+
+        const images = [...variant.images];
+        const [movedImage] = images.splice(fromIndex, 1);
+        images.splice(toIndex, 0, movedImage);
+        return { ...variant, images: normalizeImageOrder(images) };
+      }),
     );
   };
 
@@ -350,7 +392,9 @@ export function AdminProductForm({ product }: AdminProductFormProps) {
         colorSlug: variant.colorSlug,
       });
       updateVariant(index, {
-        images: [...variant.images, ...images].slice(0, MAX_IMAGES_PER_COLOR),
+        images: normalizeImageOrder(
+          [...variant.images, ...images].slice(0, MAX_IMAGES_PER_COLOR),
+        ),
       });
     } catch (uploadError) {
       setUploadErrors((current) => ({
@@ -612,7 +656,7 @@ export function AdminProductForm({ product }: AdminProductFormProps) {
                 Product images
               </p>
               <p className="mt-3 text-sm leading-6 text-[#625a51]">
-                Upload images for each color. Recommended: 1080x1350px or higher.
+                Upload images for each color. Drag to arrange them; the first image is the primary product image. Recommended: 1080x1350px or higher.
               </p>
             </div>
             <div className="space-y-5">
@@ -648,10 +692,27 @@ export function AdminProductForm({ product }: AdminProductFormProps) {
                       </span>
                     </label>
                     <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 xl:grid-cols-5">
-                      {variant.images.map((image) => (
+                      {variant.images.map((image, imageIndex) => (
                         <div
                           key={image.publicId ?? image.url}
-                          className="group relative aspect-square overflow-hidden rounded-[6px] bg-[#f5f0e8]"
+                          draggable
+                          onDragStart={() => setDraggedImage({ variantIndex: index, imageIndex })}
+                          onDragOver={(event) => {
+                            if (draggedImage?.variantIndex === index) event.preventDefault();
+                          }}
+                          onDrop={(event) => {
+                            event.preventDefault();
+                            if (draggedImage?.variantIndex === index) {
+                              moveVariantImage(index, draggedImage.imageIndex, imageIndex);
+                            }
+                            setDraggedImage(null);
+                          }}
+                          onDragEnd={() => setDraggedImage(null)}
+                          className={`group relative aspect-square cursor-grab overflow-hidden rounded-[6px] bg-[#f5f0e8] active:cursor-grabbing ${
+                            draggedImage?.variantIndex === index && draggedImage.imageIndex === imageIndex
+                              ? 'opacity-50 ring-2 ring-[#111111] ring-offset-2'
+                              : ''
+                          }`}
                         >
                           <img
                             src={image.url}
@@ -668,6 +729,29 @@ export function AdminProductForm({ product }: AdminProductFormProps) {
                           >
                             ×
                           </button>
+                          <span className="absolute left-2 top-2 rounded-full bg-[#111111]/75 px-2 py-1 text-[10px] font-medium uppercase tracking-[0.08em] text-white">
+                            {imageIndex === 0 ? 'Primary' : imageIndex + 1}
+                          </span>
+                          <div className="absolute inset-x-2 bottom-2 flex justify-between gap-1 opacity-100 transition sm:opacity-0 sm:group-hover:opacity-100 sm:focus-within:opacity-100">
+                            <button
+                              type="button"
+                              onClick={() => moveVariantImage(index, imageIndex, imageIndex - 1)}
+                              disabled={imageIndex === 0}
+                              className="flex h-7 w-7 items-center justify-center rounded-full bg-[#fffaf3] text-sm shadow disabled:cursor-not-allowed disabled:opacity-40"
+                              aria-label={`Move image ${imageIndex + 1} earlier`}
+                            >
+                              ←
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => moveVariantImage(index, imageIndex, imageIndex + 1)}
+                              disabled={imageIndex === variant.images.length - 1}
+                              className="flex h-7 w-7 items-center justify-center rounded-full bg-[#fffaf3] text-sm shadow disabled:cursor-not-allowed disabled:opacity-40"
+                              aria-label={`Move image ${imageIndex + 1} later`}
+                            >
+                              →
+                            </button>
+                          </div>
                         </div>
                       ))}
                     </div>
