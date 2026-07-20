@@ -194,9 +194,9 @@ export function LoginForm() {
                 <span className="text-xs font-semibold uppercase tracking-[0.22em] text-[#111111]">
                   Password
                 </span>
-                <span className="text-xs text-[#6d665e] underline underline-offset-4">
+                <Link href="/forgot-password" className="text-xs text-[#6d665e] underline underline-offset-4">
                   Forgot Password?
-                </span>
+                </Link>
               </div>
               <AuthInput
                 label=""

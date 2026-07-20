@@ -21,6 +21,7 @@ import { SendLoginOtpDto, VerifyLoginOtpDto } from './dto/login-otp.dto';
 import { RegisterDto } from './dto/register.dto';
 import { ResendEmailOtpDto } from './dto/resend-email-otp.dto';
 import { VerifyEmailOtpDto } from './dto/verify-email-otp.dto';
+import { ResetPasswordDto, SendPasswordResetOtpDto, VerifyPasswordResetOtpDto } from './dto/password-reset.dto';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { AuthenticatedRequest } from './types/authenticated-request';
 
@@ -95,6 +96,21 @@ export class AuthController {
         user: result.user,
       },
     };
+  }
+
+  @Post('password-reset/send-otp')
+  async sendPasswordResetOtp(@Body() dto: SendPasswordResetOtpDto) {
+    return { success: true, data: await this.authService.sendPasswordResetOtp(dto.email) };
+  }
+
+  @Post('password-reset/verify-otp')
+  async verifyPasswordResetOtp(@Body() dto: VerifyPasswordResetOtpDto) {
+    return { success: true, data: await this.authService.verifyPasswordResetOtp(dto.email, dto.code) };
+  }
+
+  @Post('password-reset')
+  async resetPassword(@Body() dto: ResetPasswordDto) {
+    return { success: true, data: await this.authService.resetPassword(dto.email, dto.resetToken, dto.password) };
   }
 
   @Post('google')

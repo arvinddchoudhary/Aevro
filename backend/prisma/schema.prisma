@@ -128,6 +128,7 @@ model User {
   addresses             UserAddress[]
   emailVerificationOtps EmailVerificationOtp[]
   loginOtps             LoginOtp[]
+  passwordResetOtps     PasswordResetOtp[]
   cartItems             CartItem[]
   wishlistItems         WishlistItem[]
   orders                Order[]
@@ -209,6 +210,27 @@ model LoginOtp {
   @@index([userId, expiresAt])
   @@index([expiresAt])
   @@map("login_otps")
+}
+
+model PasswordResetOtp {
+  id                  String    @id @default(cuid())
+  userId              String
+  user                User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  codeHash            String
+  expiresAt           DateTime
+  consumedAt          DateTime?
+  attemptCount        Int       @default(0)
+  resendCount         Int       @default(0)
+  lastSentAt          DateTime
+  verifiedAt          DateTime?
+  resetTokenHash      String?
+  resetTokenExpiresAt DateTime?
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
+
+  @@index([userId, expiresAt])
+  @@index([expiresAt])
+  @@map("password_reset_otps")
 }
 
 model AuthAccount {

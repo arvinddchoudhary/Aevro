@@ -184,6 +184,27 @@ export function resendEmailOtp(email: string) {
   });
 }
 
+export function sendPasswordResetOtp(email: string) {
+  return requestAuthAction<{ email: string; sent: boolean; expiresInMinutes: number }>(
+    '/auth/password-reset/send-otp',
+    { method: 'POST', body: JSON.stringify({ email }) },
+  );
+}
+
+export function verifyPasswordResetOtp(email: string, code: string) {
+  return requestAuthAction<{ resetToken: string; expiresInMinutes: number }>(
+    '/auth/password-reset/verify-otp',
+    { method: 'POST', body: JSON.stringify({ email, code }) },
+  );
+}
+
+export function resetPassword(email: string, resetToken: string, password: string) {
+  return requestAuthAction<{ passwordReset: boolean }>('/auth/password-reset', {
+    method: 'POST',
+    body: JSON.stringify({ email, resetToken, password }),
+  });
+}
+
 export async function logout() {
   const response = await fetch(buildApiUrl('/auth/logout'), {
     method: 'POST',

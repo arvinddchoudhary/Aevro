@@ -297,6 +297,81 @@ export class AuthService {
     return this.createAuthResult(user, context);
   }
 
+  async sendPasswordResetOtp(emailInput: string) {
+    this.assertJwtConfigured();
+    await this.prisma.passwordResetOtp.deleteMany({ where: { expiresAt: { lt: new Date() } } });
+    const email = emailInput.trim().toLowerCase();
+    const user = await this.usersService.findByEmail(email);
+
+    if (!user?.passwordHash) {
+      throw new BadRequestException('This email is not registered for password login.');
+    }
+
+    const activeOtp = await this.prisma.passwordResetOtp.findFirst({
+      where: { userId: user.id, consumedAt: null, expiresAt: { gt: new Date() } },
+      orderBy: { createdAt: 'desc' },
+    });
+    if (activeOtp && Date.now() - activeOtp.lastSentAt.getTime() < OTP_RESEND_COOLDOWN_MS) {
+      throw new BadRequestException('Please wait before requesting another OTP.');
+    }
+    if (activeOtp && activeOtp.resendCount >= OTP_MAX_RESENDS) {
+      throw new BadRequestException('Too many OTP resend requests. Please try again later.');
+    }
+
+    const code = this.createEmailOtp();
+    const otp = activeOtp
+      ? await this.prisma.passwordResetOtp.update({
+          where: { id: activeOtp.id },
+          data: { codeHash: this.hashEmailOtp(code), expiresAt: this.createOtpExpiry(), attemptCount: 0, resendCount: { increment: 1 }, lastSentAt: new Date(), verifiedAt: null, resetTokenHash: null, resetTokenExpiresAt: null },
+        })
+      : await this.prisma.passwordResetOtp.create({
+          data: { userId: user.id, codeHash: this.hashEmailOtp(code), expiresAt: this.createOtpExpiry(), lastSentAt: new Date() },
+        });
+
+    await this.notificationsService.sendEmailVerificationOtp({ user: { id: user.id, name: user.name, email: user.email }, code, expiresInMinutes: OTP_EXPIRES_IN_MINUTES });
+    return { email: user.email, sent: true, expiresInMinutes: OTP_EXPIRES_IN_MINUTES, resendCount: otp.resendCount };
+  }
+
+  async verifyPasswordResetOtp(emailInput: string, code: string) {
+    this.assertJwtConfigured();
+    const email = emailInput.trim().toLowerCase();
+    const trimmedCode = code.trim();
+    if (!/^\d{6}$/.test(trimmedCode)) throw new BadRequestException('Enter the 6-digit OTP.');
+    const user = await this.usersService.findByEmail(email);
+    if (!user?.passwordHash) throw new BadRequestException('This email is not registered for password login.');
+    const otp = await this.prisma.passwordResetOtp.findFirst({ where: { userId: user.id, consumedAt: null }, orderBy: { createdAt: 'desc' } });
+    if (!otp || otp.expiresAt <= new Date()) throw new BadRequestException('OTP expired. Please request a new code.');
+    if (otp.attemptCount >= OTP_MAX_ATTEMPTS) throw new BadRequestException('Too many attempts. Please request a new code.');
+    if (!this.safeCompare(this.hashEmailOtp(trimmedCode), otp.codeHash)) {
+      await this.prisma.passwordResetOtp.update({ where: { id: otp.id }, data: { attemptCount: { increment: 1 } } });
+      throw new BadRequestException('Invalid OTP.');
+    }
+    const resetToken = randomBytes(32).toString('base64url');
+    await this.prisma.passwordResetOtp.update({
+      where: { id: otp.id },
+      data: { verifiedAt: new Date(), resetTokenHash: this.hashRefreshToken(resetToken), resetTokenExpiresAt: this.createOtpExpiry() },
+    });
+    return { resetToken, expiresInMinutes: OTP_EXPIRES_IN_MINUTES };
+  }
+
+  async resetPassword(emailInput: string, resetToken: string, password: string) {
+    this.assertJwtConfigured();
+    const email = emailInput.trim().toLowerCase();
+    const user = await this.usersService.findByEmail(email);
+    if (!user?.passwordHash) throw new BadRequestException('This email is not registered for password login.');
+    const otp = await this.prisma.passwordResetOtp.findFirst({ where: { userId: user.id, consumedAt: null, resetTokenHash: this.hashRefreshToken(resetToken) }, orderBy: { createdAt: 'desc' } });
+    if (!otp?.verifiedAt || !otp.resetTokenExpiresAt || otp.resetTokenExpiresAt <= new Date()) {
+      throw new BadRequestException('Password reset session expired. Please request a new OTP.');
+    }
+    const passwordHash = await this.hashPassword(password);
+    await this.prisma.$transaction([
+      this.prisma.user.update({ where: { id: user.id }, data: { passwordHash } }),
+      this.prisma.passwordResetOtp.update({ where: { id: otp.id }, data: { consumedAt: new Date(), resetTokenHash: null, resetTokenExpiresAt: null } }),
+      this.prisma.refreshSession.updateMany({ where: { userId: user.id, revokedAt: null }, data: { revokedAt: new Date() } }),
+    ]);
+    return { passwordReset: true };
+  }
+
   async googleLogin(dto: GoogleLoginDto, context: SessionContext) {
     this.assertJwtConfigured();
 
