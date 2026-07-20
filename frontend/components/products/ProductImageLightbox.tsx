@@ -57,7 +57,7 @@ export function ProductImageLightbox({
       <button
         type="button"
         onClick={onClose}
-        className="absolute right-4 top-4 flex h-10 w-10 items-center justify-center rounded-full bg-white/10 text-white transition hover:bg-white/20 sm:right-6 sm:top-6"
+        className="absolute right-4 top-4 z-10 flex h-10 w-10 items-center justify-center rounded-full bg-white/10 text-white transition hover:bg-white/20 sm:right-6 sm:top-6"
         aria-label="Close image gallery"
       >
         <svg
@@ -84,7 +84,7 @@ export function ProductImageLightbox({
           onPrevious();
         }}
         disabled={!canGoPrevious}
-        className="absolute left-3 top-1/2 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-white/10 text-white transition hover:bg-white/20 disabled:cursor-not-allowed disabled:opacity-30 sm:left-6"
+        className="absolute left-3 top-1/2 z-10 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-white/10 text-white transition hover:bg-white/20 disabled:cursor-not-allowed disabled:opacity-30 sm:left-6"
         aria-label="Previous image"
       >
         <svg
@@ -110,7 +110,7 @@ export function ProductImageLightbox({
           onNext();
         }}
         disabled={!canGoNext}
-        className="absolute right-3 top-1/2 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-white/10 text-white transition hover:bg-white/20 disabled:cursor-not-allowed disabled:opacity-30 sm:right-6"
+        className="absolute right-3 top-1/2 z-10 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-white/10 text-white transition hover:bg-white/20 disabled:cursor-not-allowed disabled:opacity-30 sm:right-6"
         aria-label="Next image"
       >
         <svg
@@ -130,13 +130,13 @@ export function ProductImageLightbox({
       </button>
 
       <div
-        className="max-h-[90vh] max-w-[90vw] px-16 sm:px-20"
+        className="flex h-[100dvh] w-full max-w-none items-center justify-center px-3 py-20 sm:max-h-[90vh] sm:max-w-[90vw] sm:px-20"
         onClick={(event) => event.stopPropagation()}
       >
         <img
           src={currentImage.url}
           alt={currentImage.altText ?? productName}
-          className="max-h-[85vh] max-w-full object-contain"
+          className="h-auto max-h-[calc(100dvh-10rem)] w-auto max-w-full object-contain sm:max-h-[85vh]"
         />
       </div>
 

@@ -30,7 +30,7 @@ export function ProductCard({
           productName={product.name}
           className={
             shopMobile
-              ? 'aspect-square lg:aspect-[4/5]'
+              ? 'aspect-[3/4] lg:aspect-[4/5]'
               : compact
                 ? 'aspect-[4/5]'
                 : 'aspect-[3/4]'
