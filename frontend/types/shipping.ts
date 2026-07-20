@@ -30,6 +30,7 @@ export type AdminShipment = {
   courierCompanyId: string | null;
   courierCompanyName: string | null;
   pickupLocation: string;
+  pickupPincode: string | null;
   trackingUrl: string | null;
   status: ShipmentStatus;
   statusLabel: string | null;
@@ -38,6 +39,13 @@ export type AdminShipment = {
   lengthCm: number;
   breadthCm: number;
   heightCm: number;
+  packageType: 'SMALL' | 'LARGE' | 'MANUAL' | null;
+  recommendedWeightKg: number | null;
+  recommendedLengthCm: number | null;
+  recommendedBreadthCm: number | null;
+  recommendedHeightCm: number | null;
+  packageReviewedAt: string | null;
+  packageReviewedByAdminId: string | null;
   shippingChargeInPaise: number | null;
   estimatedDeliveryDate: string | null;
   pickupScheduledAt: string | null;
@@ -63,6 +71,54 @@ export type ShiprocketCourierRate = {
   mode: string | null;
 };
 
+export type ShipmentReview = {
+  orderId: string;
+  orderNumber: string;
+  paymentStatus: 'PAID';
+  orderStatus: 'CONFIRMED';
+  customer: {
+    name: string;
+    email: string;
+    phone: string;
+    shippingAddress: {
+      addressLine1: string;
+      addressLine2: string | null;
+      city: string;
+      state: string;
+      pincode: string;
+      country: string;
+    };
+  };
+  items: Array<{
+    name: string;
+    sku: string;
+    size: string | null;
+    color: string | null;
+    quantity: number;
+    unitPriceInPaise: number;
+  }>;
+  totalQuantity: number;
+  recommendation: {
+    packageType: 'SMALL' | 'LARGE' | 'MANUAL';
+    weightKg: number | null;
+    lengthCm: number | null;
+    breadthCm: number | null;
+    heightCm: number | null;
+    requiresManualDetails: boolean;
+  };
+  pickupLocations: Array<{ name: string; pincode: string }>;
+  defaultPickupLocation: string;
+};
+
+export type CreateShipmentPayload = {
+  pickupLocation: string;
+  packageType: 'SMALL' | 'LARGE' | 'MANUAL';
+  weightKg: number;
+  lengthCm: number;
+  breadthCm: number;
+  heightCm: number;
+};
+
 export type OrderTracking = {
   status: ShipmentStatus;
   statusLabel: string | null;
@@ -72,4 +128,3 @@ export type OrderTracking = {
   estimatedDeliveryDate: string | null;
   timeline: ShipmentTimelineEvent[];
 };
-

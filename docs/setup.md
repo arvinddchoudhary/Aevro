@@ -323,7 +323,12 @@ Recommended template variables:
 3. Set the backend-only email, password, pickup location, package defaults, and
    a long random webhook secret. Keep `SHIPROCKET_ENABLED=false` until staging
    verification is ready.
-4. Deploy migration `000015_shiprocket_shipments`, restart the backend, then set
+
+`SHIPROCKET_DEFAULT_*` values remain a backward-compatible fallback for legacy
+records/rate lookup. New admin-created shipments use the package values reviewed
+and confirmed in the admin shipment form, not these defaults.
+4. Deploy migration `000015_shiprocket_shipments` and the additive
+   `000018_shiprocket_package_review`, restart the backend, then set
    `SHIPROCKET_ENABLED=true`.
 5. Configure Shiprocket tracking webhook URL as:
 
