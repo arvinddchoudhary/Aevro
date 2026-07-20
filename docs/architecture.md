@@ -102,6 +102,14 @@ Razorpay verified -> Order CONFIRMED -> admin creates shipment
 -> webhook or manual refresh updates tracking -> customer sees sanitized status
 ```
 
+Shipment creation is review-first. The initial admin action loads a server-side
+package recommendation and saved Shiprocket pickup locations; it does not call
+Shiprocket. The admin confirms the customer/order snapshot, selects a saved
+pickup location, and may replace the recommended measured package values before
+the confirmation request creates the provider order. `Shipment` stores both the
+recommendation and final package/pickup snapshot so later package-rule or
+catalog changes do not alter an existing shipment.
+
 The payment service does not import or invoke Shiprocket. Provider failure
 therefore cannot roll back payment verification, stock deduction, or order
 confirmation. A unique one-to-one `Shipment.orderId` and unique provider IDs

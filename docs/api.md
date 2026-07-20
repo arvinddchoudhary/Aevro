@@ -62,6 +62,7 @@ POST /api/v1/webhooks/razorpay
 POST /api/v1/webhooks/brevo
 GET /api/v1/admin/orders/:orderId/shipment
 GET /api/v1/admin/orders/:orderId/shipment/shiprocket/rates
+GET /api/v1/admin/orders/:orderId/shipment/shiprocket/review
 POST /api/v1/admin/orders/:orderId/shipment/shiprocket/create
 POST /api/v1/admin/orders/:orderId/shipment/shiprocket/assign-awb
 POST /api/v1/admin/orders/:orderId/shipment/shiprocket/pickup
@@ -119,15 +120,35 @@ httpOnly admin session, `JwtAuthGuard`, `RolesGuard`, and the `ADMIN` role.
 
 ### Admin workflow
 
-1. `POST .../shiprocket/create` creates one provider shipment for a paid,
-   confirmed order. The unique `Shipment.orderId` prevents duplicates.
-2. `GET .../shiprocket/rates` returns sanitized prepaid courier options.
-3. `POST .../shiprocket/assign-awb` accepts `{ "courierId": 10 }`.
-4. `POST .../shiprocket/pickup` accepts an optional
+1. `GET .../shiprocket/review` returns the paid/confirmed order's safe customer,
+   item, server-side package recommendation, and usable saved pickup locations.
+   This endpoint does not create a provider order.
+2. `POST .../shiprocket/create` creates one provider shipment for a paid,
+   confirmed order only after an admin submits the reviewed package and pickup
+   location. The unique `Shipment.orderId` prevents duplicates.
+3. `GET .../shiprocket/rates` returns sanitized prepaid courier options.
+4. `POST .../shiprocket/assign-awb` accepts `{ "courierId": 10 }`.
+5. `POST .../shiprocket/pickup` accepts an optional
    `{ "pickupDate": "2026-07-15" }`.
-5. `POST .../shiprocket/refresh-tracking` refreshes state by AWB.
-6. `POST .../shiprocket/cancel` cancels only an eligible shipment. It does not
+6. `POST .../shiprocket/refresh-tracking` refreshes state by AWB.
+7. `POST .../shiprocket/cancel` cancels only an eligible shipment. It does not
    cancel or refund the AEVRO order.
+
+`POST .../shiprocket/create` body:
+
+```json
+{
+  "pickupLocation": "AEVRO Primary Warehouse",
+  "packageType": "SMALL",
+  "weightKg": 1.28,
+  "lengthCm": 40,
+  "breadthCm": 38,
+  "heightCm": 3
+}
+```
+
+Quantities 1–4 receive the documented AEVRO recommendation; quantities above
+four require `MANUAL` package type and explicitly measured values.
 
 `GET /api/v1/admin/orders/:orderId/shipment` returns configuration state and a
 sanitized admin shipment. Raw provider responses and credentials are omitted.

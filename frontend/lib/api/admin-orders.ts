@@ -8,7 +8,9 @@ import type {
 import type {
   AdminShipment,
   AdminShipmentState,
+  CreateShipmentPayload,
   ShiprocketCourierRate,
+  ShipmentReview,
 } from '../../types/shipping';
 import { authenticatedFetch } from './authenticated-request';
 
@@ -140,6 +142,13 @@ export async function getShiprocketRates(id: string) {
   return response.data;
 }
 
+export async function getShiprocketReview(id: string) {
+  const response = await adminOrderRequest<ShipmentResponse<ShipmentReview>>(
+    shipmentPath(id, '/shiprocket/review'),
+  );
+  return response.data;
+}
+
 async function shipmentMutation(
   id: string,
   action: string,
@@ -155,8 +164,8 @@ async function shipmentMutation(
   return response.data;
 }
 
-export function createShiprocketShipment(id: string) {
-  return shipmentMutation(id, 'create');
+export function createShiprocketShipment(id: string, payload: CreateShipmentPayload) {
+  return shipmentMutation(id, 'create', payload);
 }
 
 export function assignShiprocketAwb(id: string, courierId: number) {

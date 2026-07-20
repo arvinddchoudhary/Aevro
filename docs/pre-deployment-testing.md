@@ -127,9 +127,20 @@ These require running local services and real browser interaction.
 
 ## Shiprocket Pre-Deployment Checklist
 
-- Apply migration `000015_shiprocket_shipments` before enabling Shiprocket.
+- Apply migrations `000015_shiprocket_shipments` and
+  `000018_shiprocket_package_review` before enabling Shiprocket.
 - Confirm `SHIPROCKET_ENABLED=false` returns a clear safe admin error.
 - Confirm a paid `CONFIRMED` order can create exactly one shipment.
+- Open shipment review and confirm it does not create a Shiprocket order until
+  **Confirm and Create Shipment** is submitted.
+- Confirm quantity 1, 2, 3, and 4 load the SMALL/SMALL/LARGE/LARGE package
+  recommendations; confirm quantity above 4 requires manual measurements.
+- Confirm admin package overrides persist as the shipment snapshot and are sent
+  to Shiprocket; invalid, zero, negative, and excessive dimensions are rejected.
+- Confirm the selected saved Shiprocket pickup location and pincode are stored;
+  invalid locations are rejected at confirmation.
+- Repeat confirmation while it is in progress and after success to confirm no
+  duplicate provider order is created.
 - Confirm unpaid, cancelled, refunded, and pending orders cannot create shipments.
 - Repeat Create Shipment and confirm duplicate provider shipment creation is blocked.
 - Confirm missing phone, address, or delivery pincode fails before a provider call.

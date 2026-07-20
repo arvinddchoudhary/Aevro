@@ -41,6 +41,12 @@ enum ShipmentProvider {
   SHIPROCKET
 }
 
+enum ShipmentPackageType {
+  SMALL
+  LARGE
+  MANUAL
+}
+
 enum ShipmentStatus {
   PENDING
   CREATED
@@ -400,35 +406,43 @@ model Order {
 }
 
 model Shipment {
-  id                    String                 @id @default(cuid())
-  orderId               String                 @unique
-  order                 Order                  @relation(fields: [orderId], references: [id], onDelete: Cascade)
-  provider              ShipmentProvider       @default(SHIPROCKET)
-  providerOrderId       String?                @unique
-  providerShipmentId    String?                @unique
-  awbCode               String?                @unique
-  courierCompanyId      String?
-  courierCompanyName    String?
-  pickupLocation        String
-  trackingUrl           String?
-  status                ShipmentStatus         @default(PENDING)
-  statusLabel           String?
-  statusHistory         Json                   @default("[]")
-  weightKg              Float
-  lengthCm              Float
-  breadthCm             Float
-  heightCm              Float
-  shippingChargeInPaise Int?
-  estimatedDeliveryDate DateTime?
-  pickupScheduledAt     DateTime?
-  shippedAt             DateTime?
-  deliveredAt           DateTime?
-  cancelledAt           DateTime?
-  lastSyncedAt          DateTime?
-  rawProviderResponse   Json?
-  webhookEvents         ShipmentWebhookEvent[]
-  createdAt             DateTime               @default(now())
-  updatedAt             DateTime               @updatedAt
+  id                       String                 @id @default(cuid())
+  orderId                  String                 @unique
+  order                    Order                  @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  provider                 ShipmentProvider       @default(SHIPROCKET)
+  providerOrderId          String?                @unique
+  providerShipmentId       String?                @unique
+  awbCode                  String?                @unique
+  courierCompanyId         String?
+  courierCompanyName       String?
+  pickupLocation           String
+  pickupPincode            String?
+  trackingUrl              String?
+  status                   ShipmentStatus         @default(PENDING)
+  statusLabel              String?
+  statusHistory            Json                   @default("[]")
+  weightKg                 Float
+  lengthCm                 Float
+  breadthCm                Float
+  heightCm                 Float
+  packageType              ShipmentPackageType?
+  recommendedWeightKg      Float?
+  recommendedLengthCm      Float?
+  recommendedBreadthCm     Float?
+  recommendedHeightCm      Float?
+  packageReviewedAt        DateTime?
+  packageReviewedByAdminId String?
+  shippingChargeInPaise    Int?
+  estimatedDeliveryDate    DateTime?
+  pickupScheduledAt        DateTime?
+  shippedAt                DateTime?
+  deliveredAt              DateTime?
+  cancelledAt              DateTime?
+  lastSyncedAt             DateTime?
+  rawProviderResponse      Json?
+  webhookEvents            ShipmentWebhookEvent[]
+  createdAt                DateTime               @default(now())
+  updatedAt                DateTime               @updatedAt
 
   @@index([provider, status])
   @@index([lastSyncedAt])

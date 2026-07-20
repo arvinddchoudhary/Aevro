@@ -6,6 +6,7 @@ import {
   cancelShiprocketShipment,
   createShiprocketShipment,
   getAdminShipment,
+  getShiprocketReview,
   getShiprocketRates,
   refreshShiprocketTracking,
   scheduleShiprocketPickup,
@@ -15,8 +16,11 @@ import type { AdminOrder } from '../../../types/admin/orders';
 import type {
   AdminShipment,
   AdminShipmentState,
+  CreateShipmentPayload,
   ShiprocketCourierRate,
+  ShipmentReview,
 } from '../../../types/shipping';
+import { ShipmentReviewDialog } from './ShipmentReviewDialog';
 
 const cancellableStatuses = new Set(['AWB_ASSIGNED', 'PICKUP_SCHEDULED']);
 
@@ -37,6 +41,7 @@ export function AdminShipmentPanel({
   const [busyAction, setBusyAction] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
+  const [review, setReview] = useState<ShipmentReview | null>(null);
 
   useEffect(() => {
     let active = true;
@@ -79,8 +84,10 @@ export function AdminShipmentPanel({
       }));
       setSuccess(message);
       await onOrderChanged();
+      return true;
     } catch (actionError) {
       setError(actionError instanceof Error ? actionError.message : 'Shipping action failed.');
+      return false;
     } finally {
       setBusyAction(null);
     }
@@ -98,6 +105,28 @@ export function AdminShipmentPanel({
     } finally {
       setBusyAction(null);
     }
+  };
+
+  const openReview = async () => {
+    try {
+      setBusyAction('review');
+      setError(null);
+      setSuccess(null);
+      setReview(await getShiprocketReview(order.id));
+    } catch (reviewError) {
+      setError(reviewError instanceof Error ? reviewError.message : 'Unable to prepare shipment review.');
+    } finally {
+      setBusyAction(null);
+    }
+  };
+
+  const confirmShipment = async (payload: CreateShipmentPayload) => {
+    const created = await runAction(
+      'create',
+      () => createShiprocketShipment(order.id, payload),
+      'Shipment created.',
+    );
+    if (created) setReview(null);
   };
 
   return (
@@ -199,12 +228,10 @@ export function AdminShipmentPanel({
           <button
             type="button"
             disabled={!canCreate || busyAction !== null}
-            onClick={() =>
-              void runAction('create', () => createShiprocketShipment(order.id), 'Shipment created.')
-            }
+            onClick={() => void openReview()}
             className="h-11 border border-[#111111] bg-[#111111] px-4 text-xs font-medium uppercase tracking-[0.08em] text-white disabled:cursor-not-allowed disabled:border-[#aaa39a] disabled:bg-[#aaa39a]"
           >
-            {busyAction === 'create' ? 'Creating' : shipment ? 'Retry shipment' : 'Create shipment'}
+            {busyAction === 'review' ? 'Preparing review' : shipment ? 'Review retry' : 'Create shipment'}
           </button>
         )}
         {shipment?.status === 'CREATED' && !shipment.awbCode && rates.length > 0 && (
@@ -284,7 +311,14 @@ export function AdminShipmentPanel({
           </a>
         )}
       </div>
+      {review ? (
+        <ShipmentReviewDialog
+          review={review}
+          submitting={busyAction === 'create'}
+          onCancel={() => setReview(null)}
+          onConfirm={confirmShipment}
+        />
+      ) : null}
     </div>
   );
 }
-

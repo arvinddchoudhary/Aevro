@@ -15,6 +15,7 @@ import {
   PaymentStatus,
   Prisma,
   Shipment,
+  ShipmentPackageType,
   ShipmentProvider,
   ShipmentStatus,
   UserRole,
@@ -24,12 +25,14 @@ import { createHash, timingSafeEqual } from 'node:crypto';
 import { NotificationsService } from '../notifications/notifications.service';
 import { PrismaService } from '../prisma/prisma.service';
 import { AssignAwbDto } from './dto/assign-awb.dto';
+import { CreateShipmentDto } from './dto/create-shipment.dto';
 import { SchedulePickupDto } from './dto/schedule-pickup.dto';
 import {
   mapShiprocketStatus,
   orderStatusForShipment,
 } from './mappers/shiprocket-status.mapper';
 import { ShiprocketClient } from './shiprocket.client';
+import { recommendPackage, validateReviewedPackage } from './package-recommendation';
 import {
   JsonRecord,
   NormalizedShiprocketTracking,
@@ -67,10 +70,82 @@ export class ShiprocketService {
     };
   }
 
-  async createShipment(orderId: string) {
+  async getShipmentReview(orderId: string) {
     this.assertEnabledAndConfigured();
     const order = await this.getShippableOrder(orderId);
-    const dimensions = this.defaultDimensions();
+    const totalQuantity = order.items.reduce((total, item) => total + item.quantity, 0);
+    const [pickupLocations, existingShipment] = await Promise.all([
+      this.getPickupLocations(),
+      this.prisma.shipment.findUnique({ where: { orderId } }),
+    ]);
+
+    if (existingShipment && existingShipment.status !== ShipmentStatus.FAILED) {
+      throw new ConflictException('A Shiprocket shipment already exists for this order.');
+    }
+
+    return {
+      orderId: order.id,
+      orderNumber: order.orderNumber,
+      paymentStatus: order.payment?.status ?? null,
+      orderStatus: order.status,
+      customer: {
+        name: order.customerName,
+        email: order.customerEmail,
+        phone: order.customerPhone,
+        shippingAddress: {
+          addressLine1: order.shippingAddress,
+          addressLine2: null,
+          city: order.shippingCity,
+          state: order.shippingState,
+          pincode: order.shippingPincode,
+          country: order.shippingCountry,
+        },
+      },
+      items: order.items.map((item) => ({
+        name: item.productName,
+        sku: item.variant?.sku ?? item.product?.sku ?? item.id,
+        size: item.selectedSize,
+        color: item.selectedColor,
+        quantity: item.quantity,
+        unitPriceInPaise: item.unitPriceInPaise,
+      })),
+      totalQuantity,
+      recommendation: recommendPackage(totalQuantity),
+      pickupLocations,
+      defaultPickupLocation: this.pickupLocation(),
+    };
+  }
+
+  async createShipment(orderId: string, dto: CreateShipmentDto, adminId: string) {
+    this.assertEnabledAndConfigured();
+    const order = await this.getShippableOrder(orderId);
+    const totalQuantity = order.items.reduce((total, item) => total + item.quantity, 0);
+    const recommendation = recommendPackage(totalQuantity);
+    const packageType = dto.packageType as ShipmentPackageType;
+
+    const packageValidationError = validateReviewedPackage(dto);
+    if (packageValidationError) throw new BadRequestException(packageValidationError);
+
+    if (packageType !== recommendation.packageType) {
+      throw new BadRequestException('Package type does not match the order quantity recommendation.');
+    }
+
+    const pickup = await this.resolvePickupLocation(dto.pickupLocation);
+    const reviewedPackage = {
+      pickupLocation: pickup.name,
+      pickupPincode: pickup.pincode,
+      packageType,
+      weightKg: dto.weightKg,
+      lengthCm: dto.lengthCm,
+      breadthCm: dto.breadthCm,
+      heightCm: dto.heightCm,
+      recommendedWeightKg: recommendation.weightKg,
+      recommendedLengthCm: recommendation.lengthCm,
+      recommendedBreadthCm: recommendation.breadthCm,
+      recommendedHeightCm: recommendation.heightCm,
+      packageReviewedAt: new Date(),
+      packageReviewedByAdminId: adminId,
+    };
     let shipment = await this.prisma.shipment.findUnique({ where: { orderId } });
 
     if (shipment && shipment.status !== ShipmentStatus.FAILED) {
@@ -89,10 +164,9 @@ export class ShiprocketService {
           data: {
             orderId,
             provider: ShipmentProvider.SHIPROCKET,
-            pickupLocation: this.pickupLocation(),
             status: ShipmentStatus.PENDING,
             statusLabel: 'Creating shipment',
-            ...dimensions,
+            ...reviewedPackage,
           },
         });
       } catch (error) {
@@ -108,14 +182,14 @@ export class ShiprocketService {
           status: ShipmentStatus.PENDING,
           statusLabel: 'Retrying shipment creation',
           rawProviderResponse: Prisma.JsonNull,
-          ...dimensions,
+          ...reviewedPackage,
         },
       });
     }
 
     try {
       const reconciled = await this.findExistingProviderOrder(order.orderNumber);
-      const response = reconciled ?? (await this.client.createOrder(this.buildCreatePayload(order)));
+      const response = reconciled ?? (await this.client.createOrder(this.buildCreatePayload(order, shipment)));
       const responseRecord = this.recordValue(response);
       const providerOrderId = this.stringValue(responseRecord.order_id ?? responseRecord.id);
       const providerShipmentId = this.extractShipmentId(responseRecord);
@@ -158,8 +232,16 @@ export class ShiprocketService {
   async getRates(orderId: string) {
     this.assertEnabledAndConfigured();
     const order = await this.getShippableOrder(orderId, false);
-    const pickupPostcode = await this.resolvePickupPostcode();
-    const dimensions = this.defaultDimensions();
+    const shipment = await this.prisma.shipment.findUnique({ where: { orderId } });
+    const pickupPostcode = await this.resolvePickupPostcode(shipment?.pickupLocation);
+    const dimensions = shipment
+      ? {
+          weightKg: shipment.weightKg,
+          lengthCm: shipment.lengthCm,
+          breadthCm: shipment.breadthCm,
+          heightCm: shipment.heightCm,
+        }
+      : this.defaultDimensions();
 
     try {
       const response = await this.client.getServiceability({
@@ -512,14 +594,14 @@ export class ShiprocketService {
 
   private buildCreatePayload(
     order: Awaited<ReturnType<ShiprocketService['getShippableOrder']>>,
+    shipment: Shipment,
   ): ShiprocketCreateOrderPayload {
     const [firstName, ...lastNameParts] = order.customerName.trim().split(/\s+/);
-    const dimensions = this.defaultDimensions();
 
     return {
       order_id: order.orderNumber.slice(0, 20),
       order_date: order.createdAt.toISOString().replace('T', ' ').slice(0, 19),
-      pickup_location: this.pickupLocation(),
+      pickup_location: shipment.pickupLocation,
       billing_customer_name: firstName || order.customerName,
       billing_last_name: lastNameParts.join(' '),
       billing_address: order.shippingAddress,
@@ -532,7 +614,7 @@ export class ShiprocketService {
       billing_phone: order.customerPhone,
       shipping_is_billing: true,
       order_items: order.items.map((item) => ({
-        name: item.productName,
+        name: this.shiprocketItemName(item.productName, item.selectedSize, item.selectedColor),
         sku: (item.variant?.sku ?? item.product?.sku ?? item.id).slice(0, 50),
         units: item.quantity,
         selling_price: Number((item.unitPriceInPaise / 100).toFixed(2)),
@@ -546,10 +628,10 @@ export class ShiprocketService {
       transaction_charges: 0,
       total_discount: 0,
       sub_total: Number((order.totalInPaise / 100).toFixed(2)),
-      length: dimensions.lengthCm,
-      breadth: dimensions.breadthCm,
-      height: dimensions.heightCm,
-      weight: dimensions.weightKg,
+      length: shipment.lengthCm,
+      breadth: shipment.breadthCm,
+      height: shipment.heightCm,
+      weight: shipment.weightKg,
     };
   }
 
@@ -679,7 +761,7 @@ export class ShiprocketService {
     return createHash('sha256').update(JSON.stringify(components)).digest('hex');
   }
 
-  private async resolvePickupPostcode() {
+  private async getPickupLocations() {
     const response = await this.client.getPickupLocations();
     const data = this.recordValue(response.data);
     const locations = Array.isArray(response.shipping_address)
@@ -687,18 +769,41 @@ export class ShiprocketService {
       : Array.isArray(data.shipping_address)
         ? data.shipping_address
         : [];
-    const expected = this.pickupLocation().toLowerCase();
-    const location = locations
-      .map((value) => this.recordValue(value))
-      .find((value) => this.stringValue(value.pickup_location)?.toLowerCase() === expected);
-    const postcode = location ? this.stringValue(location.pin_code ?? location.pincode) : null;
+    const unique = new Map<string, { name: string; pincode: string }>();
 
-    if (!postcode) {
-      throw new BadRequestException(
-        'Configured Shiprocket pickup location was not found or has no pincode.',
-      );
+    locations.forEach((value) => {
+      const location = this.recordValue(value);
+      const name = this.stringValue(location.pickup_location);
+      const pincode = this.stringValue(location.pin_code ?? location.pincode);
+      const active = location.is_active ?? location.active ?? location.status;
+      const unavailable = active === false || active === 0 || active === '0' || active === 'inactive';
+      if (name && pincode && !unavailable) unique.set(name.toLowerCase(), { name, pincode });
+    });
+
+    if (unique.size === 0) {
+      throw new BadRequestException('No usable Shiprocket pickup locations are available.');
     }
-    return postcode;
+
+    return Array.from(unique.values()).sort((left, right) => left.name.localeCompare(right.name));
+  }
+
+  private async resolvePickupLocation(name: string) {
+    const expected = name.trim().toLowerCase();
+    const location = (await this.getPickupLocations()).find((item) => item.name.toLowerCase() === expected);
+
+    if (!location) {
+      throw new BadRequestException('Selected Shiprocket pickup location is not available.');
+    }
+    return location;
+  }
+
+  private async resolvePickupPostcode(locationName?: string) {
+    return (await this.resolvePickupLocation(locationName ?? this.pickupLocation())).pincode;
+  }
+
+  private shiprocketItemName(name: string, size: string | null, color: string | null) {
+    const details = [size ? `Size ${size}` : null, color].filter(Boolean).join(' — ');
+    return details ? `${name} — ${details}`.slice(0, 150) : name.slice(0, 150);
   }
 
   private extractCourierRates(response: JsonRecord): ShiprocketCourierRate[] {
@@ -743,6 +848,7 @@ export class ShiprocketService {
       courierCompanyId: shipment.courierCompanyId,
       courierCompanyName: shipment.courierCompanyName,
       pickupLocation: shipment.pickupLocation,
+      pickupPincode: shipment.pickupPincode,
       trackingUrl: shipment.trackingUrl,
       status: shipment.status,
       statusLabel: shipment.statusLabel,
@@ -751,6 +857,13 @@ export class ShiprocketService {
       lengthCm: shipment.lengthCm,
       breadthCm: shipment.breadthCm,
       heightCm: shipment.heightCm,
+      packageType: shipment.packageType,
+      recommendedWeightKg: shipment.recommendedWeightKg,
+      recommendedLengthCm: shipment.recommendedLengthCm,
+      recommendedBreadthCm: shipment.recommendedBreadthCm,
+      recommendedHeightCm: shipment.recommendedHeightCm,
+      packageReviewedAt: shipment.packageReviewedAt,
+      packageReviewedByAdminId: shipment.packageReviewedByAdminId,
       shippingChargeInPaise: shipment.shippingChargeInPaise,
       estimatedDeliveryDate: shipment.estimatedDeliveryDate,
       pickupScheduledAt: shipment.pickupScheduledAt,

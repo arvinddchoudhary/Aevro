@@ -1,9 +1,11 @@
-import { Body, Controller, Get, Inject, Param, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Inject, Param, Post, Req, UseGuards } from '@nestjs/common';
 import { UserRole } from '@prisma/client';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
+import { AuthenticatedRequest } from '../auth/types/authenticated-request';
 import { AssignAwbDto } from './dto/assign-awb.dto';
+import { CreateShipmentDto } from './dto/create-shipment.dto';
 import { SchedulePickupDto } from './dto/schedule-pickup.dto';
 import { ShiprocketService } from './shiprocket.service';
 
@@ -23,9 +25,21 @@ export class ShiprocketAdminController {
     return { success: true, data: await this.shiprocket.getRates(orderId) };
   }
 
+  @Get('shiprocket/review')
+  async review(@Param('orderId') orderId: string) {
+    return { success: true, data: await this.shiprocket.getShipmentReview(orderId) };
+  }
+
   @Post('shiprocket/create')
-  async create(@Param('orderId') orderId: string) {
-    return { success: true, data: await this.shiprocket.createShipment(orderId) };
+  async create(
+    @Param('orderId') orderId: string,
+    @Body() dto: CreateShipmentDto,
+    @Req() request: AuthenticatedRequest,
+  ) {
+    return {
+      success: true,
+      data: await this.shiprocket.createShipment(orderId, dto, request.user?.id ?? ''),
+    };
   }
 
   @Post('shiprocket/assign-awb')
