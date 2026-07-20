@@ -262,6 +262,7 @@ model Product {
   size           String?
   stock          Int                    @default(0)
   status         ProductStatus          @default(DRAFT)
+  displayOrder   Int                    @default(0)
   variants       ProductVariant[]
   searchDocument ProductSearchDocument?
   images         ProductImage[]
@@ -273,6 +274,7 @@ model Product {
 
   @@index([categoryId])
   @@index([status])
+  @@index([status, displayOrder])
   @@map("products")
 }
 

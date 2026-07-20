@@ -136,3 +136,12 @@ export class UpdateAdminProductStatusDto {
   @IsEnum(ProductStatus)
   status!: ProductStatus;
 }
+
+export class ReorderAdminProductsDto {
+  @IsArray()
+  @ArrayMinSize(1)
+  @ArrayMaxSize(1000)
+  @IsString({ each: true })
+  @MinLength(1, { each: true })
+  productIds!: string[];
+}

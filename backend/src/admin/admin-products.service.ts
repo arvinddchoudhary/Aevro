@@ -1,4 +1,4 @@
-import { Inject, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { ProductSearchIndexService } from '../products/search/product-search-index.service';
@@ -6,6 +6,7 @@ import { CreateAdminCategoryDto } from './dto/admin-category.dto';
 import {
   AdminProductVariantDto,
   CreateAdminProductDto,
+  ReorderAdminProductsDto,
   UpdateAdminProductDto,
   UpdateAdminProductStatusDto,
 } from './dto/admin-product.dto';
@@ -40,9 +41,7 @@ export class AdminProductsService {
 
   async listProducts() {
     const products = await this.prisma.product.findMany({
-      orderBy: {
-        createdAt: 'desc',
-      },
+      orderBy: [{ displayOrder: 'asc' }, { createdAt: 'desc' }],
       include: this.productInclude(),
     });
 
@@ -54,6 +53,9 @@ export class AdminProductsService {
     const totalStock = dto.variants.reduce((total, variant) => total + variant.stock, 0);
 
     const product = await this.prisma.$transaction(async (tx) => {
+      const latestPosition = await tx.product.aggregate({
+        _max: { displayOrder: true },
+      });
       const createdProduct = await tx.product.create({
         data: {
           name: dto.name.trim(),
@@ -66,6 +68,7 @@ export class AdminProductsService {
           size: firstVariant.size,
           sku: firstVariant.sku,
           stock: totalStock,
+          displayOrder: (latestPosition._max.displayOrder ?? -1) + 1,
         },
       });
 
@@ -156,6 +159,40 @@ export class AdminProductsService {
     });
 
     return this.serializeProduct(product);
+  }
+
+  async reorderProducts(dto: ReorderAdminProductsDto) {
+    const productIds = dto.productIds.map((id) => id.trim());
+    const uniqueIds = new Set(productIds);
+
+    if (productIds.some((id) => !id) || uniqueIds.size !== productIds.length) {
+      throw new BadRequestException('Each product must appear exactly once in the catalog order.');
+    }
+
+    await this.prisma.$transaction(async (tx) => {
+      const existing = await tx.product.findMany({ select: { id: true } });
+      const existingIds = new Set(existing.map((product) => product.id));
+
+      if (
+        existing.length !== productIds.length ||
+        productIds.some((id) => !existingIds.has(id))
+      ) {
+        throw new BadRequestException(
+          'Catalog order must contain every current product exactly once. Refresh and try again.',
+        );
+      }
+
+      await Promise.all(
+        productIds.map((id, displayOrder) =>
+          tx.product.update({ where: { id }, data: { displayOrder } }),
+        ),
+      );
+    }, {
+      maxWait: 10000,
+      timeout: 20000,
+    });
+
+    return this.listProducts();
   }
 
   private async ensureProductExists(id: string) {
@@ -257,6 +294,7 @@ export class AdminProductsService {
       category: product.category,
       primaryImage,
       stock: product.stock,
+      displayOrder: product.displayOrder,
       lowStock: product.stock > 0 && product.stock <= this.lowStockThreshold,
       createdAt: product.createdAt,
       updatedAt: product.updatedAt,

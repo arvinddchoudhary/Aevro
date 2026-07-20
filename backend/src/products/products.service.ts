@@ -399,7 +399,7 @@ export class ProductsService {
       return Prisma.sql`p."priceInPaise" DESC, p."createdAt" DESC, p."id" ASC`;
     }
 
-    return Prisma.sql`p."createdAt" DESC, p."id" ASC`;
+    return Prisma.sql`p."displayOrder" ASC, p."createdAt" DESC, p."id" ASC`;
   }
 
   private validatePriceRange(query: ListProductsQueryDto) {
