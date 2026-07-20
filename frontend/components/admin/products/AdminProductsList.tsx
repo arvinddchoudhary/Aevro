@@ -1,12 +1,31 @@
 'use client';
 
 import Link from 'next/link';
-import { useEffect, useState } from 'react';
+import { type DragEvent, useEffect, useState } from 'react';
 import { getAdminProducts, reorderAdminProducts } from '../../../lib/api/admin-products';
 import { formatPrice } from '../../../lib/format';
 import type { AdminProduct } from '../../../types/admin/products';
 import { EmptyState } from '../../ui/EmptyState';
 import { ErrorState } from '../../ui/ErrorState';
+
+function DragHandleIcon() {
+  return (
+    <svg
+      width="16"
+      height="24"
+      viewBox="0 0 16 24"
+      fill="currentColor"
+      aria-hidden="true"
+    >
+      <circle cx="5" cy="4" r="1.4" />
+      <circle cx="11" cy="4" r="1.4" />
+      <circle cx="5" cy="10" r="1.4" />
+      <circle cx="11" cy="10" r="1.4" />
+      <circle cx="5" cy="16" r="1.4" />
+      <circle cx="11" cy="16" r="1.4" />
+    </svg>
+  );
+}
 
 export function AdminProductsList() {
   const [products, setProducts] = useState<AdminProduct[]>([]);
@@ -16,6 +35,7 @@ export function AdminProductsList() {
   const [isSavingOrder, setIsSavingOrder] = useState(false);
   const [orderError, setOrderError] = useState<string | null>(null);
   const [draggedProductId, setDraggedProductId] = useState<string | null>(null);
+  const [dragOverProductId, setDragOverProductId] = useState<string | null>(null);
 
   useEffect(() => {
     async function loadProducts() {
@@ -72,6 +92,7 @@ export function AdminProductsList() {
     setDraftProducts(null);
     setOrderError(null);
     setDraggedProductId(null);
+    setDragOverProductId(null);
   };
 
   const saveOrder = async () => {
@@ -88,7 +109,20 @@ export function AdminProductsList() {
     } finally {
       setIsSavingOrder(false);
       setDraggedProductId(null);
+      setDragOverProductId(null);
     }
+  };
+
+  const startDrag = (event: DragEvent<HTMLButtonElement>, productId: string) => {
+    if (isSavingOrder) return;
+    event.dataTransfer.effectAllowed = 'move';
+    event.dataTransfer.setData('text/plain', productId);
+    setDraggedProductId(productId);
+  };
+
+  const endDrag = () => {
+    setDraggedProductId(null);
+    setDragOverProductId(null);
   };
 
   return (
@@ -143,20 +177,61 @@ export function AdminProductsList() {
         return (
           <article
             key={product.id}
-            draggable={isArranging}
-            onDragStart={() => setDraggedProductId(product.id)}
             onDragOver={(event) => {
-              if (isArranging) event.preventDefault();
+              if (!isArranging || !draggedProductId || draggedProductId === product.id) return;
+              event.preventDefault();
+              event.dataTransfer.dropEffect = 'move';
+              setDragOverProductId(product.id);
+            }}
+            onDragLeave={(event) => {
+              if (event.currentTarget.contains(event.relatedTarget as Node)) return;
+              setDragOverProductId((current) => current === product.id ? null : current);
             }}
             onDrop={(event) => {
               event.preventDefault();
               if (!isArranging || !draggedProductId) return;
               const fromIndex = displayedProducts.findIndex((item) => item.id === draggedProductId);
               moveProduct(fromIndex, index);
+              endDrag();
             }}
-            onDragEnd={() => setDraggedProductId(null)}
-            className="grid gap-4 border border-[#ddd4c8] bg-[#fffaf3] p-4 transition hover:border-[#111111] sm:gap-5 sm:p-5 md:grid-cols-[96px_1fr_auto]"
+            className={`relative grid gap-4 border bg-[#fffaf3] transition-[transform,opacity,border-color,box-shadow,background-color] duration-200 ease-out hover:border-[#111111] sm:gap-5 md:grid-cols-[96px_1fr_auto] ${
+              isArranging ? 'px-10 py-4 sm:px-12 sm:py-5' : 'p-4 sm:p-5'
+            } ${
+              draggedProductId === product.id
+                ? 'scale-[0.99] border-[#111111] opacity-45 shadow-none'
+                : dragOverProductId === product.id
+                  ? 'border-[#111111] bg-[#f5efe6] shadow-[0_12px_30px_rgba(49,37,26,0.12)]'
+                  : 'border-[#ddd4c8]'
+            }`}
           >
+            {isArranging ? (
+              <>
+                <button
+                  type="button"
+                  draggable={!isSavingOrder}
+                  onDragStart={(event) => startDrag(event, product.id)}
+                  onDragEnd={endDrag}
+                  disabled={isSavingOrder}
+                  className="absolute inset-y-0 left-0 z-10 flex w-9 cursor-grab touch-none items-center justify-center text-[#7a7269] transition hover:bg-[#eee5da] hover:text-[#111111] active:cursor-grabbing disabled:cursor-not-allowed disabled:opacity-40 sm:w-11"
+                  aria-label={`Drag ${product.name} to reorder`}
+                  title="Drag to reorder"
+                >
+                  <DragHandleIcon />
+                </button>
+                <button
+                  type="button"
+                  draggable={!isSavingOrder}
+                  onDragStart={(event) => startDrag(event, product.id)}
+                  onDragEnd={endDrag}
+                  disabled={isSavingOrder}
+                  className="absolute inset-y-0 right-0 z-10 flex w-9 cursor-grab touch-none items-center justify-center text-[#7a7269] transition hover:bg-[#eee5da] hover:text-[#111111] active:cursor-grabbing disabled:cursor-not-allowed disabled:opacity-40 sm:w-11"
+                  aria-label={`Drag ${product.name} to reorder`}
+                  title="Drag to reorder"
+                >
+                  <DragHandleIcon />
+                </button>
+              </>
+            ) : null}
             <div className="aspect-[3/4] overflow-hidden bg-[#f5f5f5]">
               {product.primaryImage ? (
                 <img
