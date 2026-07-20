@@ -29,6 +29,7 @@ POST /api/v1/admin/products
 GET /api/v1/admin/products/:id
 PATCH /api/v1/admin/products/:id
 PATCH /api/v1/admin/products/:id/status
+PATCH /api/v1/admin/products/reorder
 GET /api/v1/admin/homepage-sections
 POST /api/v1/admin/homepage-sections
 PATCH /api/v1/admin/homepage-sections/:id
@@ -687,7 +688,21 @@ POST /api/v1/admin/products
 GET /api/v1/admin/products/:id
 PATCH /api/v1/admin/products/:id
 PATCH /api/v1/admin/products/:id/status
+PATCH /api/v1/admin/products/reorder
 ```
+
+`PATCH /api/v1/admin/products/reorder` is admin-only and persists the complete
+catalog order used by the public default/Newest ordering. Send every current
+product ID exactly once, in the desired first-to-last order:
+
+```json
+{
+  "productIds": ["product_id_for_first", "product_id_for_second"]
+}
+```
+
+The endpoint rejects duplicate, missing, or unknown IDs so a stale admin page
+cannot accidentally leave part of the catalog unordered.
 
 Create product body:
 

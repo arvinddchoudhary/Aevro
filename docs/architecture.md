@@ -146,6 +146,13 @@ AND semantics between facets. Fixed aggregate queries calculate current-context
 facet counts without one query per option. Products are paginated before
 serialization and variant joins are deduplicated by product ID.
 
+Admins can set a durable catalog order through the protected product reorder
+endpoint. `Product.displayOrder` is stored separately from image `sortOrder`;
+the latter controls only product-gallery images. Public default and `newest`
+catalog requests use `displayOrder` first and creation time as a stable
+fallback. Price sorting and search relevance remain independent of the manual
+catalog arrangement.
+
 The current schema does not contain fit, style, material, or tag attributes, so
 those facets are intentionally empty. They should be added only with a formal
 catalog schema extension. The frontend keeps search, filters, sorting, and

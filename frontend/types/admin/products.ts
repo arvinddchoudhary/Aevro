@@ -46,6 +46,7 @@ export type AdminProduct = {
   category: Category | null;
   primaryImage: AdminProductImage | null;
   stock: number;
+  displayOrder: number;
   lowStock?: boolean;
   createdAt: string;
   updatedAt: string;

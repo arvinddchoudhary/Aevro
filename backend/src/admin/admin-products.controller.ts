@@ -7,6 +7,7 @@ import { AdminProductsService } from './admin-products.service';
 import { CreateAdminCategoryDto } from './dto/admin-category.dto';
 import {
   CreateAdminProductDto,
+  ReorderAdminProductsDto,
   UpdateAdminProductDto,
   UpdateAdminProductStatusDto,
 } from './dto/admin-product.dto';
@@ -49,6 +50,14 @@ export class AdminProductsController {
     return {
       success: true,
       data: await this.adminProductsService.createProduct(dto),
+    };
+  }
+
+  @Patch('products/reorder')
+  async reorderProducts(@Body() dto: ReorderAdminProductsDto) {
+    return {
+      success: true,
+      data: await this.adminProductsService.reorderProducts(dto),
     };
   }
 

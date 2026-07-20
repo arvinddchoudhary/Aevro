@@ -86,6 +86,12 @@ These require running local services and real browser interaction.
 - Order belongs to logged-in user.
 - Homepage loads without console errors.
 - Products page filters work: category, search, color, size, min/max price, sort.
+- As an admin, arrange products, save the full order, refresh the admin page, and
+  confirm the order persists. Confirm the first arranged active product appears
+  first in the public default/Newest catalog and homepage product selection.
+- Verify duplicate, missing, or stale product IDs are rejected by
+  `PATCH /api/v1/admin/products/reorder`; confirm price and relevance sorting
+  remain unaffected.
 - Product detail page loads by slug/id.
 - Variant selection works.
 - Out-of-stock variants cannot be added to cart.

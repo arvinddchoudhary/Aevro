@@ -107,6 +107,25 @@ export async function getAdminProducts() {
   return response.data;
 }
 
+export async function reorderAdminProducts(productIds: string[]) {
+  const response = await adminRequest<AdminCollectionResponse<AdminProduct>>(
+    '/admin/products/reorder',
+    {
+      method: 'PATCH',
+      body: JSON.stringify({ productIds }),
+    },
+  );
+
+  if (!response.success) {
+    throw new AdminApiError(
+      Array.isArray(response.message) ? response.message.join(' ') : response.message,
+      response.statusCode,
+    );
+  }
+
+  return response.data;
+}
+
 export async function getAdminProduct(id: string) {
   const response = await adminRequest<AdminItemResponse<AdminProduct>>(
     `/admin/products/${id}`,
