@@ -26,6 +26,9 @@ const AUTH_RATE_LIMITS: Record<string, RateLimitRule> = {
   'POST /api/v1/auth/login': { limit: 10, windowMs: FIFTEEN_MINUTES },
   'POST /api/v1/auth/login/send-otp': { limit: 5, windowMs: FIFTEEN_MINUTES },
   'POST /api/v1/auth/login/verify-otp': { limit: 10, windowMs: FIFTEEN_MINUTES },
+  'POST /api/v1/auth/password-reset/send-otp': { limit: 5, windowMs: FIFTEEN_MINUTES },
+  'POST /api/v1/auth/password-reset/verify-otp': { limit: 10, windowMs: FIFTEEN_MINUTES },
+  'POST /api/v1/auth/password-reset': { limit: 5, windowMs: FIFTEEN_MINUTES },
   'POST /api/v1/auth/google': { limit: 20, windowMs: FIFTEEN_MINUTES },
   'POST /api/v1/auth/refresh': { limit: 60, windowMs: FIFTEEN_MINUTES },
 };
