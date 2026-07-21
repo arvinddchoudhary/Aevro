@@ -598,11 +598,11 @@ export function CheckoutPageContent() {
                     </p>
                   ) : item.quantity > item.stock ? (
                     <p className="mt-1 text-xs leading-5 text-[#8a1f1f]">
-                      Only {item.stock} available
+                      Requested quantity is unavailable
                     </p>
                   ) : item.stock <= 5 ? (
                     <p className="mt-1 text-xs leading-5 text-[#8a1f1f]">
-                      Only {item.stock} left
+                      Limited availability
                     </p>
                   ) : null}
                 </div>

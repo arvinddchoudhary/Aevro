@@ -101,9 +101,7 @@ export function ProductVariantSelection({ product }: ProductVariantSelectionProp
   const canAddToCart = Boolean(selectedColor && selectedVariant && selectedVariant.stock > 0);
   const stockLabel = selectedVariant
     ? selectedVariant.stock > 0
-      ? selectedVariant.lowStock
-        ? `Only ${selectedVariant.stock} left`
-        : `${selectedVariant.stock} available`
+      ? 'Available'
       : 'Out of stock'
     : selectedColor
       ? 'Select a size'
@@ -288,7 +286,15 @@ export function ProductVariantSelection({ product }: ProductVariantSelectionProp
               <p className="text-xs font-semibold uppercase tracking-[0.12em]">
                 Size: <span className="text-[#77716a]">{selectedSize || 'Select your size'}</span>
               </p>
-              <p className="text-xs text-[#514c45]">{stockLabel}</p>
+              <div className="flex items-center gap-3">
+                <Link
+                  href="/help/size-guide"
+                  className="text-xs font-medium underline underline-offset-4 hover:text-[#514c45]"
+                >
+                  Size guide
+                </Link>
+                <p className="text-xs text-[#514c45]">{stockLabel}</p>
+              </div>
             </div>
             <div className="grid grid-cols-4 gap-2.5 sm:grid-cols-5 sm:gap-3">
               {availableSizes.map((size) => (
@@ -304,11 +310,6 @@ export function ProductVariantSelection({ product }: ProductVariantSelectionProp
                   }`}
                 >
                   <span>{size.size}</span>
-                  {size.stock > 0 && size.lowStock ? (
-                    <span className="ml-1 text-[10px] uppercase tracking-[0.08em]">
-                      Low
-                    </span>
-                  ) : null}
                 </button>
               ))}
             </div>
@@ -339,7 +340,7 @@ export function ProductVariantSelection({ product }: ProductVariantSelectionProp
           {product.category && (
             <Link
               href={`/products?category=${product.category.slug}`}
-              className="inline-flex h-11 w-full cursor-pointer items-center justify-center rounded-[4px] border border-[#111111] px-7 text-xs font-semibold uppercase tracking-[0.08em] hover:bg-[#111111] hover:text-[#fffaf3]"
+              className="inline-flex h-11 w-full cursor-pointer items-center justify-center rounded-[4px] border border-[#111111] px-7 text-xs font-semibold uppercase tracking-[0.08em] transition hover:border-[#6d665d] hover:bg-[#f1e9de]"
             >
               More {product.category.name}
             </Link>

@@ -28,7 +28,7 @@ const faqs = [
   {
     question: 'How long does shipping take?',
     answer:
-      'Metro cities: 3–5 business days. Rest of India: 5–7 business days. Orders placed before 2 PM IST on business days are typically dispatched the same day.',
+      'Orders are typically delivered within 7–10 business days across India, subject to serviceability and unforeseen delays.',
   },
   {
     question: 'Is shipping free?',

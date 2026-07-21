@@ -32,12 +32,8 @@ export default function ShippingPage() {
               </h2>
               <div className="mt-4 space-y-3 text-sm leading-7 text-[#3f3932]">
                 <p>
-                  <strong className="text-[#111111]">Metro cities:</strong> 3–5
-                  business days
-                </p>
-                <p>
-                  <strong className="text-[#111111]">Rest of India:</strong> 5–7
-                  business days
+                  Orders are typically delivered within 7–10 business days across
+                  India, subject to serviceability and unforeseen delays.
                 </p>
                 <p>
                   Orders placed before 2 PM IST on business days are typically

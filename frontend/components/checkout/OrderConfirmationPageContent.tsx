@@ -194,7 +194,7 @@ export function OrderConfirmationPageContent({
                   </div>
 
                   <div className="text-sm sm:min-w-[126px] sm:text-right">
-                    <p className="text-[#9a9289] line-through">
+                    <p className="text-[#77716a]">
                       {formatPrice(item.unitPriceInPaise)} each
                     </p>
                     <p className="mt-3 font-medium text-[#111111]">
