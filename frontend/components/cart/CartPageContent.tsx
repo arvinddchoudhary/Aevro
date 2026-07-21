@@ -73,11 +73,11 @@ export function CartPageContent() {
                   </p>
                 ) : item.quantity >= item.stock ? (
                   <p className="mt-3 text-sm text-[#8a1f1f]">
-                    You have selected the maximum available stock.
+                    You have selected the maximum available quantity.
                   </p>
                 ) : item.stock <= 5 ? (
                   <p className="mt-3 text-sm text-[#8a1f1f]">
-                    Low stock: only {item.stock} left.
+                    This selection has limited availability.
                   </p>
                 ) : null}
                 <div className="mt-4">

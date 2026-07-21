@@ -117,38 +117,37 @@ export default async function ProductDetailsPage({
         </div>
         <ProductVariantSelection product={product} />
 
-        <section className="mt-6 grid overflow-hidden rounded-[6px] border border-[#eadfd2] bg-[#fffaf3]/70 lg:grid-cols-3">
-          <div className="border-b border-[#eadfd2] p-5 sm:p-6 lg:border-b-0 lg:border-r">
-            <p className="text-xs font-semibold uppercase tracking-[0.1em]">Details</p>
-            <p className="mt-5 max-w-md text-sm leading-7 text-[#2f2a25]">
+        <section className="mt-8 grid gap-3 lg:grid-cols-3 lg:gap-4">
+          <article className="rounded-[6px] border border-[#eadfd2] bg-[#fffaf3]/80 p-5 shadow-[0_10px_30px_rgba(49,37,26,0.035)] sm:p-6">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[#77716a]">Details</p>
+            <p className="mt-4 max-w-md text-sm leading-7 text-[#2f2a25]">
               {product.description ??
                 'Tailored with precision, these trousers feature a refined drape, considered proportions, and versatile styling for formal and casual looks.'}
             </p>
-            <ul className="mt-5 space-y-2 text-sm text-[#2f2a25]">
-              <li>• Relaxed fit</li>
-              <li>• Clean front silhouette</li>
-              <li>• Side pockets</li>
-              <li>• Belt loops</li>
+            <ul className="mt-5 grid gap-2 text-sm text-[#514c45]">
+              <li>Relaxed fit</li>
+              <li>Clean front silhouette</li>
+              <li>Side pockets and belt loops</li>
             </ul>
-          </div>
-          <div className="border-b border-[#eadfd2] p-5 sm:p-6 lg:border-b-0 lg:border-r">
-            <p className="text-xs font-semibold uppercase tracking-[0.1em]">Fabric & care</p>
-            <p className="mt-5 text-sm text-[#2f2a25]">
+          </article>
+          <article className="rounded-[6px] border border-[#eadfd2] bg-[#fffaf3]/80 p-5 shadow-[0_10px_30px_rgba(49,37,26,0.035)] sm:p-6">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[#77716a]">Fabric & care</p>
+            <p className="mt-4 text-sm leading-7 text-[#2f2a25]">
               Premium trouser-weight fabric selected for structure and drape.
             </p>
-            <div className="mt-5 grid gap-3 text-sm text-[#2f2a25]">
+            <div className="mt-5 grid gap-2 text-sm text-[#514c45]">
               <span>Machine wash cold</span>
               <span>Do not bleach</span>
               <span>Iron on low</span>
               <span>Dry clean recommended</span>
             </div>
-          </div>
-          <div className="p-5 sm:p-6">
-            <p className="text-xs font-semibold uppercase tracking-[0.1em]">Shipping & returns</p>
-            <p className="mt-5 text-sm text-[#2f2a25]">
-              Free shipping on orders above ₹4,999. Delivered in 3–7 business days across India.
+          </article>
+          <article className="rounded-[6px] border border-[#eadfd2] bg-[#fffaf3]/80 p-5 shadow-[0_10px_30px_rgba(49,37,26,0.035)] sm:p-6">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[#77716a]">Shipping & returns</p>
+            <p className="mt-4 text-sm leading-7 text-[#2f2a25]">
+              Free shipping on orders above ₹4,999. Delivered in 7–10 business days across India.
             </p>
-            <div className="mt-5 grid gap-3 text-sm text-[#2f2a25]">
+            <div className="mt-5 grid gap-2 text-sm text-[#514c45]">
               <span>14-day returns on unworn items</span>
               <span>Free exchanges, subject to stock</span>
               <Link href="/help/shipping" className="underline underline-offset-4 hover:text-[#111111]">
@@ -158,7 +157,7 @@ export default async function ProductDetailsPage({
                 Full returns policy →
               </Link>
             </div>
-          </div>
+          </article>
         </section>
 
         {relatedProducts.length > 0 && (

@@ -44,9 +44,9 @@ export default function ShippingPolicyPage() {
               </h2>
               <div className="mt-4 space-y-3 text-sm leading-7 text-[#3f3932]">
                 <p>
-                  Metro cities: 3–5 business days. Other locations: 5–7 business
-                  days. Delivery timelines are estimates and may vary due to
-                  unforeseen circumstances.
+                  Orders are typically delivered within 7–10 business days across
+                  India. Delivery timelines are estimates and may vary due to
+                  serviceability and unforeseen circumstances.
                 </p>
               </div>
             </div>
