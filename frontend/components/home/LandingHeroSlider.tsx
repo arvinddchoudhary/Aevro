@@ -3,33 +3,35 @@
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 
-const heroSlides = [
-  '/images/Landing-Page-Hero-Section/WideLegHero1.png',
-  '/images/Landing-Page-Hero-Section/WideLegHero2.png',
-  '/images/Landing-Page-Hero-Section/WideLegHero3.png',
-  '/images/Landing-Page-Hero-Section/WideLegHero4.png',
-] as const;
-
 type LandingHeroSliderProps = {
   description?: string | null;
   ctaHref?: string | null;
   ctaLabel?: string | null;
+  slides?: string[];
 };
 
 export function LandingHeroSlider({
   description = 'Refined trousers and elevated essentials crafted for the way you live and dress.',
   ctaHref = '/products',
   ctaLabel = 'Shop trousers',
+  slides = [],
 }: LandingHeroSliderProps) {
+  const heroSlides = slides;
   const [activeSlide, setActiveSlide] = useState(0);
 
   useEffect(() => {
+    if (heroSlides.length < 2) return;
+
     const intervalId = window.setInterval(() => {
       setActiveSlide((currentSlide) => (currentSlide + 1) % heroSlides.length);
-    }, 3000);
+    }, 7000);
 
     return () => window.clearInterval(intervalId);
-  }, []);
+  }, [heroSlides.length]);
+
+  useEffect(() => {
+    setActiveSlide((currentSlide) => Math.min(currentSlide, Math.max(heroSlides.length - 1, 0)));
+  }, [heroSlides.length]);
 
   const buttonLabel = ctaLabel?.trim() || 'Shop trousers';
   const descriptionText = description?.trim() || 'Refined trousers and elevated essentials crafted for the way you live and dress.';
@@ -42,8 +44,8 @@ export function LandingHeroSlider({
             key={src}
             src={src}
             alt="AEVRO tailored trousers"
-            className={`absolute inset-0 h-full w-full object-cover object-[64%_center] transition-opacity duration-700 ease-out motion-reduce:transition-none md:object-contain md:object-right ${
-              index === activeSlide ? 'opacity-100' : 'pointer-events-none opacity-0'
+            className={`absolute inset-0 h-full w-full object-cover object-[64%_center] transition-[opacity,transform] duration-[1200ms] ease-in-out motion-reduce:transition-none md:object-contain md:object-right ${
+              index === activeSlide ? 'scale-100 opacity-100' : 'pointer-events-none scale-[1.015] opacity-0'
             }`}
           />
         ))}
@@ -72,22 +74,24 @@ export function LandingHeroSlider({
           </div>
         </div>
 
-        <div className="absolute bottom-2.5 left-1/2 z-10 flex -translate-x-1/2 items-center gap-1.5 md:bottom-6" aria-label="Hero slides">
-          {heroSlides.map((src, index) => (
-            <button
-              key={src}
-              type="button"
-              aria-label={`Show hero image ${index + 1}`}
-              aria-current={index === activeSlide ? 'true' : undefined}
-              onClick={() => setActiveSlide(index)}
-              className={`rounded-full transition-all duration-300 motion-reduce:transition-none ${
-                index === activeSlide
-                  ? 'h-1.5 w-5 bg-[#111111]'
-                  : 'h-1.5 w-1.5 bg-[#fffaf3] hover:bg-[#111111]'
-              }`}
-            />
-          ))}
-        </div>
+        {heroSlides.length > 1 && (
+          <div className="absolute bottom-2.5 left-1/2 z-10 flex -translate-x-1/2 items-center gap-1.5 md:bottom-6" aria-label="Hero slides">
+            {heroSlides.map((src, index) => (
+              <button
+                key={src}
+                type="button"
+                aria-label={`Show hero image ${index + 1}`}
+                aria-current={index === activeSlide ? 'true' : undefined}
+                onClick={() => setActiveSlide(index)}
+                className={`rounded-full transition-all duration-300 motion-reduce:transition-none ${
+                  index === activeSlide
+                    ? 'h-1.5 w-5 bg-[#111111]'
+                    : 'h-1.5 w-1.5 bg-[#fffaf3] hover:bg-[#111111]'
+                }`}
+              />
+            ))}
+          </div>
+        )}
       </div>
     </section>
   );
