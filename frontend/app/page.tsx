@@ -6,6 +6,7 @@ import { EmptyState } from '../components/ui/EmptyState';
 import { ErrorState } from '../components/ui/ErrorState';
 import { getProducts } from '../lib/api/catalog';
 import { getHomepageSections } from '../lib/api/homepage';
+import { getLandingHeroSlides } from '../lib/landing-hero-images';
 import { defaultSeoDescription, pageMetadata } from '../lib/seo';
 import type { HomepageSection } from '../types/homepage';
 import type { Product } from '../types/catalog';
@@ -24,6 +25,7 @@ export default async function HomePage() {
     getProducts({ limit: 4, sort: 'newest' }),
     getHomepageSections(),
   ]);
+  const heroSlides = await getLandingHeroSlides();
   const products =
     catalogResult.status === 'fulfilled' ? catalogResult.value.data : [];
   const hasCatalogError = catalogResult.status === 'rejected';
@@ -34,7 +36,7 @@ export default async function HomePage() {
     return (
       <main className="text-[#111111]">
         {homepageSections.map((section) =>
-          renderHomepageSection(section, products, hasCatalogError),
+          renderHomepageSection(section, products, hasCatalogError, heroSlides),
         )}
       </main>
     );
@@ -42,7 +44,7 @@ export default async function HomePage() {
 
   return (
     <main className="text-[#111111]">
-      <LandingHeroSlider />
+      <LandingHeroSlider slides={heroSlides} />
       <MobileHomeBenefits />
 
       <section className="aevro-container py-6 sm:py-14">
@@ -349,6 +351,7 @@ function renderHomepageSection(
   section: HomepageSection,
   products: Product[],
   hasCatalogError: boolean,
+  heroSlides: string[],
 ) {
   if (section.type === 'HERO') {
     return (
@@ -357,6 +360,7 @@ function renderHomepageSection(
           description={section.description}
           ctaHref={section.ctaHref}
           ctaLabel={section.ctaLabel}
+          slides={heroSlides}
         />
         <MobileHomeBenefits />
       </div>
