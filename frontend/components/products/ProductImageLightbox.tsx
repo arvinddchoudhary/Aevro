@@ -2,6 +2,7 @@
 
 import { useEffect } from 'react';
 import type { ProductImage } from '../../types/catalog';
+import { CloudinaryProductImage } from './CloudinaryProductImage';
 
 type ProductImageLightboxProps = {
   images: ProductImage[];
@@ -130,13 +131,16 @@ export function ProductImageLightbox({
       </button>
 
       <div
-        className="flex h-[100dvh] w-full max-w-none items-center justify-center px-3 py-20 sm:max-h-[90vh] sm:max-w-[90vw] sm:px-20"
+        className="relative flex h-[100dvh] w-full max-w-none items-center justify-center px-3 py-20 sm:max-h-[90vh] sm:max-w-[90vw] sm:px-20"
         onClick={(event) => event.stopPropagation()}
       >
-        <img
+        <CloudinaryProductImage
           src={currentImage.url}
           alt={currentImage.altText ?? productName}
-          className="h-auto max-h-[calc(100dvh-10rem)] w-auto max-w-full object-contain sm:max-h-[85vh]"
+          delivery="product-detail"
+          sizes="100vw"
+          loading="eager"
+          className="object-contain"
         />
       </div>
 

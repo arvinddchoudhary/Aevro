@@ -12,6 +12,7 @@ import { EmptyState } from '../ui/EmptyState';
 import { ErrorState } from '../ui/ErrorState';
 import { OrderStatusPill } from './OrderStatusPill';
 import { OrderTrackingPanel } from './OrderTrackingPanel';
+import { CloudinaryProductImage } from '../products/CloudinaryProductImage';
 
 export function AccountOrderDetailsPageContent({ id }: { id: string }) {
   const router = useRouter();
@@ -102,12 +103,14 @@ export function AccountOrderDetailsPageContent({ id }: { id: string }) {
                 key={item.id}
                 className="grid gap-5 border-b border-[#ddd4c8] pb-5 sm:grid-cols-[110px_1fr_auto]"
               >
-                <div className="aspect-[3/4] overflow-hidden bg-[#f5f5f5]">
+                <div className="relative aspect-[3/4] overflow-hidden bg-[#f5f5f5]">
                   {image ? (
-                    <img
+                    <CloudinaryProductImage
                       src={image.url}
                       alt={image.altText ?? item.productName}
-                      className="h-full w-full object-cover"
+                      delivery="thumbnail"
+                      sizes="110px"
+                      className="object-cover"
                     />
                   ) : (
                     <div className="flex h-full items-center justify-center text-xs uppercase tracking-[0.18em] text-[#777777]">

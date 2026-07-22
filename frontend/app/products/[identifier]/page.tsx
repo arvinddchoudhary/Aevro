@@ -175,7 +175,7 @@ export default async function ProductDetailsPage({
             </div>
             <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4 xl:grid-cols-5">
               {relatedProducts.map((item) => (
-                <ProductCard key={item.id} product={item} compact />
+                <ProductCard key={item.id} product={item} compact imageSizes="(max-width: 1023px) 50vw, (max-width: 1279px) 25vw, 20vw" />
               ))}
             </div>
           </section>

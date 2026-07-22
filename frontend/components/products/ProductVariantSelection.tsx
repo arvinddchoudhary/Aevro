@@ -163,6 +163,9 @@ export function ProductVariantSelection({ product }: ProductVariantSelectionProp
                 image={image}
                 productName={product.name}
                 className="aspect-square rounded-[4px]"
+                delivery="thumbnail"
+                sizes="(max-width: 639px) 68px, (max-width: 1279px) 76px, 82px"
+                loading="lazy"
               />
             </button>
           ))}
@@ -179,6 +182,9 @@ export function ProductVariantSelection({ product }: ProductVariantSelectionProp
               productName={product.name}
               className="aspect-[4/5] w-full rounded-[8px] sm:aspect-[1086/1448] sm:max-w-[540px] sm:rounded-[6px]"
               imageClassName="object-contain"
+              delivery="product-detail"
+              sizes="(max-width: 639px) 100vw, 540px"
+              preload
             />
           </button>
 

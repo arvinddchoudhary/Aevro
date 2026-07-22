@@ -15,6 +15,7 @@ import { AccountBenefitBar } from '../account/AccountBenefitBar';
 import { AccountHero } from '../account/AccountHero';
 import { AccountIcon } from '../account/AccountIcons';
 import { AccountInfoCard } from '../account/AccountInfoCard';
+import { CloudinaryProductImage } from '../products/CloudinaryProductImage';
 import { AccountSidebar } from '../account/AccountSidebar';
 import { AccountSummaryCard } from '../account/AccountSummaryCard';
 import { EmptyState } from '../ui/EmptyState';
@@ -270,12 +271,14 @@ export function AccountPageContent() {
                           href={`/account/orders/${order.id}`}
                           className="grid grid-cols-[44px_minmax(0,1fr)] items-center gap-3 border-b border-[#eee5da] pb-3 last:border-b-0 last:pb-0 min-[390px]:grid-cols-[44px_minmax(0,1fr)_auto]"
                         >
-                          <span className="block h-12 w-11 overflow-hidden bg-[#eee5da]">
+                          <span className="relative block h-12 w-11 overflow-hidden bg-[#eee5da]">
                             {image ? (
-                              <img
+                              <CloudinaryProductImage
                                 src={image.url}
                                 alt={image.altText ?? order.items[0]?.productName ?? 'Order item'}
-                                className="h-full w-full object-cover"
+                                delivery="thumbnail"
+                                sizes="44px"
+                                className="object-cover"
                               />
                             ) : (
                               <span className="flex h-full w-full items-center justify-center text-[#8a8177]">
@@ -331,12 +334,14 @@ export function AccountPageContent() {
                             href={`/products/${item.product.slug}`}
                             className="group min-w-0"
                           >
-                            <span className="block aspect-[3/4] overflow-hidden bg-[#eee5da]">
+                            <span className="relative block aspect-[3/4] overflow-hidden bg-[#eee5da]">
                               {image ? (
-                                <img
+                                <CloudinaryProductImage
                                   src={image.url}
                                   alt={image.altText ?? item.product.name}
-                                  className="h-full w-full object-cover transition group-hover:scale-[1.02]"
+                                  delivery="thumbnail"
+                                  sizes="(max-width: 639px) 50vw, 300px"
+                                  className="object-cover transition group-hover:scale-[1.02]"
                                 />
                               ) : (
                                 <span className="flex h-full w-full items-center justify-center text-[#8a8177]">

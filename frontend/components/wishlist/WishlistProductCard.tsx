@@ -6,6 +6,7 @@ import { AccountIcon } from '../account/AccountIcons';
 import { useCart } from '../../lib/cart';
 import { formatPrice } from '../../lib/format';
 import type { WishlistItem } from '../../types/wishlist';
+import { CloudinaryProductImage } from '../products/CloudinaryProductImage';
 
 type WishlistProductCardProps = {
   item: WishlistItem;
@@ -75,12 +76,14 @@ export function WishlistProductCard({
     >
       <div className="relative overflow-hidden bg-[#eee5da]">
         <Link href={`/products/${item.product.slug}`} className="block">
-          <div className={layout === 'list' ? 'aspect-[4/5]' : 'aspect-[3/4]'}>
+          <div className={`relative ${layout === 'list' ? 'aspect-[4/5]' : 'aspect-[3/4]'}`}>
             {image ? (
-              <img
+              <CloudinaryProductImage
                 src={image.url}
                 alt={image.altText ?? item.product.name}
-                className="h-full w-full object-cover"
+                delivery="thumbnail"
+                sizes="(max-width: 639px) 50vw, (max-width: 1023px) 33vw, 300px"
+                className="object-cover"
               />
             ) : (
               <span className="flex h-full w-full items-center justify-center text-[#7f7468]">

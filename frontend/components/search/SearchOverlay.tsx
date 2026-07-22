@@ -6,6 +6,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { getProductSuggestions, getProducts } from '../../lib/api/catalog';
 import { formatPrice } from '../../lib/format';
 import type { Product } from '../../types/catalog';
+import { CloudinaryProductImage } from '../products/CloudinaryProductImage';
 
 type SearchOverlayProps = {
   isOpen: boolean;
@@ -357,12 +358,14 @@ export function SearchOverlay({ isOpen, onClose }: SearchOverlayProps) {
                       onClick={onClose}
                       className="group grid min-h-[86px] cursor-pointer grid-cols-[70px_minmax(0,1fr)_auto] items-center gap-3 border border-[#e1d8cc] bg-[#fffaf3]/82 p-2.5 transition hover:border-[#111111] sm:grid-cols-[84px_1fr_auto] sm:gap-4"
                     >
-                      <div className="h-[64px] w-[64px] overflow-hidden rounded-[4px] bg-[#eee5da] sm:h-[76px] sm:w-[76px]">
+                      <div className="relative h-[64px] w-[64px] overflow-hidden rounded-[4px] bg-[#eee5da] sm:h-[76px] sm:w-[76px]">
                         {image ? (
-                          <img
+                          <CloudinaryProductImage
                             src={image.url}
                             alt={image.altText ?? product.name}
-                            className="h-full w-full object-cover transition duration-500 group-hover:scale-[1.03]"
+                            delivery="thumbnail"
+                            sizes="(max-width: 639px) 64px, 76px"
+                            className="object-cover transition duration-500 group-hover:scale-[1.03]"
                           />
                         ) : null}
                       </div>

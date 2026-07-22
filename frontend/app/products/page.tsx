@@ -226,7 +226,7 @@ export default async function ProductsPage({
             />
           ) : (
             <div className="grid grid-cols-2 gap-2.5 min-[390px]:gap-3 sm:gap-5 md:grid-cols-3 xl:grid-cols-4">
-              {products.map((product) => <ProductCard key={product.id} product={product} compact shopMobile />)}
+              {products.map((product) => <ProductCard key={product.id} product={product} compact shopMobile imageSizes="(max-width: 767px) 50vw, (max-width: 1279px) 33vw, 25vw" />)}
             </div>
           )}
 
