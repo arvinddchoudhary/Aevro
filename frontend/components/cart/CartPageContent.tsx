@@ -5,6 +5,7 @@ import { formatPrice } from '../../lib/format';
 import { useCart } from '../../lib/cart';
 import { EmptyState } from '../ui/EmptyState';
 import { CartQuantityControls } from './CartQuantityControls';
+import { CloudinaryProductImage } from '../products/CloudinaryProductImage';
 
 export function CartPageContent() {
   const { items, subtotalInPaise, clearCart } = useCart();
@@ -31,13 +32,15 @@ export function CartPageContent() {
           >
             <Link
               href={`/products/${item.slug}`}
-              className="aspect-[1086/1448] w-full max-w-[124px] cursor-pointer overflow-hidden rounded-[4px] bg-[#eee8de] sm:max-w-[150px] md:max-w-[170px]"
+              className="relative aspect-[1086/1448] w-full max-w-[124px] cursor-pointer overflow-hidden rounded-[4px] bg-[#eee8de] sm:max-w-[150px] md:max-w-[170px]"
             >
               {item.imageUrl ? (
-                <img
+                <CloudinaryProductImage
                   src={item.imageUrl}
                   alt={item.imageAltText ?? item.name}
-                  className="h-full w-full object-cover"
+                  delivery="thumbnail"
+                  sizes="(max-width: 639px) 124px, (max-width: 767px) 150px, 170px"
+                  className="object-cover"
                 />
               ) : (
                 <div className="flex h-full items-center justify-center text-xs uppercase tracking-[0.18em] text-[#777777]">

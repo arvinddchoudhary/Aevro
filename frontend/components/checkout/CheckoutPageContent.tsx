@@ -16,6 +16,7 @@ import {
   verifyRazorpayPayment,
 } from '../../lib/api/payments';
 import { createUserAddress, getUserAddresses } from '../../lib/api/users';
+import { CloudinaryProductImage } from '../products/CloudinaryProductImage';
 import { useAuth } from '../../lib/auth';
 import { formatPrice } from '../../lib/format';
 import { loadRazorpayScript, openRazorpayCheckout } from '../../lib/razorpay';
@@ -571,12 +572,14 @@ export function CheckoutPageContent() {
                 key={item.itemKey}
                 className="grid grid-cols-[58px_minmax(0,1fr)] gap-3 border-b border-[#e7ded2] pb-4 last:border-b-0 min-[390px]:grid-cols-[58px_minmax(0,1fr)_auto] sm:gap-4"
               >
-                <div className="h-[74px] overflow-hidden rounded-[3px] bg-[#f5f5f5]">
+                <div className="relative h-[74px] overflow-hidden rounded-[3px] bg-[#f5f5f5]">
                   {item.imageUrl ? (
-                    <img
+                    <CloudinaryProductImage
                       src={item.imageUrl}
                       alt={item.imageAltText ?? item.name}
-                      className="h-full w-full object-cover"
+                      delivery="thumbnail"
+                      sizes="58px"
+                      className="object-cover"
                     />
                   ) : (
                     <div className="flex h-full items-center justify-center text-[10px] uppercase tracking-[0.14em] text-[#777777]">

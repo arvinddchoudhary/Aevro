@@ -7,6 +7,7 @@ import { formatPrice } from '../../lib/format';
 import type { Order } from '../../types/orders';
 import { RazorpayPaymentPanel } from '../payments/RazorpayPaymentPanel';
 import { ErrorState } from '../ui/ErrorState';
+import { CloudinaryProductImage } from '../products/CloudinaryProductImage';
 
 type OrderConfirmationPageContentProps = {
   orderId: string;
@@ -161,12 +162,14 @@ export function OrderConfirmationPageContent({
                   key={item.id}
                   className="grid min-w-0 gap-5 rounded-[5px] border border-[#ddd4c8] bg-[#fffaf3]/78 p-4 shadow-[0_14px_45px_rgba(72,57,39,0.04)] backdrop-blur-[2px] sm:grid-cols-[112px_minmax(0,1fr)_auto] sm:items-center sm:p-6"
                 >
-                  <div className="h-[136px] w-[104px] overflow-hidden rounded-[4px] bg-[#ebe2d7] sm:h-[140px] sm:w-[112px]">
+                  <div className="relative h-[136px] w-[104px] overflow-hidden rounded-[4px] bg-[#ebe2d7] sm:h-[140px] sm:w-[112px]">
                     {image ? (
-                      <img
+                      <CloudinaryProductImage
                         src={image.url}
                         alt={image.altText ?? item.productName}
-                        className="h-full w-full object-cover object-top"
+                        delivery="thumbnail"
+                        sizes="(max-width: 639px) 104px, 112px"
+                        className="object-cover object-top"
                       />
                     ) : (
                       <span className="flex h-full items-center justify-center px-3 text-center text-[10px] uppercase tracking-[0.16em] text-[#8d847a]">

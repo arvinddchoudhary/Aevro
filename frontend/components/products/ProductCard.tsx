@@ -12,12 +12,14 @@ type ProductCardProps = {
   product: Product;
   compact?: boolean;
   shopMobile?: boolean;
+  imageSizes?: string;
 };
 
 export function ProductCard({
   product,
   compact = false,
   shopMobile = false,
+  imageSizes = '(max-width: 767px) 33vw, (max-width: 1023px) 33vw, (max-width: 1279px) 25vw, 20vw',
 }: ProductCardProps) {
   const primaryImage = product.primaryImage ?? product.images[0];
   const images = useMemo<ProductImage[]>(() => {
@@ -83,6 +85,8 @@ export function ProductCard({
                   : 'aspect-[3/4]'
             }
             imageClassName="object-cover object-center"
+            sizes={imageSizes}
+            loading="lazy"
           />
         </div>
       </Link>

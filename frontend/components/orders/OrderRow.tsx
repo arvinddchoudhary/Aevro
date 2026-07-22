@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { AccountIcon } from '../account/AccountIcons';
 import { formatPrice } from '../../lib/format';
 import type { Order } from '../../types/orders';
+import { CloudinaryProductImage } from '../products/CloudinaryProductImage';
 
 type OrderRowProps = {
   order: Order;
@@ -64,10 +65,12 @@ export function OrderRow({ order }: OrderRowProps) {
         <div className="grid min-w-0 grid-cols-[72px_minmax(0,1fr)] items-center gap-4 min-[1440px]:contents">
           <div className="relative h-[76px] w-[72px] overflow-hidden bg-[#eee5da]">
             {images.length > 0 ? (
-              <img
+              <CloudinaryProductImage
                 src={images[0].url}
                 alt={images[0].alt}
-                className="h-full w-full object-cover"
+                delivery="thumbnail"
+                sizes="72px"
+                className="object-cover"
               />
             ) : (
               <span className="flex h-full w-full items-center justify-center text-[#7f7468]">
