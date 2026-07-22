@@ -84,6 +84,7 @@ export function ProductVariantSelection({ product }: ProductVariantSelectionProp
   const firstColor = colors[0]?.colorSlug ?? product.color ?? '';
   const [selectedColorSlug, setSelectedColorSlug] = useState(firstColor);
   const [selectedSize, setSelectedSize] = useState('');
+  const [addedVariantId, setAddedVariantId] = useState<string | null>(null);
   const colorImages = imagesByColor[selectedColorSlug] ?? product.images;
   const [selectedImageId, setSelectedImageId] = useState<string | null>(
     (colorImages.find((image) => image.isPrimary) ?? colorImages[0])?.id ?? null,
@@ -99,6 +100,7 @@ export function ProductVariantSelection({ product }: ProductVariantSelectionProp
     product.primaryImage ??
     product.images[0];
   const canAddToCart = Boolean(selectedColor && selectedVariant && selectedVariant.stock > 0);
+  const selectedVariantIsAdded = selectedVariant?.variantId === addedVariantId;
   const stockLabel = selectedVariant
     ? selectedVariant.stock > 0
       ? 'Available'
@@ -113,6 +115,7 @@ export function ProductVariantSelection({ product }: ProductVariantSelectionProp
 
     setSelectedColorSlug(colorSlug);
     setSelectedSize('');
+    setAddedVariantId(null);
     setSelectedImageId(nextPrimaryImage?.id ?? null);
   };
 
@@ -154,7 +157,7 @@ export function ProductVariantSelection({ product }: ProductVariantSelectionProp
               key={image?.id ?? index}
               type="button"
               onClick={() => setSelectedImageId(image?.id ?? null)}
-              className={`min-w-[68px] cursor-pointer overflow-hidden rounded-[5px] border bg-[#eee8de] transition hover:border-[#111111] sm:min-w-0 ${
+              className={`w-[68px] cursor-pointer overflow-hidden rounded-[5px] border bg-[#eee8de] transition hover:border-[#111111] sm:w-full ${
                 image?.id === selectedImage?.id ? 'border-[#111111]' : 'border-[#ddd4c8]'
               }`}
               aria-label={`View ${product.name} image ${index + 1}`}
@@ -308,7 +311,10 @@ export function ProductVariantSelection({ product }: ProductVariantSelectionProp
                   key={size.variantId}
                   type="button"
                   disabled={size.stock <= 0}
-                  onClick={() => setSelectedSize(size.size)}
+                  onClick={() => {
+                    setSelectedSize(size.size);
+                    setAddedVariantId(null);
+                  }}
                   className={`h-11 cursor-pointer rounded-[4px] border text-sm transition disabled:cursor-not-allowed disabled:border-[#e8ded2] disabled:text-[#b6aea5] ${
                     selectedSize === size.size
                       ? 'border-[#111111] bg-[#fffaf3] text-[#111111] shadow-[inset_0_0_0_1px_#111111]'
@@ -336,6 +342,8 @@ export function ProductVariantSelection({ product }: ProductVariantSelectionProp
             disabled={!canAddToCart}
             disabledLabel={selectedVariant?.stock === 0 ? 'Out of stock' : 'Select options'}
             className="w-full"
+            added={selectedVariantIsAdded}
+            onAdded={() => setAddedVariantId(selectedVariant?.variantId ?? null)}
           />
           <WishlistToggleButton
             productId={product.id}
@@ -382,6 +390,9 @@ export function ProductVariantSelection({ product }: ProductVariantSelectionProp
             disabled={!canAddToCart}
             disabledLabel={selectedVariant?.stock === 0 ? 'Out' : 'Select'}
             className="w-[8rem] shrink-0"
+            added={selectedVariantIsAdded}
+            onAdded={() => setAddedVariantId(selectedVariant?.variantId ?? null)}
+            showAddedMessage={false}
           />
         </div>
       </div>
