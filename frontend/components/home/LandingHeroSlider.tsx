@@ -4,10 +4,10 @@ import Link from 'next/link';
 import { useEffect, useState } from 'react';
 
 const heroSlides = [
-  '/images/Landing-Page-Hero-Section/Sample1.png',
-  '/images/Landing-Page-Hero-Section/Sample2.png',
-  '/images/Landing-Page-Hero-Section/Sample3.png',
-  '/images/Landing-Page-Hero-Section/Sample4.png',
+  '/images/Landing-Page-Hero-Section/WideLegHero1.png',
+  '/images/Landing-Page-Hero-Section/WideLegHero2.png',
+  '/images/Landing-Page-Hero-Section/WideLegHero3.png',
+  '/images/Landing-Page-Hero-Section/WideLegHero4.png',
 ] as const;
 
 type LandingHeroSliderProps = {
