@@ -136,6 +136,33 @@ These require running local services and real browser interaction.
 - No horizontal overflow on public, account, checkout, and admin pages.
 - No major browser console errors or failed normal-load API calls.
 
+## Product Review Pre-Deployment Checklist
+
+- Apply migration `000021_product_reviews` to a non-production database first;
+  verify existing orders, order items, users, and products remain intact.
+- This migration is additive and PostgreSQL DDL is transactional, but Prisma
+  migrations do not provide an automatic down migration. If staging exposes an
+  issue, restore from a verified backup or use a new forward-only corrective
+  migration; never edit or delete an already-applied migration.
+- Verify an authenticated customer can review only an item in their own
+  `DELIVERED` order, and cannot review a pending, shipped, cancelled, or another
+  user's item.
+- Verify a second order for the same product reopens the retained review rather
+  than creating a duplicate; soft delete and restore should retain its history.
+- Submit a review with 1, 5, invalid, empty, and whitespace-only ratings/text;
+  verify only valid 1–5 and 10–2000 character content is accepted.
+- Upload JPEG, PNG, and WebP review photos; reject unsupported types, files over
+  5 MB, and more than four active photos. Confirm failed database writes clean
+  up uploaded provider images where possible.
+- Approve a review and confirm it appears in the product page, aggregate rating,
+  JSON-LD, and public pagination. Reject, hide, and soft-delete it in turn and
+  confirm it disappears from all public outputs.
+- Edit an approved review or remove a photo; confirm it returns to `PENDING`.
+- Verify only admins can list or moderate reviews, required reject/hide/delete
+  reasons are enforced, and moderation events retain the previous/new status.
+- Confirm review thumbnails lazy-load and no review photos are preloaded during
+  the product page's initial load.
+
 ## Shiprocket Pre-Deployment Checklist
 
 - Apply migrations `000015_shiprocket_shipments` and

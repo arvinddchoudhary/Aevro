@@ -158,6 +158,30 @@ those facets are intentionally empty. They should be added only with a formal
 catalog schema extension. The frontend keeps search, filters, sorting, and
 pagination in the URL; desktop uses a sidebar and mobile uses filter/sort sheets.
 
+## Product Review Architecture
+
+Verified product reviews are implemented by `backend/src/reviews`. A customer
+may keep one retained review per product (`ProductReview.userId + productId`),
+but may create or restore it only from an order item they own after its order is
+`DELIVERED`. The qualifying `orderId`, `orderItemId`, selected size, selected
+colour, and server-derived `verifiedPurchase` flag are stored as a purchase
+snapshot. Customer removal is soft deletion; restoring or editing the same
+record is deliberate and never creates a second review.
+
+New and customer-edited reviews are `PENDING`. Only non-deleted `APPROVED`
+reviews appear in public lists, aggregates, product JSON-LD, and the product
+page. `REJECTED` and `HIDDEN` reviews remain internal. Admin status changes and
+soft deletions create immutable `ProductReviewModerationEvent` records while
+the latest moderation metadata remains on the review for fast display.
+
+Review photos are accepted only through authenticated review mutations. The
+review service validates purchase ownership and image limits, then calls the
+existing backend `UploadsService`; customers never receive a generic upload
+endpoint. Images use server-controlled Cloudinary review folders, are soft
+deleted with the review image record, and use the optimized lazy Cloudinary
+thumbnail component in storefront lists. Failed provider cleanup is logged for
+safe manual/retry reconciliation without exposing customer data.
+
 A future OpenSearch/Elasticsearch migration is appropriate only if catalog scale,
 language support, analytics, or cross-entity search requirements exceed
 PostgreSQL's indexed capabilities.

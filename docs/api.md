@@ -42,6 +42,7 @@ GET /api/v1/categories
 GET /api/v1/products
 GET /api/v1/products/suggestions?q=tro&limit=8
 GET /api/v1/products/:identifier
+GET /api/v1/products/:identifier/reviews
 GET /api/v1/users/me
 PATCH /api/v1/users/me
 GET /api/v1/users/me/addresses
@@ -54,6 +55,12 @@ POST /api/v1/users/me/wishlist
 DELETE /api/v1/users/me/wishlist/:id
 DELETE /api/v1/users/me/wishlist/product/:productId
 POST /api/v1/orders
+GET /api/v1/orders/:orderId/review-eligibility
+POST /api/v1/orders/:orderId/items/:orderItemId/review
+PATCH /api/v1/reviews/:reviewId
+DELETE /api/v1/reviews/:reviewId
+POST /api/v1/reviews/:reviewId/restore
+DELETE /api/v1/reviews/:reviewId/images/:imageId
 GET /api/v1/orders/:id
 GET /api/v1/orders/me
 GET /api/v1/orders/me/:id
@@ -73,6 +80,10 @@ GET /api/v1/orders/:orderId/tracking
 POST /api/v1/webhooks/shiprocket
 POST /api/v1/location/pincode
 POST /api/v1/checkout/delivery-estimate
+GET /api/v1/admin/reviews
+GET /api/v1/admin/reviews/:reviewId
+PATCH /api/v1/admin/reviews/:reviewId/moderation
+DELETE /api/v1/admin/reviews/:reviewId
 ```
 
 `GET /api/v1/health/database` verifies Prisma can connect to PostgreSQL.
@@ -140,6 +151,31 @@ ranked from active product names and indexed catalog text.
 
 Migration `000016_catalog_search` enables `pg_trgm`, creates the full-text and
 trigram indexes, and backfills the product search documents.
+
+## Product Reviews API
+
+`GET /api/v1/products/:identifier/reviews?page=1&limit=6&sort=newest` is public
+and returns only approved, non-deleted reviews, plus the approved average,
+count, 1–5 rating breakdown, fit breakdown, and bounded pagination metadata.
+`sort` accepts `newest`, `highest`, or `lowest`; `limit` is capped at 12. No
+pending, rejected, hidden, deleted, provider, or customer-contact fields are
+returned.
+
+Authenticated customers use `GET /api/v1/orders/:orderId/review-eligibility`
+to see only their own order items and their current review state. A delivered
+owned item may submit multipart review data through
+`POST /api/v1/orders/:orderId/items/:orderItemId/review`. The body accepts an
+integer `rating` (1–5), optional `title` (100 characters), required `body`
+(10–2000 characters), optional `fitFeedback`, and at most four `images`.
+Only JPEG, PNG, and WebP images up to 5 MB are accepted. `PATCH`, `DELETE`,
+`restore`, and image deletion routes are owner-only; content or image changes
+return the review to pending moderation.
+
+Admin review routes require an authenticated `ADMIN` user. The list supports
+bounded page/limit plus status, product ID, rating, and date-range filters.
+Admins may approve, reject, or hide via the moderation route; rejection and
+hiding require a reason. Admin soft deletion also requires a reason. Every
+moderation action is retained in the review moderation-event history.
 
 ## Shiprocket Shipping API
 

@@ -11,6 +11,7 @@ type AdminIconProps = {
     | 'plus'
     | 'product'
     | 'search'
+    | 'star'
     | 'shield'
     | 'upload'
     | 'users';
@@ -102,6 +103,12 @@ export function AdminIcon({ name, className = 'h-5 w-5' }: AdminIconProps) {
         <svg {...shared}>
           <path d="M10.8 17.1a6.3 6.3 0 1 0 0-12.6 6.3 6.3 0 0 0 0 12.6Z" />
           <path d="m15.5 15.5 4 4" />
+        </svg>
+      );
+    case 'star':
+      return (
+        <svg {...shared}>
+          <path d="m12 3 2.8 5.7 6.2.9-4.5 4.4 1.1 6.2-5.6-3-5.6 3 1.1-6.2L3 9.6l6.2-.9L12 3Z" />
         </svg>
       );
     case 'shield':
