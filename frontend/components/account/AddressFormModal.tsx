@@ -2,6 +2,8 @@
 
 import type { FormEvent } from 'react';
 import type { AddressPayload } from '../../types/user';
+import type { LocationAddress } from '../../lib/api/location';
+import { PincodeAutofillField } from '../location/PincodeAutofillField';
 
 type AddressFormModalProps = {
   error: string | null;
@@ -12,6 +14,7 @@ type AddressFormModalProps = {
   mode: 'create' | 'edit';
   onCancel: () => void;
   onFieldChange: (name: keyof AddressPayload, value: string) => void;
+  onPincodeFound: (address: LocationAddress) => void;
   onSetDefaultChange: (value: boolean) => void;
   onSubmit: (event: FormEvent<HTMLFormElement>) => void;
 };
@@ -24,7 +27,6 @@ const fields = [
   ['addressLine2', 'Address Line 2'],
   ['city', 'City'],
   ['state', 'State'],
-  ['postalCode', 'Postal Code'],
   ['country', 'Country'],
 ] as Array<[keyof AddressPayload, string]>;
 
@@ -37,6 +39,7 @@ export function AddressFormModal({
   mode,
   onCancel,
   onFieldChange,
+  onPincodeFound,
   onSetDefaultChange,
   onSubmit,
 }: AddressFormModalProps) {
@@ -96,6 +99,11 @@ export function AddressFormModal({
                 </label>
               );
             })}
+            <PincodeAutofillField
+              value={formValues.postalCode ?? ''}
+              onChange={(value) => onFieldChange('postalCode', value)}
+              onAddressFound={onPincodeFound}
+            />
           </div>
 
           <label className="mt-5 flex items-center gap-3 text-sm text-[#2f2a25]">

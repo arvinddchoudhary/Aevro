@@ -108,6 +108,11 @@ These require running local services and real browser interaction.
 - Cart add/increase/decrease/remove works.
 - Cart count updates.
 - Cart quantity does not exceed stock.
+- Enter a valid six-digit pincode at checkout with one, two, three, and four
+  cart items; confirm an estimate appears without courier names, rates, or raw
+  Shiprocket data.
+- Use a cart above four items; confirm checkout shows `7–10 business days` and
+  does not request Shiprocket serviceability.
 - `/account/orders` and `/account/orders/:id` load.
 - Razorpay order creation works in configured environment.
 - Razorpay payment verification succeeds for valid payment.

@@ -140,6 +140,7 @@ JWT_REFRESH_SECRET=replace_with_long_random_refresh_secret
 JWT_ACCESS_EXPIRES_IN=15m
 JWT_REFRESH_EXPIRES_IN=30d
 GOOGLE_CLIENT_ID=your_google_oauth_client_id.apps.googleusercontent.com
+GOOGLE_MAPS_GEOCODING_API_KEY=your_server_side_google_maps_geocoding_key
 COOKIE_DOMAIN=
 CLOUDINARY_CLOUD_NAME=your_cloudinary_cloud_name
 CLOUDINARY_API_KEY=your_cloudinary_api_key
@@ -170,6 +171,23 @@ SHIPROCKET_DEFAULT_BREADTH_CM=25
 SHIPROCKET_DEFAULT_HEIGHT_CM=5
 SHIPROCKET_ENABLED=false
 ```
+
+## Pincode address autofill
+
+Enable the **Geocoding API** in the Google Cloud project used for AEVRO, then
+create a server-restricted API key and set it only on the backend as
+`GOOGLE_MAPS_GEOCODING_API_KEY`. Do not add this key to Vercel or any
+`NEXT_PUBLIC_*` variable.
+
+When a customer enters a six-digit Indian pincode, AEVRO verifies it on the
+backend and fills city, state, and country. House, street, and landmark fields
+remain manual, and customers can edit the resulting city and state if needed.
+No browser coordinates are requested or stored.
+
+At checkout, AEVRO uses the same package recommendation for one to four cart
+items to request a Shiprocket delivery estimate for the entered pincode. Orders
+above four items show the standard `7–10 business days` estimate until the
+package is manually reviewed by an admin.
 
 ## Neon + Prisma Setup
 
