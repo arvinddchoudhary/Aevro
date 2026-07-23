@@ -5,6 +5,7 @@ import type {
   Product,
   ProductListQuery,
 } from '../../types/catalog';
+import type { ProductReviewsResponse } from '../../types/reviews';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8000/api/v1';
 
@@ -100,5 +101,18 @@ export async function getProduct(identifier: string): Promise<ApiItemResponse<Pr
       success: false,
       message: 'Unable to load product',
     };
+  }
+}
+
+export async function getProductReviews(
+  identifier: string,
+  query: { page?: number; limit?: number; sort?: 'newest' | 'highest' | 'lowest' } = {},
+): Promise<ProductReviewsResponse | null> {
+  try {
+    return await request<ProductReviewsResponse>(`/products/${encodeURIComponent(identifier)}/reviews`, {
+      params: query,
+    });
+  } catch {
+    return null;
   }
 }

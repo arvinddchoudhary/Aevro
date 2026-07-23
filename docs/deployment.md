@@ -85,6 +85,19 @@ Recommended Render settings:
 - Start command: `npm run start:prod`
 - Health check path: `/api/v1/health`
 
+### Prisma migration policy
+
+`backend/prisma/migrations/` is committed migration history. It includes
+`migration_lock.toml`, which records the PostgreSQL provider used by the SQL
+migrations. Keep that file with the migration folders in source control.
+
+Use `npm run prisma:deploy` (`prisma migrate deploy`) for staging and
+production schema changes. Never use `prisma db push` for a shared, staging, or
+production database, and never edit or delete a migration that has already
+been applied. Verify every new migration against a disposable PostgreSQL
+database or staging first, and confirm a current database backup can be
+restored before production deployment.
+
 The free plan does not support Render's pre-deploy command, so the Blueprint
 runs the idempotent Prisma migration deployment during the build. On a paid
 service, move `npm run prisma:deploy` to `preDeployCommand`.

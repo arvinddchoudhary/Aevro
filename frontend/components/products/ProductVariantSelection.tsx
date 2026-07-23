@@ -16,6 +16,10 @@ import { ProductImageLightbox } from './ProductImageLightbox';
 
 type ProductVariantSelectionProps = {
   product: Product;
+  reviewSummary?: {
+    averageRating: number | null;
+    reviewCount: number;
+  };
 };
 
 function buildColors(product: Product): ProductColorOption[] {
@@ -77,7 +81,7 @@ function buildImages(product: Product): Record<string, ProductImage[]> {
   );
 }
 
-export function ProductVariantSelection({ product }: ProductVariantSelectionProps) {
+export function ProductVariantSelection({ product, reviewSummary }: ProductVariantSelectionProps) {
   const colors = useMemo(() => buildColors(product), [product]);
   const sizesByColor = useMemo(() => buildSizes(product), [product]);
   const imagesByColor = useMemo(() => buildImages(product), [product]);
@@ -149,7 +153,7 @@ export function ProductVariantSelection({ product }: ProductVariantSelectionProp
   }, [colorImages, selectedImageIndex]);
 
   return (
-    <div className="grid gap-6 lg:grid-cols-[minmax(0,560px)_minmax(360px,1fr)] lg:gap-10 xl:grid-cols-[minmax(0,620px)_minmax(400px,1fr)]">
+    <div className="grid gap-7 lg:mx-auto lg:max-w-[1080px] lg:grid-cols-[minmax(0,540px)_minmax(390px,1fr)] lg:gap-16">
       <section className="mx-auto grid w-full max-w-[620px] gap-3 sm:grid-cols-[76px_minmax(0,520px)] sm:gap-4 xl:grid-cols-[82px_minmax(0,540px)]">
         <div className="order-2 grid grid-cols-4 gap-2 overflow-x-auto pb-1 sm:order-1 sm:block sm:space-y-4 sm:overflow-visible sm:pb-0">
           {(colorImages.length > 0 ? colorImages : [undefined]).map((image, index) => (
@@ -245,23 +249,32 @@ export function ProductVariantSelection({ product }: ProductVariantSelectionProp
         </div>
       </section>
 
-      <section className="max-w-[520px] lg:sticky lg:top-24 lg:self-start">
+      <section className="max-w-[470px] lg:sticky lg:top-24 lg:self-start">
         <span className="mb-3 inline-flex rounded-full bg-[#efe8df] px-3 py-1 text-[0.68rem] font-semibold uppercase tracking-[0.08em] text-[#514c45]">
           Best seller
         </span>
-        <h1 className="max-w-2xl text-[1.55rem] font-light uppercase leading-[1.08] sm:text-3xl md:text-4xl">
+        <h1 className="max-w-2xl text-[1.55rem] font-light uppercase leading-[1.08] sm:text-3xl">
           {product.name}
         </h1>
         <p className="mt-4 text-lg font-semibold sm:text-xl">{formatPrice(product.priceInPaise)}</p>
         <p className="mt-1 text-sm text-[#514c45]">Inclusive of all taxes</p>
+        {reviewSummary ? (
+          <a
+            href="#reviews"
+            className="mt-4 flex items-center justify-between gap-3 border-y border-[#e5dbcf] py-3 text-xs text-[#2f2a25] transition hover:text-[#111111]"
+          >
+            {reviewSummary.reviewCount > 0 ? (
+              <>
+                <span aria-label={`${reviewSummary.averageRating?.toFixed(1)} out of 5 stars`}>★ {reviewSummary.averageRating?.toFixed(1)} · {reviewSummary.reviewCount} verified review{reviewSummary.reviewCount === 1 ? '' : 's'}</span>
+                <span className="font-semibold uppercase tracking-[0.1em]">Customer reviews</span>
+              </>
+            ) : (
+              <><span>Ratings &amp; reviews</span><span className="font-semibold uppercase tracking-[0.1em]">Customer reviews</span></>
+            )}
+          </a>
+        ) : null}
 
-        {product.description && (
-          <p className="mt-4 max-w-xl text-sm leading-6 text-[#2f2a25]">
-            {product.description}
-          </p>
-        )}
-
-        <div className="mt-5 border-y border-[#ddd4c8] py-4 sm:py-5">
+        <div className="mt-5 border-b border-[#ddd4c8] pb-4 sm:pb-5">
           <div>
             <div className="mb-3 flex items-center justify-between gap-4">
               <p className="text-xs font-semibold uppercase tracking-[0.12em]">
@@ -328,7 +341,7 @@ export function ProductVariantSelection({ product }: ProductVariantSelectionProp
           </div>
         </div>
 
-        <div className="mt-4 flex flex-col gap-3 sm:mt-5">
+        <div className="mt-5 grid gap-3 sm:grid-cols-2">
           <AddToCartButton
             product={product}
             selection={{
@@ -354,7 +367,7 @@ export function ProductVariantSelection({ product }: ProductVariantSelectionProp
           {product.category && (
             <Link
               href={`/products?category=${product.category.slug}`}
-              className="inline-flex h-11 w-full cursor-pointer items-center justify-center rounded-[4px] border border-[#111111] px-7 text-xs font-semibold uppercase tracking-[0.08em] transition hover:border-[#6d665d] hover:bg-[#f1e9de]"
+              className="inline-flex h-11 w-full cursor-pointer items-center justify-center rounded-[4px] border border-[#111111] px-7 text-xs font-semibold uppercase tracking-[0.08em] transition hover:border-[#6d665d] hover:bg-[#f1e9de] sm:col-span-2"
             >
               More {product.category.name}
             </Link>

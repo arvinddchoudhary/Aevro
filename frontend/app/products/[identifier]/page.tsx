@@ -2,12 +2,25 @@ import Link from 'next/link';
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { ProductVariantSelection } from '../../../components/products/ProductVariantSelection';
+import { ProductReviews } from '../../../components/products/ProductReviews';
 import { ProductCard } from '../../../components/products/ProductCard';
 import { ErrorState } from '../../../components/ui/ErrorState';
-import { getProduct, getProducts } from '../../../lib/api/catalog';
+import { getProduct, getProductReviews, getProducts } from '../../../lib/api/catalog';
 import { absoluteUrl, pageMetadata, siteName } from '../../../lib/seo';
 
 export const dynamic = 'force-dynamic';
+
+function ProductInformationIcon({ type }: { type: 'details' | 'care' | 'shipping' }) {
+  if (type === 'details') {
+    return <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.25" aria-hidden="true"><path d="M7 5.5 10 3h4l3 2.5 3 1.5-1 4-2.5-1V21H7.5V10l-2.5 1-1-4L7 5.5Z" /><path d="M10 3v4m4-4v4" /></svg>;
+  }
+
+  if (type === 'care') {
+    return <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.25" aria-hidden="true"><path d="m7 4 3 3-6 6 3 3 6-6 3 3 4-4-9-9-4 4Z" /><path d="m12 16 3 3-3 3-3-3 3-3Z" /></svg>;
+  }
+
+  return <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.25" aria-hidden="true"><path d="m4 8 8-4 8 4v10l-8 4-8-4V8Z" /><path d="m4 8 8 4 8-4M12 12v10" /><path d="M9 6.5h6" /></svg>;
+}
 
 export async function generateMetadata({
   params,
@@ -93,11 +106,10 @@ export default async function ProductDetailsPage({
   }
 
   const product = result.data;
-  const relatedResult = await getProducts({
-    limit: 5,
-    sort: 'newest',
-    category: product.category?.slug,
-  }).catch(() => null);
+  const [relatedResult, reviewsResult] = await Promise.all([
+    getProducts({ limit: 5, sort: 'newest', category: product.category?.slug }).catch(() => null),
+    getProductReviews(product.slug || identifier, { page: 1, limit: 6, sort: 'newest' }),
+  ]);
   const relatedProducts =
     relatedResult?.data.filter((item) => item.id !== product.id).slice(0, 5) ?? [];
 
@@ -115,48 +127,54 @@ export default async function ProductDetailsPage({
           <span>/</span>
           <span className="text-[#111111]">{product.name}</span>
         </div>
-        <ProductVariantSelection product={product} />
+        <ProductVariantSelection product={product} reviewSummary={reviewsResult?.summary ?? { averageRating: null, reviewCount: 0 }} />
 
-        <section className="mt-8 grid gap-3 lg:grid-cols-3 lg:gap-4">
-          <article className="rounded-[6px] border border-[#eadfd2] bg-[#fffaf3]/80 p-5 shadow-[0_10px_30px_rgba(49,37,26,0.035)] sm:p-6">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[#77716a]">Details</p>
-            <p className="mt-4 max-w-md text-sm leading-7 text-[#2f2a25]">
-              {product.description ??
-                'Tailored with precision, these trousers feature a refined drape, considered proportions, and versatile styling for formal and casual looks.'}
-            </p>
-            <ul className="mt-5 grid gap-2 text-sm text-[#514c45]">
-              <li>Relaxed fit</li>
-              <li>Clean front silhouette</li>
-              <li>Side pockets and belt loops</li>
-            </ul>
+        {reviewsResult && reviewsResult.summary.reviewCount > 0 ? (
+          <>
+            <script
+              type="application/ld+json"
+              dangerouslySetInnerHTML={{
+                __html: JSON.stringify({
+                  '@context': 'https://schema.org',
+                  '@type': 'Product',
+                  name: product.name,
+                  url: absoluteUrl(`/products/${product.slug || identifier}`),
+                  ...(reviewsResult.summary.reviewCount > 0
+                    ? {
+                        aggregateRating: {
+                          '@type': 'AggregateRating',
+                          ratingValue: reviewsResult.summary.averageRating,
+                          reviewCount: reviewsResult.summary.reviewCount,
+                          bestRating: 5,
+                          worstRating: 1,
+                        },
+                        review: reviewsResult.data.map((review) => ({
+                          '@type': 'Review',
+                          author: { '@type': 'Person', name: review.reviewerName },
+                          reviewRating: { '@type': 'Rating', ratingValue: review.rating, bestRating: 5, worstRating: 1 },
+                          reviewBody: review.body,
+                          ...(review.title ? { name: review.title } : {}),
+                          datePublished: review.createdAt,
+                        })),
+                      }
+                    : {}),
+                }),
+              }}
+            />
+          </>
+        ) : null}
+
+        <ProductReviews identifier={product.slug || identifier} initial={reviewsResult} />
+
+        <section className="mt-8 grid gap-3 sm:grid-cols-3 sm:gap-4">
+          <article className="min-h-[136px] rounded-sm border border-[#e9e1d7] bg-[#fffdf9] px-6 py-5 sm:px-7 sm:py-6">
+            <div className="flex items-start gap-4"><span className="mt-0.5 h-5 w-5 shrink-0 text-[#9a8f82]"><ProductInformationIcon type="details" /></span><div><p className="text-[10px] font-semibold uppercase tracking-[0.17em] text-[#77716a]">Details</p><p className="mt-2 text-[11px] leading-[1.45] text-[#514c45]">{product.description ?? 'Tailored with precision, these trousers feature a refined drape and considered proportions.'}</p><Link href="/about/craftsmanship" className="mt-3 inline-block text-[11px] underline underline-offset-4 hover:text-[#111111]">View more</Link></div></div>
           </article>
-          <article className="rounded-[6px] border border-[#eadfd2] bg-[#fffaf3]/80 p-5 shadow-[0_10px_30px_rgba(49,37,26,0.035)] sm:p-6">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[#77716a]">Fabric & care</p>
-            <p className="mt-4 text-sm leading-7 text-[#2f2a25]">
-              Premium trouser-weight fabric selected for structure and drape.
-            </p>
-            <div className="mt-5 grid gap-2 text-sm text-[#514c45]">
-              <span>Machine wash cold</span>
-              <span>Do not bleach</span>
-              <span>Iron on low</span>
-              <span>Dry clean recommended</span>
-            </div>
+          <article className="min-h-[136px] rounded-sm border border-[#e9e1d7] bg-[#fffdf9] px-6 py-5 sm:px-7 sm:py-6">
+            <div className="flex items-start gap-4"><span className="mt-0.5 h-5 w-5 shrink-0 text-[#9a8f82]"><ProductInformationIcon type="care" /></span><div><p className="text-[10px] font-semibold uppercase tracking-[0.17em] text-[#77716a]">Fabric &amp; care</p><p className="mt-2 text-[11px] leading-[1.45] text-[#514c45]">Premium suiting fabric with a soft hand feel. Dry clean only. Cool iron if needed.</p><Link href="/help/faq" className="mt-3 inline-block text-[11px] underline underline-offset-4 hover:text-[#111111]">View more</Link></div></div>
           </article>
-          <article className="rounded-[6px] border border-[#eadfd2] bg-[#fffaf3]/80 p-5 shadow-[0_10px_30px_rgba(49,37,26,0.035)] sm:p-6">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[#77716a]">Shipping & returns</p>
-            <p className="mt-4 text-sm leading-7 text-[#2f2a25]">
-              Free shipping on orders above ₹4,999. Delivered in 7–10 business days across India.
-            </p>
-            <div className="mt-5 grid gap-2 text-sm text-[#514c45]">
-              <span>14-day returns on unworn items</span>
-              <span>Free exchanges, subject to stock</span>
-              <Link href="/help/shipping" className="underline underline-offset-4 hover:text-[#111111]">
-                Full shipping policy →
-              </Link>
-              <Link href="/help/returns" className="underline underline-offset-4 hover:text-[#111111]">
-                Full returns policy →
-              </Link>
-            </div>
+          <article className="min-h-[136px] rounded-sm border border-[#e9e1d7] bg-[#fffdf9] px-6 py-5 sm:px-7 sm:py-6">
+            <div className="flex items-start gap-4"><span className="mt-0.5 h-5 w-5 shrink-0 text-[#9a8f82]"><ProductInformationIcon type="shipping" /></span><div><p className="text-[10px] font-semibold uppercase tracking-[0.17em] text-[#77716a]">Shipping &amp; returns</p><p className="mt-2 text-[11px] leading-[1.45] text-[#514c45]">Free shipping on orders above ₹4,000. Delivered in 7–10 business days.</p><Link href="/help/shipping" className="mt-3 inline-block text-[11px] underline underline-offset-4 hover:text-[#111111]">View more</Link></div></div>
           </article>
         </section>
 

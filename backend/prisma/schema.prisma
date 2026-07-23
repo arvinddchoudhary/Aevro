@@ -115,26 +115,42 @@ enum HomepageSectionType {
   CAMPAIGN_BANNER
 }
 
+enum ProductReviewStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  HIDDEN
+}
+
+enum ProductReviewFitFeedback {
+  RUNS_SMALL
+  TRUE_TO_SIZE
+  RUNS_LARGE
+}
+
 model User {
-  id                    String                 @id @default(cuid())
-  name                  String
-  email                 String                 @unique
-  phone                 String?
-  passwordHash          String?
-  role                  UserRole               @default(CUSTOMER)
-  emailVerified         Boolean                @default(false)
-  authAccounts          AuthAccount[]
-  refreshSessions       RefreshSession[]
-  addresses             UserAddress[]
-  emailVerificationOtps EmailVerificationOtp[]
-  loginOtps             LoginOtp[]
-  passwordResetOtps     PasswordResetOtp[]
-  cartItems             CartItem[]
-  wishlistItems         WishlistItem[]
-  orders                Order[]
-  emailNotifications    EmailNotification[]
-  createdAt             DateTime               @default(now())
-  updatedAt             DateTime               @updatedAt
+  id                     String                         @id @default(cuid())
+  name                   String
+  email                  String                         @unique
+  phone                  String?
+  passwordHash           String?
+  role                   UserRole                       @default(CUSTOMER)
+  emailVerified          Boolean                        @default(false)
+  authAccounts           AuthAccount[]
+  refreshSessions        RefreshSession[]
+  addresses              UserAddress[]
+  emailVerificationOtps  EmailVerificationOtp[]
+  loginOtps              LoginOtp[]
+  passwordResetOtps      PasswordResetOtp[]
+  cartItems              CartItem[]
+  wishlistItems          WishlistItem[]
+  orders                 Order[]
+  emailNotifications     EmailNotification[]
+  productReviews         ProductReview[]                @relation("ProductReviewAuthor")
+  moderatedReviews       ProductReview[]                @relation("ProductReviewModerator")
+  reviewModerationEvents ProductReviewModerationEvent[]
+  createdAt              DateTime                       @default(now())
+  updatedAt              DateTime                       @updatedAt
 
   @@index([role])
   @@map("users")
@@ -297,6 +313,7 @@ model Product {
   cartItems      CartItem[]
   wishlistItems  WishlistItem[]
   orderItems     OrderItem[]
+  reviews        ProductReview[]
   createdAt      DateTime               @default(now())
   updatedAt      DateTime               @updatedAt
 
@@ -421,12 +438,81 @@ model Order {
   payment            Payment?
   shipment           Shipment?
   emailNotifications EmailNotification[]
+  productReviews     ProductReview[]
   createdAt          DateTime            @default(now())
   updatedAt          DateTime            @updatedAt
 
   @@index([userId])
   @@index([status])
   @@map("orders")
+}
+
+model ProductReview {
+  id               String                         @id @default(cuid())
+  userId           String
+  user             User                           @relation("ProductReviewAuthor", fields: [userId], references: [id], onDelete: Restrict)
+  productId        String
+  product          Product                        @relation(fields: [productId], references: [id], onDelete: Restrict)
+  orderId          String
+  order            Order                          @relation(fields: [orderId], references: [id], onDelete: Restrict)
+  orderItemId      String                         @unique
+  orderItem        OrderItem                      @relation(fields: [orderItemId], references: [id], onDelete: Restrict)
+  rating           Int
+  title            String?                        @db.VarChar(100)
+  body             String                         @db.Text
+  fitFeedback      ProductReviewFitFeedback?
+  purchasedSize    String?
+  purchasedColor   String?
+  verifiedPurchase Boolean                        @default(true)
+  status           ProductReviewStatus            @default(PENDING)
+  moderatedById    String?
+  moderatedBy      User?                          @relation("ProductReviewModerator", fields: [moderatedById], references: [id], onDelete: SetNull)
+  moderatedAt      DateTime?
+  moderationReason String?                        @db.VarChar(500)
+  deletedAt        DateTime?
+  images           ProductReviewImage[]
+  moderationEvents ProductReviewModerationEvent[]
+  createdAt        DateTime                       @default(now())
+  updatedAt        DateTime                       @updatedAt
+
+  @@unique([userId, productId])
+  @@index([productId, status, createdAt])
+  @@index([userId, createdAt])
+  @@index([status, createdAt])
+  @@index([orderId])
+  @@index([rating])
+  @@map("product_reviews")
+}
+
+model ProductReviewImage {
+  id        String        @id @default(cuid())
+  reviewId  String
+  review    ProductReview @relation(fields: [reviewId], references: [id], onDelete: Cascade)
+  url       String
+  publicId  String        @unique
+  sortOrder Int           @default(0)
+  deletedAt DateTime?
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+
+  @@index([reviewId, sortOrder])
+  @@map("product_review_images")
+}
+
+model ProductReviewModerationEvent {
+  id             String               @id @default(cuid())
+  reviewId       String
+  review         ProductReview        @relation(fields: [reviewId], references: [id], onDelete: Cascade)
+  moderatorId    String?
+  moderator      User?                @relation(fields: [moderatorId], references: [id], onDelete: SetNull)
+  previousStatus ProductReviewStatus?
+  newStatus      ProductReviewStatus?
+  reason         String?              @db.VarChar(500)
+  createdAt      DateTime             @default(now())
+
+  @@index([reviewId, createdAt])
+  @@index([moderatorId, createdAt])
+  @@map("product_review_moderation_events")
 }
 
 model Shipment {
@@ -510,6 +596,7 @@ model OrderItem {
   selectedSize     String?
   createdAt        DateTime        @default(now())
   updatedAt        DateTime        @updatedAt
+  reviews          ProductReview[]
 
   @@index([orderId])
   @@index([productId])

@@ -15,7 +15,7 @@
     "start": "node dist/main.js",
     "start:dev": "tsx watch src/main.ts",
     "start:prod": "node dist/main.js",
-    "test": "tsx --test src/auth/**/*.spec.ts src/users/**/*.spec.ts src/location/**/*.spec.ts src/shiprocket/*.spec.ts src/shiprocket/**/*.spec.ts src/products/**/*.spec.ts src/admin/**/*.spec.ts",
+    "test": "tsx --test src/auth/**/*.spec.ts src/users/**/*.spec.ts src/location/**/*.spec.ts src/shiprocket/*.spec.ts src/shiprocket/**/*.spec.ts src/products/**/*.spec.ts src/reviews/*.spec.ts src/admin/**/*.spec.ts",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {

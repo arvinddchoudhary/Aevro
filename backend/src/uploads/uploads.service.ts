@@ -2,6 +2,7 @@ import {
   BadRequestException,
   Inject,
   Injectable,
+  Logger,
   ServiceUnavailableException,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
@@ -27,6 +28,7 @@ const ALLOWED_MIME_TYPES = new Set([
 
 @Injectable()
 export class UploadsService {
+  private readonly logger = new Logger(UploadsService.name);
   private readonly cloudName: string;
   private readonly apiKey: string;
   private readonly apiSecret: string;
@@ -84,6 +86,58 @@ export class UploadsService {
       publicId: result.public_id,
       altText: 'Homepage section image',
     };
+  }
+
+  async uploadReviewImages(input: { files: UploadFile[]; reviewId: string }) {
+    this.assertCloudinaryConfigured();
+
+    if (input.files.length === 0) return [];
+    if (input.files.length > 4) {
+      throw new BadRequestException('Upload up to 4 review images.');
+    }
+
+    input.files.forEach((file) => this.validateImage(file));
+    const folder = `aevro/reviews/${input.reviewId}`;
+
+    const uploaded: Array<{ url: string; publicId: string; sortOrder: number }> = [];
+    try {
+      for (const [index, file] of input.files.entries()) {
+        const result = await this.uploadToCloudinary(file, folder);
+        uploaded.push({ url: result.secure_url, publicId: result.public_id, sortOrder: index });
+      }
+      return uploaded;
+    } catch (error) {
+      await Promise.all(uploaded.map((image) => this.deleteImage(image.publicId)));
+      throw error;
+    }
+  }
+
+  async deleteImage(publicId: string) {
+    if (!publicId || !this.cloudName || !this.apiKey || !this.apiSecret) return false;
+
+    const timestamp = Math.floor(Date.now() / 1000).toString();
+    const signature = this.signCloudinaryParams({ public_id: publicId, timestamp });
+    const formData = new FormData();
+    formData.set('public_id', publicId);
+    formData.set('api_key', this.apiKey);
+    formData.set('timestamp', timestamp);
+    formData.set('invalidate', 'true');
+    formData.set('signature', signature);
+
+    try {
+      const response = await fetch(
+        `https://api.cloudinary.com/v1_1/${this.cloudName}/image/destroy`,
+        { method: 'POST', body: formData },
+      );
+      if (!response.ok) {
+        this.logger.warn('Cloudinary review-image cleanup was unsuccessful.');
+        return false;
+      }
+      return true;
+    } catch {
+      this.logger.warn('Cloudinary review-image cleanup was unsuccessful.');
+      return false;
+    }
   }
 
   private validateImage(file: UploadFile) {

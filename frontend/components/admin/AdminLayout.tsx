@@ -8,6 +8,7 @@ const adminNavItems = [
   { label: 'Dashboard', href: '/admin', icon: 'dashboard' },
   { label: 'Products', href: '/admin/products', icon: 'product' },
   { label: 'Orders', href: '/admin/orders', icon: 'bag' },
+  { label: 'Reviews', href: '/admin/reviews', icon: 'star' },
   { label: 'Uploads', href: '/admin/uploads', icon: 'upload' },
   { label: 'Customers', href: '/admin/customers', icon: 'users' },
 ] as const;

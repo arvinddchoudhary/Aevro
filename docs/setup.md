@@ -206,6 +206,12 @@ npm run prisma:dev -- --name init
 npm run db:seed
 ```
 
+For staging and production, use `npm run prisma:deploy`, never `prisma db
+push`. `prisma/migrations/migration_lock.toml` is part of the committed
+PostgreSQL migration history. Do not edit or delete applied migration files.
+Test a new migration against a disposable or staging PostgreSQL database first,
+and verify a database backup before production deployment.
+
 This repository also includes an initial generated migration at:
 
 ```txt
@@ -511,6 +517,16 @@ redirect-based Google OAuth flow. `GOOGLE_CLIENT_ID` and
 Before production release, verify that Google login succeeds at both production
 origins, rejects an unverified Google email, and does not place Google or AEVRO
 session tokens in browser storage.
+
+## Product Review Image Setup
+
+Product reviews reuse the existing backend Cloudinary configuration:
+`CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY`, and
+`CLOUDINARY_API_SECRET`. Do not add a customer-visible upload preset or expose
+Cloudinary credentials in frontend environment variables. The review service
+creates its own signed uploads only after it verifies the authenticated
+customer's delivered order item. It accepts JPEG, PNG, or WebP files up to 5 MB
+and at most four active images per review.
 
 ## Cloudinary Product Image Setup
 

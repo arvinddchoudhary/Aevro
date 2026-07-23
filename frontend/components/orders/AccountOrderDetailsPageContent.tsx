@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { getMyOrder, getOrderTracking } from '../../lib/api/orders';
+import { getOrderReviewEligibility } from '../../lib/api/reviews';
 import { useAuth } from '../../lib/auth';
 import { formatPrice } from '../../lib/format';
 import type { Order } from '../../types/orders';
@@ -13,12 +14,15 @@ import { ErrorState } from '../ui/ErrorState';
 import { OrderStatusPill } from './OrderStatusPill';
 import { OrderTrackingPanel } from './OrderTrackingPanel';
 import { CloudinaryProductImage } from '../products/CloudinaryProductImage';
+import { OrderItemReview } from './OrderItemReview';
+import type { OrderReviewEligibility } from '../../types/reviews';
 
 export function AccountOrderDetailsPageContent({ id }: { id: string }) {
   const router = useRouter();
   const { status } = useAuth();
   const [order, setOrder] = useState<Order | null>(null);
   const [tracking, setTracking] = useState<OrderTracking | null>(null);
+  const [reviewEligibility, setReviewEligibility] = useState<OrderReviewEligibility | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -37,9 +41,10 @@ export function AccountOrderDetailsPageContent({ id }: { id: string }) {
       setIsLoading(true);
       setError(null);
 
-      const [response, trackingResult] = await Promise.all([
+      const [response, trackingResult, reviewResult] = await Promise.all([
         getMyOrder(id),
         getOrderTracking(id).catch(() => null),
+        getOrderReviewEligibility(id).catch(() => null),
       ]);
 
       if (!response.success) {
@@ -54,6 +59,7 @@ export function AccountOrderDetailsPageContent({ id }: { id: string }) {
 
       setOrder(response.data);
       setTracking(trackingResult);
+      setReviewEligibility(reviewResult);
       setIsLoading(false);
     }
 
@@ -134,6 +140,7 @@ export function AccountOrderDetailsPageContent({ id }: { id: string }) {
                     {item.selectedColor ? ` / ${item.selectedColor}` : ''}
                     {item.selectedSize ? ` / ${item.selectedSize}` : ''}
                   </p>
+                  {reviewEligibility ? <OrderItemReview orderId={order.id} item={reviewEligibility.items.find((entry) => entry.orderItemId === item.id) ?? { orderItemId: item.id, productId: item.productId, productName: item.productName, productSlug: item.productSlug, eligible: false, ineligibilityReason: 'Review information is unavailable.', review: null }} /> : null}
                 </div>
                 <div className="text-sm sm:text-right">
                   <p className="text-[#777777]">
