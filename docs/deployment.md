@@ -102,6 +102,7 @@ JWT_REFRESH_SECRET=replace-with-strong-secret
 JWT_ACCESS_EXPIRES_IN=15m
 JWT_REFRESH_EXPIRES_IN=30d
 GOOGLE_CLIENT_ID=your-google-web-client-id.apps.googleusercontent.com
+GOOGLE_MAPS_GEOCODING_API_KEY=your-server-side-google-maps-geocoding-key
 COOKIE_DOMAIN=
 CLOUDINARY_CLOUD_NAME=your-cloud-name
 CLOUDINARY_API_KEY=your-api-key

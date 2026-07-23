@@ -71,9 +71,37 @@ POST /api/v1/admin/orders/:orderId/shipment/shiprocket/cancel
 POST /api/v1/admin/orders/:orderId/shipment/shiprocket/refresh-tracking
 GET /api/v1/orders/:orderId/tracking
 POST /api/v1/webhooks/shiprocket
+POST /api/v1/location/pincode
+POST /api/v1/checkout/delivery-estimate
 ```
 
 `GET /api/v1/health/database` verifies Prisma can connect to PostgreSQL.
+
+### Pincode lookup
+
+`POST /api/v1/location/pincode` accepts a six-digit Indian pincode and returns
+only the delivery-region fields required by checkout.
+
+```json
+{
+  "postalCode": "533344"
+}
+```
+
+The backend requires `GOOGLE_MAPS_GEOCODING_API_KEY`, rate-limits requests per
+IP, accepts only complete Indian results matching the submitted pincode, and
+returns `city`, `state`, `postalCode`, and `country`. It never returns or stores
+a street address from this lookup.
+
+### Checkout delivery estimate
+
+`POST /api/v1/checkout/delivery-estimate` accepts a verified six-digit pincode
+and the current cart's product/variant IDs and quantities. The backend loads
+current product prices, applies the central package recommendation for one to
+four items, and queries Shiprocket serviceability. It returns only a customer
+delivery estimate; courier names, rates, pickup details, and provider responses
+are not exposed. Carts above four items return the standard `7–10 business days`
+message because their parcel needs an admin-reviewed package.
 
 ## Product Search and Catalog Filters
 

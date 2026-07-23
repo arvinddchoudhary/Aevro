@@ -11,6 +11,7 @@ import {
 } from '../../lib/api/users';
 import { useAuth } from '../../lib/auth';
 import type { AddressPayload, UserAddress } from '../../types/user';
+import type { LocationAddress } from '../../lib/api/location';
 import { EmptyState } from '../ui/EmptyState';
 import { ErrorState } from '../ui/ErrorState';
 import { AccountBenefitBar } from './AccountBenefitBar';
@@ -125,6 +126,17 @@ export function AddressesPageContent() {
     setFormValues((currentValues) => ({ ...currentValues, [name]: value }));
     setFormError(null);
     setMessage(null);
+  };
+
+  const applyPincodeAddress = (address: LocationAddress) => {
+    setFormValues((currentValues) => ({
+      ...currentValues,
+      city: address.city,
+      state: address.state,
+      postalCode: address.postalCode,
+      country: address.country,
+    }));
+    setFormError(null);
   };
 
   const submitAddress = async (event: FormEvent<HTMLFormElement>) => {
@@ -319,6 +331,7 @@ export function AddressesPageContent() {
         mode={editingId ? 'edit' : 'create'}
         onCancel={closeForm}
         onFieldChange={updateField}
+        onPincodeFound={applyPincodeAddress}
         onSetDefaultChange={setIsSetDefault}
         onSubmit={submitAddress}
       />

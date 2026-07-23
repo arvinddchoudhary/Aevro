@@ -75,6 +75,10 @@ class EnvironmentVariables {
 
   @IsString()
   @IsOptional()
+  GOOGLE_MAPS_GEOCODING_API_KEY?: string;
+
+  @IsString()
+  @IsOptional()
   COOKIE_DOMAIN?: string;
 
   @IsString()

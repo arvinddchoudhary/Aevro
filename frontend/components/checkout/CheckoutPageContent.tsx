@@ -23,6 +23,9 @@ import { loadRazorpayScript, openRazorpayCheckout } from '../../lib/razorpay';
 import { useCart } from '../../lib/cart';
 import type { UserAddress } from '../../types/user';
 import { EmptyState } from '../ui/EmptyState';
+import { PincodeAutofillField } from '../location/PincodeAutofillField';
+import type { LocationAddress } from '../../lib/api/location';
+import { CheckoutDeliveryEstimate } from './CheckoutDeliveryEstimate';
 
 const initialValues: CheckoutFormValues = {
   fullName: '',
@@ -156,6 +159,27 @@ export function CheckoutPageContent() {
       setSelectedAddressId('new');
     }
     setErrors((currentErrors) => ({ ...currentErrors, [name]: undefined }));
+    setFormError(null);
+    setPendingOrderId(null);
+    setPaymentIdempotencyKey(createPaymentIdempotencyKey());
+  };
+
+  const applyPincodeAddress = (address: LocationAddress) => {
+    setValues((currentValues) => ({
+      ...currentValues,
+      city: address.city,
+      state: address.state,
+      postalCode: address.postalCode,
+      country: address.country,
+    }));
+    setSelectedAddressId('new');
+    setErrors((currentErrors) => ({
+      ...currentErrors,
+      city: undefined,
+      state: undefined,
+      postalCode: undefined,
+      country: undefined,
+    }));
     setFormError(null);
     setPendingOrderId(null);
     setPaymentIdempotencyKey(createPaymentIdempotencyKey());
@@ -516,14 +540,11 @@ export function CheckoutPageContent() {
                 />
               </div>
               <div className="md:col-span-2">
-                <CheckoutField
-                  label="Pincode"
-                  name="postalCode"
+                <PincodeAutofillField
                   value={values.postalCode}
                   error={errors.postalCode}
-                  autoComplete="postal-code"
-                  inputMode="numeric"
-                  onChange={updateValue}
+                  onChange={(value) => updateValue('postalCode', value)}
+                  onAddressFound={applyPincodeAddress}
                 />
               </div>
               <div className="md:col-span-2">
@@ -537,6 +558,7 @@ export function CheckoutPageContent() {
                 />
               </div>
             </div>
+            <CheckoutDeliveryEstimate postalCode={values.postalCode} items={items} />
             <p className="mt-6 border-t border-[#ddd4c8] pt-4 text-xs text-[#514c45]">
               All orders are processed securely.
             </p>

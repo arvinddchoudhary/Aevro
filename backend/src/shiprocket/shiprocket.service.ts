@@ -14,6 +14,7 @@ import {
   OrderStatus,
   PaymentStatus,
   Prisma,
+  ProductStatus,
   Shipment,
   ShipmentPackageType,
   ShipmentProvider,
@@ -26,6 +27,7 @@ import { NotificationsService } from '../notifications/notifications.service';
 import { PrismaService } from '../prisma/prisma.service';
 import { AssignAwbDto } from './dto/assign-awb.dto';
 import { CreateShipmentDto } from './dto/create-shipment.dto';
+import { CheckoutDeliveryEstimateDto } from './dto/checkout-delivery-estimate.dto';
 import { SchedulePickupDto } from './dto/schedule-pickup.dto';
 import {
   mapShiprocketStatus,
@@ -48,10 +50,29 @@ const CANCELLABLE_STATUSES = new Set<ShipmentStatus>([
   ShipmentStatus.PICKUP_SCHEDULED,
 ]);
 const STALE_CREATION_LOCK_MS = 2 * 60 * 1000;
+const CHECKOUT_ESTIMATE_CACHE_MS = 10 * 60 * 1000;
+const CHECKOUT_ESTIMATE_RATE_LIMIT_WINDOW_MS = 15 * 60 * 1000;
+const CHECKOUT_ESTIMATE_MAX_REQUESTS = 12;
+
+type CheckoutDeliveryEstimate = {
+  source: 'SHIPROCKET' | 'STANDARD';
+  estimatedDeliveryStartDate: string | null;
+  estimatedDeliveryEndDate: string | null;
+  estimatedDeliveryDays: number | null;
+  message: string;
+};
 
 @Injectable()
 export class ShiprocketService {
   private readonly logger = new Logger(ShiprocketService.name);
+  private readonly checkoutEstimateCache = new Map<
+    string,
+    { value: CheckoutDeliveryEstimate; expiresAt: number }
+  >();
+  private readonly checkoutEstimateRequestsByIp = new Map<
+    string,
+    { count: number; resetAt: number }
+  >();
 
   constructor(
     @Inject(PrismaService) private readonly prisma: PrismaService,
@@ -68,6 +89,53 @@ export class ShiprocketService {
       enabled: this.isEnabled(),
       shipment: shipment ? this.serializeAdminShipment(shipment) : null,
     };
+  }
+
+  async getCheckoutDeliveryEstimate(
+    dto: CheckoutDeliveryEstimateDto,
+    clientIp: string,
+  ): Promise<CheckoutDeliveryEstimate> {
+    const totalQuantity = dto.items.reduce((total, item) => total + item.quantity, 0);
+    const recommendation = recommendPackage(totalQuantity);
+
+    if (recommendation.requiresManualDetails) {
+      return this.standardCheckoutEstimate();
+    }
+
+    if (!this.canRequestCheckoutEstimate(clientIp) || !this.isEnabled()) {
+      return this.standardCheckoutEstimate();
+    }
+    const cart = await this.resolveCheckoutCart(dto);
+    const cacheKey = `${dto.postalCode}:${totalQuantity}:${cart.declaredValueInPaise}`;
+    const cached = this.checkoutEstimateCache.get(cacheKey);
+
+    if (cached && cached.expiresAt > Date.now()) {
+      return cached.value;
+    }
+
+    try {
+      this.assertEnabledAndConfigured();
+      const pickupPostcode = await this.resolvePickupPostcode();
+      const response = await this.client.getServiceability({
+        pickup_postcode: pickupPostcode,
+        delivery_postcode: dto.postalCode,
+        cod: 0,
+        weight: recommendation.weightKg ?? 0,
+        length: recommendation.lengthCm ?? 0,
+        breadth: recommendation.breadthCm ?? 0,
+        height: recommendation.heightCm ?? 0,
+        declared_value: Number((cart.declaredValueInPaise / 100).toFixed(2)),
+      });
+      const estimate = this.checkoutEstimateFromRates(this.extractCourierRates(response));
+      this.checkoutEstimateCache.set(cacheKey, {
+        value: estimate,
+        expiresAt: Date.now() + CHECKOUT_ESTIMATE_CACHE_MS,
+      });
+      return estimate;
+    } catch (error) {
+      this.logger.warn('Checkout delivery estimate unavailable.');
+      return this.standardCheckoutEstimate();
+    }
   }
 
   async getShipmentReview(orderId: string) {
@@ -827,6 +895,126 @@ export class ShiprocketService {
         mode: this.stringValue(courier.mode),
       }];
     });
+  }
+
+  private async resolveCheckoutCart(dto: CheckoutDeliveryEstimateDto) {
+    const requestedItems = new Map<string, { productId: string; variantId?: string; quantity: number }>();
+
+    dto.items.forEach((item) => {
+      const key = `${item.productId}:${item.variantId ?? ''}`;
+      const current = requestedItems.get(key);
+      requestedItems.set(key, {
+        productId: item.productId,
+        ...(item.variantId ? { variantId: item.variantId } : {}),
+        quantity: (current?.quantity ?? 0) + item.quantity,
+      });
+    });
+
+    const items = Array.from(requestedItems.values());
+    const productIds = Array.from(new Set(items.map((item) => item.productId)));
+    const products = await this.prisma.product.findMany({
+      where: { id: { in: productIds }, status: ProductStatus.ACTIVE },
+      select: {
+        id: true,
+        priceInPaise: true,
+        stock: true,
+        variants: { select: { id: true, stock: true } },
+      },
+    });
+
+    if (products.length !== productIds.length) {
+      throw new BadRequestException('One or more cart items are unavailable.');
+    }
+
+    const productsById = new Map(products.map((product) => [product.id, product]));
+    const declaredValueInPaise = items.reduce((total, item) => {
+      const product = productsById.get(item.productId);
+      if (!product) throw new BadRequestException('One or more cart items are unavailable.');
+      const variant = item.variantId
+        ? product.variants.find((candidate) => candidate.id === item.variantId)
+        : null;
+
+      if ((item.variantId && !variant) || (product.variants.length > 0 && !variant)) {
+        throw new BadRequestException('One or more selected product options are unavailable.');
+      }
+
+      const availableStock = variant?.stock ?? product.stock;
+      if (item.quantity > availableStock || item.quantity > 99) {
+        throw new BadRequestException('One or more cart quantities are unavailable.');
+      }
+
+      return total + product.priceInPaise * item.quantity;
+    }, 0);
+
+    return { declaredValueInPaise };
+  }
+
+  private checkoutEstimateFromRates(rates: ShiprocketCourierRate[]): CheckoutDeliveryEstimate {
+    if (rates.length === 0) return this.standardCheckoutEstimate();
+
+    const dates = rates
+      .map((rate) => this.dateValue(rate.etd))
+      .filter((date): date is Date => Boolean(date))
+      .sort((left, right) => left.getTime() - right.getTime());
+
+    if (dates.length > 0) {
+      const start = dates[0].toISOString();
+      const end = dates[dates.length - 1].toISOString();
+      return {
+        source: 'SHIPROCKET',
+        estimatedDeliveryStartDate: start,
+        estimatedDeliveryEndDate: end,
+        estimatedDeliveryDays: null,
+        message: 'Estimated delivery available.',
+      };
+    }
+
+    const days = rates
+      .map((rate) => rate.estimatedDeliveryDays)
+      .filter((value): value is number => value !== null && value > 0)
+      .sort((left, right) => left - right);
+
+    if (days.length === 0) return this.standardCheckoutEstimate();
+
+    const start = days[0];
+    const end = days[days.length - 1];
+    return {
+      source: 'SHIPROCKET',
+      estimatedDeliveryStartDate: null,
+      estimatedDeliveryEndDate: null,
+      estimatedDeliveryDays: end,
+      message:
+        start === end
+          ? `Estimated delivery in ${start} business day${start === 1 ? '' : 's'}.`
+          : `Estimated delivery in ${start}–${end} business days.`,
+    };
+  }
+
+  private standardCheckoutEstimate(): CheckoutDeliveryEstimate {
+    return {
+      source: 'STANDARD',
+      estimatedDeliveryStartDate: null,
+      estimatedDeliveryEndDate: null,
+      estimatedDeliveryDays: null,
+      message: 'Estimated delivery: 7–10 business days.',
+    };
+  }
+
+  private canRequestCheckoutEstimate(clientIp: string) {
+    const now = Date.now();
+    const current = this.checkoutEstimateRequestsByIp.get(clientIp);
+
+    if (!current || current.resetAt <= now) {
+      this.checkoutEstimateRequestsByIp.set(clientIp, {
+        count: 1,
+        resetAt: now + CHECKOUT_ESTIMATE_RATE_LIMIT_WINDOW_MS,
+      });
+      return true;
+    }
+
+    if (current.count >= CHECKOUT_ESTIMATE_MAX_REQUESTS) return false;
+    current.count += 1;
+    return true;
   }
 
   private extractShipmentId(response: JsonRecord) {

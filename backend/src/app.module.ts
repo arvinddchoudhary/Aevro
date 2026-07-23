@@ -9,6 +9,7 @@ import { OriginProtectionGuard } from './common/guards/origin-protection.guard';
 import { validateEnvironment } from './config/env.validation';
 import { HealthModule } from './health/health.module';
 import { HomepageModule } from './homepage/homepage.module';
+import { LocationModule } from './location/location.module';
 import { NotificationsModule } from './notifications/notifications.module';
 import { OrdersModule } from './orders/orders.module';
 import { PaymentsModule } from './payments/payments.module';
@@ -25,6 +26,7 @@ import { UsersModule } from './users/users.module';
     }),
     HealthModule,
     HomepageModule,
+    LocationModule,
     UsersModule,
     UsersApiModule,
     AuthModule,
